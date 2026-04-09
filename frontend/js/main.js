@@ -27,7 +27,7 @@
   // ===================================================================
   const API_BASE = window.location.hostname === 'localhost'
     ? 'http://localhost:3000'
-    : 'https://dilshad-designs-backend.onrender.com';
+    : 'https://dilshad-designs.onrender.com';
 
   // ===================================================================
   // 1. EMAILJS INIT
