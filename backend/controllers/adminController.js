@@ -167,8 +167,8 @@ exports.updateLeadStatus = async (req, res, next) => {
 
     const lead = await Lead.findByIdAndUpdate(
       id,
-      { status },
-      { new: true }
+      { $set: { status } },
+      { new: true, runValidators: false }
     );
 
     if (!lead) {
