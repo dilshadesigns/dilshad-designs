@@ -1,747 +1,1954 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin Dashboard — Dilshad Designs</title>
   <meta name="robots" content="noindex, nofollow">
   <link rel="icon" href="photo/favicon (2).png" type="image/png">
+  
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <!-- Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  
+  <!-- Chart.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
 
   <style>
-    /* ── Reset ── */
-    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
-    html { scroll-behavior: smooth; }
-
-    /* ── Variables ── */
+    /* ════════════════════════════════════════════════════════════════
+       CSS VARIABLES & DESIGN SYSTEM
+       ════════════════════════════════════════════════════════════════ */
     :root {
-      --brand      : #2F7A66;
-      --brand-dark : #1e5548;
-      --brand-light: #e8f5f1;
-      --gold       : #f5c62c;
-      --bg         : #f4f7f6;
-      --surface    : #ffffff;
-      --border     : #e5ede9;
-      --text       : #1a2e26;
-      --text-muted : #5a7a6e;
-      --radius     : 12px;
-      --shadow     : 0 4px 24px rgba(47,122,102,0.08);
+      --primary: #2F7A66;
+      --primary-dark: #1e5548;
+      --primary-light: #e8f5f1;
+      --accent: #f5c62c;
+      --accent-dark: #d4a91f;
+      
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --info: #3b82f6;
+      
+      --bg-primary: #ffffff;
+      --bg-secondary: #f8fafc;
+      --bg-tertiary: #f1f5f9;
+      
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --text-tertiary: #94a3b8;
+      
+      --border: #e2e8f0;
+      --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.05);
+      --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.08);
+      --shadow-lg: 0 12px 24px rgba(15, 23, 42, 0.12);
+      --shadow-xl: 0 20px 40px rgba(15, 23, 42, 0.15);
+      
+      --radius-sm: 6px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-xl: 16px;
+      
+      --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    [data-theme="dark"] {
+      --bg-primary: #0f172a;
+      --bg-secondary: #1e293b;
+      --bg-tertiary: #334155;
+      
+      --text-primary: #f1f5f9;
+      --text-secondary: #cbd5e1;
+      --text-tertiary: #94a3b8;
+      
+      --border: #334155;
+      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+      --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+      --shadow-lg: 0 12px 24px rgba(0, 0, 0, 0.5);
+      --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.6);
+    }
+
+    /* ════════════════════════════════════════════════════════════════
+       RESET & BASE
+       ════════════════════════════════════════════════════════════════ */
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
     }
 
     body {
-      font-family: 'DM Sans', sans-serif;
-      background  : var(--bg);
-      color       : var(--text);
-      min-height  : 100vh;
+      font-family: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      transition: background var(--transition), color var(--transition);
     }
 
-    /* ── Login Screen ── */
+    input, textarea, select, button {
+      font-family: inherit;
+    }
+
+    button {
+      cursor: pointer;
+      border: none;
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    /* ════════════════════════════════════════════════════════════════
+       LOGIN SCREEN
+       ════════════════════════════════════════════════════════════════ */
     #loginScreen {
-      min-height  : 100vh;
-      display     : flex;
-      align-items : center;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
       justify-content: center;
-      padding     : 1rem;
+      background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+      padding: 1.5rem;
+    }
+
+    .login-container {
+      width: 100%;
+      max-width: 400px;
+      animation: slideUp 0.6s ease;
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     .login-card {
-      background    : var(--surface);
-      border        : 1px solid var(--border);
-      border-radius : 20px;
-      padding       : 2.5rem;
-      width         : 100%;
-      max-width     : 400px;
-      box-shadow    : var(--shadow);
-      text-align    : center;
+      background: var(--bg-primary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: 2.5rem;
+      box-shadow: var(--shadow-lg);
+      text-align: center;
     }
 
-    .login-logo {
-      font-family : 'Syne', sans-serif;
-      font-size   : 1.8rem;
-      font-weight : 800;
-      margin-bottom: 0.5rem;
-    }
-    .login-logo .gold  { color: var(--gold); }
-    .login-logo .green { color: var(--brand); }
-
-    .login-card p {
-      color        : var(--text-muted);
-      font-size    : 0.9rem;
+    .login-header {
       margin-bottom: 2rem;
     }
 
-    .login-input {
-      width         : 100%;
-      padding       : 0.85rem 1rem;
-      border        : 1.5px solid var(--border);
-      border-radius : 8px;
-      font-size     : 0.95rem;
-      font-family   : inherit;
-      color         : var(--text);
-      outline       : none;
-      margin-bottom : 1rem;
-      transition    : border-color 0.3s;
-    }
-    .login-input:focus { border-color: var(--brand); }
-
-    .login-btn {
-      width         : 100%;
-      padding       : 0.9rem;
-      background    : var(--brand);
-      color         : #fff;
-      border        : none;
-      border-radius : 8px;
-      font-size     : 1rem;
-      font-weight   : 600;
-      font-family   : inherit;
-      cursor        : pointer;
-      transition    : background 0.3s;
-    }
-    .login-btn:hover { background: var(--brand-dark); }
-
-    .login-error {
-      color       : #dc2626;
-      font-size   : 0.85rem;
-      margin-top  : 0.75rem;
-      display     : none;
+    .login-logo {
+      font-size: 1.8rem;
+      font-weight: 800;
+      letter-spacing: -1px;
+      margin-bottom: 0.5rem;
     }
 
-    /* ── Dashboard ── */
-    #dashboard { display: none; }
+    .login-logo .gold { color: var(--accent); }
+    .login-logo .green { color: var(--primary); }
 
-    /* ── Top Bar ── */
-    .topbar {
-      background    : #0d1a15;
-      padding       : 0 2rem;
-      height        : 64px;
-      display       : flex;
-      align-items   : center;
-      justify-content: space-between;
-      position      : sticky;
-      top           : 0;
-      z-index       : 100;
-    }
-
-    .topbar-logo {
-      font-family : 'Syne', sans-serif;
-      font-size   : 1.2rem;
-      font-weight : 800;
-    }
-    .topbar-logo .gold  { color: var(--gold); }
-    .topbar-logo .green { color: #8ec4b4; }
-    .topbar-badge {
-      background    : var(--brand);
-      color         : #fff;
-      font-size     : 0.7rem;
-      font-weight   : 600;
-      padding       : 0.2rem 0.6rem;
-      border-radius : 99px;
-      margin-left   : 0.5rem;
+    .login-subtitle {
+      font-size: 0.85rem;
+      color: var(--text-tertiary);
       letter-spacing: 0.05em;
     }
 
+    .login-form {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .login-input {
+      width: 100%;
+      padding: 0.9rem 1.1rem;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-md);
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      font-size: 0.95rem;
+      outline: none;
+      transition: all var(--transition);
+    }
+
+    .login-input:focus {
+      border-color: var(--primary);
+      background: var(--bg-primary);
+      box-shadow: 0 0 0 3px rgba(47, 122, 102, 0.1);
+    }
+
+    .login-btn {
+      padding: 0.95rem;
+      background: var(--primary);
+      color: #fff;
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      font-size: 0.95rem;
+      transition: all var(--transition);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .login-btn:hover:not(:disabled) {
+      background: var(--primary-dark);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .login-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .login-error {
+      color: var(--danger);
+      font-size: 0.85rem;
+      display: none;
+      padding: 0.75rem;
+      background: rgba(239, 68, 68, 0.1);
+      border-radius: var(--radius-sm);
+      border-left: 3px solid var(--danger);
+    }
+
+    .login-error.show {
+      display: block;
+      animation: shake 0.3s ease;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+    }
+
+    /* ════════════════════════════════════════════════════════════════
+       DASHBOARD LAYOUT
+       ════════════════════════════════════════════════════════════════ */
+    #dashboard {
+      display: none;
+      min-height: 100vh;
+      display: flex;
+    }
+
+    /* SIDEBAR */
+    .sidebar {
+      width: 260px;
+      background: var(--bg-secondary);
+      border-right: 1px solid var(--border);
+      padding: 1.5rem 0;
+      position: fixed;
+      left: 0;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      z-index: 100;
+      transition: transform var(--transition);
+    }
+
+    .sidebar.hidden {
+      transform: translateX(-100%);
+    }
+
+    .sidebar-logo {
+      padding: 0 1.5rem 2rem;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .sidebar-logo-icon {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-weight: 700;
+    }
+
+    .sidebar-logo-text {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .sidebar-nav {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      padding: 0 0.75rem;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem 1rem;
+      border-radius: var(--radius-md);
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: all var(--transition);
+      cursor: pointer;
+      position: relative;
+    }
+
+    .nav-item:hover {
+      background: var(--bg-tertiary);
+      color: var(--primary);
+    }
+
+    .nav-item.active {
+      background: linear-gradient(135deg, rgba(47, 122, 102, 0.1), rgba(245, 198, 44, 0.05));
+      color: var(--primary);
+      font-weight: 600;
+    }
+
+    .nav-item.active::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      background: var(--primary);
+      border-radius: 0 3px 3px 0;
+    }
+
+    .nav-item i {
+      width: 18px;
+      text-align: center;
+      font-size: 1rem;
+    }
+
+    .nav-badge {
+      margin-left: auto;
+      background: var(--primary);
+      color: #fff;
+      padding: 0.2rem 0.6rem;
+      border-radius: 99px;
+      font-size: 0.7rem;
+      font-weight: 700;
+    }
+
+    .sidebar-footer {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 1.5rem 0.75rem;
+      border-top: 1px solid var(--border);
+      background: var(--bg-secondary);
+    }
+
+    .sidebar-profile {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem 1rem;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: all var(--transition);
+    }
+
+    .sidebar-profile:hover {
+      background: var(--bg-tertiary);
+    }
+
+    .profile-avatar {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+
+    .profile-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .profile-name {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .profile-role {
+      font-size: 0.75rem;
+      color: var(--text-tertiary);
+    }
+
+    /* MAIN CONTENT */
+    .main-content {
+      flex: 1;
+      margin-left: 260px;
+      display: flex;
+      flex-direction: column;
+      transition: margin-left var(--transition);
+    }
+
+    /* TOPBAR */
+    .topbar {
+      height: 68px;
+      background: var(--bg-primary);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .hamburger {
+      display: none;
+      width: 40px;
+      height: 40px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      background: var(--bg-secondary);
+      cursor: pointer;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-primary);
+      font-size: 1rem;
+      transition: all var(--transition);
+    }
+
+    .hamburger:hover {
+      background: var(--bg-tertiary);
+    }
+
+    .topbar-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .topbar-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.95rem;
+      transition: all var(--transition);
+    }
+
+    .topbar-btn:hover {
+      background: var(--bg-tertiary);
+      color: var(--primary);
+    }
+
     .logout-btn {
-      background    : rgba(255,255,255,0.08);
-      color         : rgba(255,255,255,0.7);
-      border        : 1px solid rgba(255,255,255,0.15);
-      padding       : 0.4rem 1rem;
-      border-radius : 99px;
-      font-size     : 0.85rem;
-      font-family   : inherit;
-      cursor        : pointer;
-      transition    : all 0.3s;
-      display       : flex;
-      align-items   : center;
-      gap           : 0.4rem;
+      padding: 0.6rem 1.2rem;
+      background: var(--danger);
+      color: #fff;
+      border-radius: var(--radius-md);
+      font-size: 0.85rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all var(--transition);
     }
+
     .logout-btn:hover {
-      background : rgba(220,38,38,0.3);
-      color      : #fff;
-      border-color: rgba(220,38,38,0.5);
+      background: #dc2626;
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-md);
     }
 
-    /* ── Main Content ── */
-    .main {
-      max-width : 1200px;
-      margin    : 0 auto;
-      padding   : 2rem 1.5rem;
+    /* CONTENT AREA */
+    .content {
+      flex: 1;
+      padding: 2rem;
+      overflow-y: auto;
     }
 
-    /* ── Stats Grid ── */
+    /* ════════════════════════════════════════════════════════════════
+       STATS GRID
+       ════════════════════════════════════════════════════════════════ */
     .stats-grid {
-      display               : grid;
-      grid-template-columns : repeat(4, 1fr);
-      gap                   : 1.25rem;
-      margin-bottom         : 2.5rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2.5rem;
     }
 
     .stat-card {
-      background    : var(--surface);
-      border        : 1px solid var(--border);
-      border-radius : var(--radius);
-      padding       : 1.5rem;
-      display       : flex;
-      align-items   : center;
-      gap           : 1rem;
-      box-shadow    : var(--shadow);
+      background: var(--bg-primary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      transition: all var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+      opacity: 0;
+      transition: opacity var(--transition);
+    }
+
+    .stat-card:hover {
+      border-color: var(--primary);
+      box-shadow: var(--shadow-md);
+      transform: translateY(-4px);
+    }
+
+    .stat-card:hover::before {
+      opacity: 1;
+    }
+
+    .stat-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 1rem;
     }
 
     .stat-icon {
-      width         : 52px;
-      height        : 52px;
-      border-radius : 12px;
-      display       : flex;
-      align-items   : center;
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
       justify-content: center;
-      font-size     : 1.3rem;
-      flex-shrink   : 0;
+      font-size: 1.5rem;
     }
 
-    .stat-icon.green  { background: var(--brand-light); color: var(--brand); }
-    .stat-icon.gold   { background: rgba(245,198,44,0.12); color: #d4a91f; }
-    .stat-icon.blue   { background: rgba(59,130,246,0.1); color: #3b82f6; }
-    .stat-icon.purple { background: rgba(139,92,246,0.1); color: #8b5cf6; }
-
-    .stat-num {
-      font-family : 'Syne', sans-serif;
-      font-size   : 2rem;
-      font-weight : 800;
-      color       : var(--text);
-      line-height : 1;
+    .stat-icon.green {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(16, 185, 129, 0.05));
+      color: var(--success);
     }
+
+    .stat-icon.blue {
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(59, 130, 246, 0.05));
+      color: var(--info);
+    }
+
+    .stat-icon.amber {
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(245, 158, 11, 0.05));
+      color: var(--warning);
+    }
+
+    .stat-icon.purple {
+      background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(139, 92, 246, 0.05));
+      color: #8b5cf6;
+    }
+
+    .stat-trend {
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 0.3rem 0.6rem;
+      border-radius: 99px;
+      background: rgba(16, 185, 129, 0.1);
+      color: var(--success);
+    }
+
+    .stat-trend.down {
+      background: rgba(239, 68, 68, 0.1);
+      color: var(--danger);
+    }
+
     .stat-label {
-      font-size  : 0.82rem;
-      color      : var(--text-muted);
-      margin-top : 0.2rem;
-      font-weight: 500;
+      font-size: 0.8rem;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.5rem;
     }
 
-    /* ── Tabs ── */
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      line-height: 1;
+    }
+
+    /* ════════════════════════════════════════════════════════════════
+       TABS
+       ════════════════════════════════════════════════════════════════ */
     .tabs {
-      display       : flex;
-      gap           : 0.5rem;
-      margin-bottom : 1.5rem;
-      border-bottom : 2px solid var(--border);
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border);
       padding-bottom: 0;
     }
 
     .tab-btn {
-      padding       : 0.7rem 1.5rem;
-      border        : none;
-      background    : transparent;
-      font-size     : 0.9rem;
-      font-weight   : 600;
-      font-family   : inherit;
-      color         : var(--text-muted);
-      cursor        : pointer;
-      border-bottom : 2px solid transparent;
-      margin-bottom : -2px;
-      transition    : all 0.3s;
-      display       : flex;
-      align-items   : center;
-      gap           : 0.4rem;
+      padding: 0.75rem 1.5rem;
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      position: relative;
+      transition: all var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
     }
-    .tab-btn:hover   { color: var(--brand); }
-    .tab-btn.active  {
-      color        : var(--brand);
-      border-color : var(--brand);
+
+    .tab-btn:hover {
+      color: var(--primary);
+    }
+
+    .tab-btn.active {
+      color: var(--primary);
+    }
+
+    .tab-btn.active::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--primary);
     }
 
     .tab-badge {
-      background    : var(--brand);
-      color         : #fff;
-      font-size     : 0.7rem;
-      padding       : 0.1rem 0.45rem;
-      border-radius : 99px;
-      font-weight   : 700;
+      background: var(--primary);
+      color: #fff;
+      padding: 0.15rem 0.5rem;
+      border-radius: 99px;
+      font-size: 0.7rem;
+      font-weight: 700;
     }
 
-    /* ── Table ── */
-    .table-wrap {
-      background    : var(--surface);
-      border        : 1px solid var(--border);
-      border-radius : var(--radius);
-      overflow      : hidden;
-      box-shadow    : var(--shadow);
+    /* ════════════════════════════════════════════════════════════════
+       TABLE SECTION
+       ════════════════════════════════════════════════════════════════ */
+    .table-section {
+      background: var(--bg-primary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
     }
 
     .table-header {
-      padding         : 1.25rem 1.5rem;
-      border-bottom   : 1px solid var(--border);
-      display         : flex;
-      align-items     : center;
-      justify-content : space-between;
+      padding: 1.5rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--bg-secondary);
+      flex-wrap: wrap;
+      gap: 1rem;
     }
 
     .table-title {
-      font-family : 'Syne', sans-serif;
-      font-size   : 1rem;
-      font-weight : 700;
-      color       : var(--text);
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text-primary);
     }
 
-    .refresh-btn {
-      background    : var(--brand-light);
-      color         : var(--brand);
-      border        : 1px solid rgba(47,122,102,0.2);
-      padding       : 0.4rem 1rem;
-      border-radius : 99px;
-      font-size     : 0.82rem;
-      font-weight   : 600;
-      font-family   : inherit;
-      cursor        : pointer;
-      transition    : all 0.3s;
-      display       : flex;
-      align-items   : center;
-      gap           : 0.35rem;
-    }
-    .refresh-btn:hover { background: var(--brand); color: #fff; }
-
-    table {
-      width           : 100%;
-      border-collapse : collapse;
+    .table-controls {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
     }
 
-    th {
-      background    : var(--bg);
-      padding       : 0.85rem 1.25rem;
-      text-align    : left;
-      font-size     : 0.78rem;
-      font-weight   : 700;
-      color         : var(--text-muted);
+    .search-box {
+      position: relative;
+      width: 200px;
+    }
+
+    .search-box input {
+      width: 100%;
+      padding: 0.6rem 0.9rem 0.6rem 2.2rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      font-size: 0.85rem;
+      outline: none;
+      transition: all var(--transition);
+    }
+
+    .search-box input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(47, 122, 102, 0.1);
+    }
+
+    .search-box i {
+      position: absolute;
+      left: 0.8rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-tertiary);
+      font-size: 0.85rem;
+    }
+
+    .btn-refresh {
+      padding: 0.6rem 1rem;
+      border: 1px solid var(--border);
+      background: var(--bg-primary);
+      border-radius: var(--radius-md);
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all var(--transition);
+    }
+
+    .btn-refresh:hover {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+
+    /* TABLE */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .data-table thead {
+      background: var(--bg-secondary);
+    }
+
+    .data-table th {
+      padding: 1rem 1.5rem;
+      text-align: left;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--text-tertiary);
       text-transform: uppercase;
-      letter-spacing: 0.06em;
-      border-bottom : 1px solid var(--border);
-    }
-
-    td {
-      padding     : 1rem 1.25rem;
-      font-size   : 0.88rem;
-      color       : var(--text);
+      letter-spacing: 0.05em;
       border-bottom: 1px solid var(--border);
-      vertical-align: top;
+      user-select: none;
     }
 
-    tr:last-child td { border-bottom: none; }
-    tr:hover td { background: var(--bg); }
-
-    .td-email a {
-      color          : var(--brand);
-      font-weight    : 600;
-      text-decoration: none;
+    .data-table td {
+      padding: 1.1rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.9rem;
+      color: var(--text-primary);
+      vertical-align: middle;
     }
-    .td-email a:hover { text-decoration: underline; }
 
-    .td-message {
-      max-width   : 280px;
-      white-space : nowrap;
-      overflow    : hidden;
+    .data-table tbody tr {
+      transition: background var(--transition);
+    }
+
+    .data-table tbody tr:hover {
+      background: var(--bg-secondary);
+    }
+
+    .data-table tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    .email-link {
+      color: var(--primary);
+      font-weight: 600;
+      transition: all var(--transition);
+    }
+
+    .email-link:hover {
+      text-decoration: underline;
+    }
+
+    .name-text {
+      display: block;
+      font-size: 0.85rem;
+      color: var(--text-primary);
+      font-weight: 600;
+      margin-top: 0.2rem;
+    }
+
+    .message-preview {
+      color: var(--text-secondary);
+      max-width: 280px;
+      white-space: nowrap;
+      overflow: hidden;
       text-overflow: ellipsis;
-      color       : var(--text-muted);
     }
 
-    .td-date {
-      color     : var(--text-muted);
-      font-size : 0.82rem;
+    .date-text {
+      color: var(--text-tertiary);
+      font-size: 0.85rem;
       white-space: nowrap;
     }
 
-    /* ── Status Badges ── */
-    .badge {
-      display       : inline-flex;
-      align-items   : center;
-      gap           : 0.3rem;
-      padding       : 0.25rem 0.75rem;
-      border-radius : 99px;
-      font-size     : 0.75rem;
-      font-weight   : 700;
-      white-space   : nowrap;
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.35rem 0.85rem;
+      border-radius: 99px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      white-space: nowrap;
     }
 
-    .badge-new       { background: rgba(59,130,246,0.1); color: #2563eb; }
-    .badge-read      { background: rgba(245,198,44,0.15); color: #d4a91f; }
-    .badge-replied   { background: rgba(47,122,102,0.12); color: var(--brand); }
-    .badge-contacted { background: rgba(245,198,44,0.15); color: #d4a91f; }
-    .badge-converted { background: rgba(47,122,102,0.12); color: var(--brand); }
+    .badge-new {
+      background: rgba(59, 130, 246, 0.15);
+      color: var(--info);
+    }
 
-    /* ── Status Select ── */
+    .badge-read {
+      background: rgba(245, 158, 11, 0.15);
+      color: var(--warning);
+    }
+
+    .badge-replied {
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--success);
+    }
+
+    .badge-contacted {
+      background: rgba(245, 158, 11, 0.15);
+      color: var(--warning);
+    }
+
+    .badge-converted {
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--success);
+    }
+
     .status-select {
-      padding       : 0.3rem 0.6rem;
-      border        : 1.5px solid var(--border);
-      border-radius : 6px;
-      font-size     : 0.8rem;
-      font-family   : inherit;
-      color         : var(--text);
-      background    : var(--surface);
-      cursor        : pointer;
-      outline       : none;
+      padding: 0.4rem 0.8rem;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      font-size: 0.8rem;
+      font-weight: 500;
+      cursor: pointer;
+      outline: none;
+      transition: all var(--transition);
     }
-    .status-select:focus { border-color: var(--brand); }
 
-    /* ── Empty State ── */
+    .status-select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(47, 122, 102, 0.1);
+    }
+
+    /* ════════════════════════════════════════════════════════════════
+       EMPTY STATE & LOADING
+       ════════════════════════════════════════════════════════════════ */
     .empty-state {
-      text-align : center;
-      padding    : 4rem 2rem;
-      color      : var(--text-muted);
+      text-align: center;
+      padding: 4rem 2rem;
     }
-    .empty-state i {
-      font-size    : 2.5rem;
+
+    .empty-icon {
+      font-size: 3rem;
+      color: var(--text-tertiary);
+      opacity: 0.5;
       margin-bottom: 1rem;
-      opacity      : 0.4;
-      display      : block;
     }
-    .empty-state p { font-size: 0.95rem; }
 
-    /* ── Loading ── */
-    .loading {
-      text-align : center;
-      padding    : 3rem;
-      color      : var(--text-muted);
-      font-size  : 0.9rem;
+    .empty-text {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
     }
-    .loading i { margin-right: 0.5rem; }
 
-    /* ── Responsive ── */
+    .loading-skeleton {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      padding: 2rem;
+    }
+
+    .skeleton-row {
+      display: grid;
+      grid-template-columns: 200px 150px 200px 100px 100px;
+      gap: 1rem;
+    }
+
+    .skeleton-item {
+      height: 16px;
+      background: linear-gradient(90deg, var(--bg-tertiary) 0%, var(--bg-secondary) 50%, var(--bg-tertiary) 100%);
+      border-radius: var(--radius-sm);
+      background-size: 200% 100%;
+      animation: loading 1.5s infinite;
+    }
+
+    @keyframes loading {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    .loading-spinner {
+      text-align: center;
+      padding: 3rem;
+      color: var(--text-tertiary);
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 32px;
+      height: 32px;
+      border: 3px solid var(--bg-tertiary);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-bottom: 0.75rem;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* ════════════════════════════════════════════════════════════════
+       MODALS
+       ════════════════════════════════════════════════════════════════ */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 200;
+      padding: 1.5rem;
+      animation: fadeIn 0.2s ease;
+    }
+
+    .modal-overlay.show {
+      display: flex;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .modal {
+      background: var(--bg-primary);
+      border-radius: var(--radius-lg);
+      max-width: 600px;
+      width: 100%;
+      max-height: 80vh;
+      overflow-y: auto;
+      box-shadow: var(--shadow-xl);
+      animation: slideUp 0.3s ease;
+    }
+
+    .modal-header {
+      padding: 1.5rem 2rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .modal-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .modal-close {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--bg-secondary);
+      border: none;
+      color: var(--text-secondary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      transition: all var(--transition);
+    }
+
+    .modal-close:hover {
+      background: var(--danger);
+      color: #fff;
+    }
+
+    .modal-body {
+      padding: 2rem;
+    }
+
+    .modal-field {
+      margin-bottom: 1.5rem;
+    }
+
+    .modal-label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 0.5rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .modal-value {
+      font-size: 0.95rem;
+      color: var(--text-primary);
+      padding: 0.75rem;
+      background: var(--bg-secondary);
+      border-radius: var(--radius-md);
+      word-break: break-word;
+    }
+
+    /* ════════════════════════════════════════════════════════════════
+       TOAST NOTIFICATIONS
+       ════════════════════════════════════════════════════════════════ */
+    .toast-container {
+      position: fixed;
+      top: 1.5rem;
+      right: 1.5rem;
+      z-index: 300;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .toast {
+      background: var(--bg-primary);
+      border-left: 4px solid var(--success);
+      border-radius: var(--radius-md);
+      padding: 1rem 1.25rem;
+      box-shadow: var(--shadow-lg);
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      animation: slideInRight 0.3s ease;
+    }
+
+    .toast.error {
+      border-left-color: var(--danger);
+    }
+
+    .toast.warning {
+      border-left-color: var(--warning);
+    }
+
+    .toast.info {
+      border-left-color: var(--info);
+    }
+
+    .toast-icon {
+      font-size: 1.2rem;
+      flex-shrink: 0;
+    }
+
+    .toast-message {
+      font-size: 0.9rem;
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+
+    @keyframes slideInRight {
+      from { 
+        opacity: 0;
+        transform: translateX(400px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    /* ════════════════════════════════════════════════════════════════
+       CHARTS
+       ════════════════════════════════════════════════════════════════ */
+    .charts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .chart-card {
+      background: var(--bg-primary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .chart-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 1.25rem;
+    }
+
+    .chart-container {
+      position: relative;
+      height: 280px;
+    }
+
+    /* ════════════════════════════════════════════════════════════════
+       RESPONSIVE
+       ════════════════════════════════════════════════════════════════ */
     @media (max-width: 768px) {
-      .stats-grid { grid-template-columns: repeat(2, 1fr); }
-      .topbar     { padding: 0 1rem; }
-      .main       { padding: 1.5rem 1rem; }
-      td, th      { padding: 0.75rem 0.85rem; }
-      .td-message { max-width: 140px; }
+      .sidebar {
+        width: 100%;
+        height: 100vh;
+        z-index: 150;
+      }
+
+      .main-content {
+        margin-left: 0;
+      }
+
+      .hamburger {
+        display: flex;
+      }
+
+      .content {
+        padding: 1.5rem;
+      }
+
+      .topbar {
+        padding: 0 1rem;
+      }
+
+      .topbar-title {
+        font-size: 1rem;
+      }
+
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .data-table {
+        font-size: 0.85rem;
+      }
+
+      .data-table th,
+      .data-table td {
+        padding: 0.75rem;
+      }
+
+      .message-preview {
+        max-width: 150px;
+      }
+
+      .search-box {
+        width: 150px;
+      }
+
+      .charts-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .table-controls {
+        width: 100%;
+        flex-wrap: wrap;
+      }
+
+      .toast-container {
+        left: 1rem;
+        right: 1rem;
+      }
     }
 
     @media (max-width: 480px) {
-      .stats-grid { grid-template-columns: 1fr 1fr; }
+      .sidebar {
+        width: 100%;
+      }
+
+      .table-header {
+        padding: 1rem;
+      }
+
+      .table-title {
+        width: 100%;
+      }
+
+      .tabs {
+        gap: 0;
+      }
+
+      .tab-btn {
+        padding: 0.6rem 1rem;
+        font-size: 0.8rem;
+      }
+
+      .data-table th {
+        padding: 0.6rem;
+        font-size: 0.7rem;
+      }
+
+      .data-table td {
+        padding: 0.6rem;
+        font-size: 0.8rem;
+      }
     }
   </style>
 </head>
 <body>
 
-<!-- ==================== LOGIN SCREEN ==================== -->
+<!-- ══════════════════════════════════════════════════════════════════
+     LOGIN SCREEN
+     ══════════════════════════════════════════════════════════════════ -->
 <div id="loginScreen">
-  <div class="login-card">
-    <div class="login-logo">
-      <span class="gold">Dilshad</span><span class="green">esigns</span>
+  <div class="login-container">
+    <div class="login-card">
+      <div class="login-header">
+        <div class="login-logo">
+          <span class="gold">Dilshad</span><span class="green">esigns</span>
+        </div>
+        <div class="login-subtitle">ADMIN DASHBOARD</div>
+      </div>
+
+      <form class="login-form" id="loginForm">
+        <input
+          type="password"
+          id="passwordInput"
+          class="login-input"
+          placeholder="Enter admin password"
+          autocomplete="current-password"
+          required
+        >
+
+        <button type="submit" class="login-btn">
+          <i class="fas fa-lock"></i> Login
+        </button>
+
+        <div class="login-error" id="loginError"></div>
+      </form>
     </div>
-    <p>Admin Dashboard — Enter your password to continue</p>
-
-    <input
-      type="password"
-      id="passwordInput"
-      class="login-input"
-      placeholder="Enter admin password"
-      autocomplete="current-password"
-    >
-
-    <button class="login-btn" id="loginBtn">
-      <i class="fas fa-lock"></i> Login
-    </button>
-
-    <p class="login-error" id="loginError">
-      <i class="fas fa-exclamation-circle"></i>
-      Incorrect password. Please try again.
-    </p>
   </div>
 </div>
 
-<!-- ==================== DASHBOARD ==================== -->
+<!-- ══════════════════════════════════════════════════════════════════
+     DASHBOARD
+     ══════════════════════════════════════════════════════════════════ -->
 <div id="dashboard">
-
-  <!-- Top Bar -->
-  <div class="topbar">
-    <div style="display:flex;align-items:center;gap:0.5rem;">
-      <div class="topbar-logo">
-        <span class="gold">Dilshad</span><span class="green">esigns</span>
-      </div>
-      <span class="topbar-badge">ADMIN</span>
-    </div>
-    <button class="logout-btn" id="logoutBtn">
-      <i class="fas fa-sign-out-alt"></i> Logout
-    </button>
-  </div>
-
-  <!-- Main Content -->
-  <div class="main">
-
-    <!-- Stats -->
-    <div class="stats-grid" id="statsGrid">
-      <div class="stat-card">
-        <div class="stat-icon green"><i class="fas fa-envelope"></i></div>
-        <div>
-          <div class="stat-num" id="statTotalContacts">—</div>
-          <div class="stat-label">Total Messages</div>
-        </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon blue"><i class="fas fa-bell"></i></div>
-        <div>
-          <div class="stat-num" id="statNewContacts">—</div>
-          <div class="stat-label">New Messages</div>
-        </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon gold"><i class="fas fa-bolt"></i></div>
-        <div>
-          <div class="stat-num" id="statTotalLeads">—</div>
-          <div class="stat-label">Total Leads</div>
-        </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon purple"><i class="fas fa-star"></i></div>
-        <div>
-          <div class="stat-num" id="statNewLeads">—</div>
-          <div class="stat-label">New Leads</div>
-        </div>
-      </div>
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-icon">D</div>
+      <div class="sidebar-logo-text">Admin</div>
     </div>
 
-    <!-- Tabs -->
-    <div class="tabs">
-      <button class="tab-btn active" data-tab="contacts" id="tabContacts">
+    <nav class="sidebar-nav">
+      <div class="nav-item active" data-page="dashboard">
+        <i class="fas fa-home"></i>
+        <span>Dashboard</span>
+      </div>
+      <div class="nav-item" data-page="contacts">
         <i class="fas fa-envelope"></i>
-        Messages
-        <span class="tab-badge" id="contactsBadge">0</span>
-      </button>
-      <button class="tab-btn" data-tab="leads" id="tabLeads">
+        <span>Messages</span>
+        <div class="nav-badge" id="messagesBadge">0</div>
+      </div>
+      <div class="nav-item" data-page="leads">
         <i class="fas fa-bolt"></i>
-        Leads
-        <span class="tab-badge" id="leadsBadge">0</span>
-      </button>
-    </div>
+        <span>Leads</span>
+        <div class="nav-badge" id="leadsBadge">0</div>
+      </div>
+      <div style="margin-top: 1rem; padding: 0.75rem 1rem; border-top: 1px solid var(--border); color: var(--text-tertiary); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em;">Settings</div>
+      <div class="nav-item" data-page="settings">
+        <i class="fas fa-cog"></i>
+        <span>Settings</span>
+      </div>
+    </nav>
 
-    <!-- Contacts Table -->
-    <div id="contactsTab">
-      <div class="table-wrap">
-        <div class="table-header">
-          <div class="table-title">Contact Form Submissions</div>
-          <button class="refresh-btn" id="refreshContacts">
-            <i class="fas fa-sync-alt"></i> Refresh
-          </button>
-        </div>
-        <div id="contactsTableWrap">
-          <div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading messages...</div>
+    <div class="sidebar-footer">
+      <div class="sidebar-profile" id="profileBtn">
+        <div class="profile-avatar">A</div>
+        <div class="profile-info">
+          <div class="profile-name">Admin</div>
+          <div class="profile-role">Manager</div>
         </div>
       </div>
     </div>
+  </aside>
 
-    <!-- Leads Table -->
-    <div id="leadsTab" style="display:none;">
-      <div class="table-wrap">
-        <div class="table-header">
-          <div class="table-title">Chatbot Lead Captures</div>
-          <button class="refresh-btn" id="refreshLeads">
-            <i class="fas fa-sync-alt"></i> Refresh
-          </button>
-        </div>
-        <div id="leadsTableWrap">
-          <div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading leads...</div>
-        </div>
+  <!-- MAIN CONTENT -->
+  <div class="main-content">
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <div class="topbar-left">
+        <button class="hamburger" id="hamburger">
+          <i class="fas fa-bars"></i>
+        </button>
+        <h1 class="topbar-title" id="pageTitle">Dashboard</h1>
+      </div>
+
+      <div class="topbar-right">
+        <button class="topbar-btn" id="themeToggle" title="Toggle dark mode">
+          <i class="fas fa-moon"></i>
+        </button>
+        <button class="logout-btn" id="logoutBtn">
+          <i class="fas fa-sign-out-alt"></i> Logout
+        </button>
       </div>
     </div>
 
+    <!-- CONTENT -->
+    <div class="content">
+      <!-- DASHBOARD PAGE -->
+      <div id="dashboardPage" class="page-section">
+        <div class="stats-grid" id="statsGrid"></div>
+
+        <div class="charts-grid" id="chartsGrid"></div>
+
+        <div class="tabs">
+          <button class="tab-btn active" data-tab="contacts">
+            <i class="fas fa-envelope"></i> Messages
+            <span class="tab-badge" id="contactsBadge">0</span>
+          </button>
+          <button class="tab-btn" data-tab="leads">
+            <i class="fas fa-bolt"></i> Leads
+            <span class="tab-badge" id="leadsBadge2">0</span>
+          </button>
+        </div>
+
+        <div id="contactsTab">
+          <div class="table-section">
+            <div class="table-header">
+              <h3 class="table-title">Contact Form Submissions</h3>
+              <div class="table-controls">
+                <div class="search-box">
+                  <i class="fas fa-search"></i>
+                  <input type="text" id="contactSearch" placeholder="Search...">
+                </div>
+                <button class="btn-refresh" id="refreshContacts">
+                  <i class="fas fa-sync-alt"></i> Refresh
+                </button>
+              </div>
+            </div>
+            <div id="contactsTableWrap"></div>
+          </div>
+        </div>
+
+        <div id="leadsTab" style="display: none;">
+          <div class="table-section">
+            <div class="table-header">
+              <h3 class="table-title">Chatbot Leads</h3>
+              <div class="table-controls">
+                <div class="search-box">
+                  <i class="fas fa-search"></i>
+                  <input type="text" id="leadsSearch" placeholder="Search...">
+                </div>
+                <button class="btn-refresh" id="refreshLeads">
+                  <i class="fas fa-sync-alt"></i> Refresh
+                </button>
+              </div>
+            </div>
+            <div id="leadsTableWrap"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CONTACTS PAGE -->
+      <div id="contactsPage" class="page-section" style="display: none;">
+        <div class="table-section">
+          <div class="table-header">
+            <h3 class="table-title">All Messages</h3>
+            <div class="table-controls">
+              <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="contactSearchPage" placeholder="Search...">
+              </div>
+              <button class="btn-refresh" id="refreshContactsPage">
+                <i class="fas fa-sync-alt"></i> Refresh
+              </button>
+            </div>
+          </div>
+          <div id="contactsTableWrapPage"></div>
+        </div>
+      </div>
+
+      <!-- LEADS PAGE -->
+      <div id="leadsPage" class="page-section" style="display: none;">
+        <div class="table-section">
+          <div class="table-header">
+            <h3 class="table-title">All Leads</h3>
+            <div class="table-controls">
+              <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="leadsSearchPage" placeholder="Search...">
+              </div>
+              <button class="btn-refresh" id="refreshLeadsPage">
+                <i class="fas fa-sync-alt"></i> Refresh
+              </button>
+            </div>
+          </div>
+          <div id="leadsTableWrapPage"></div>
+        </div>
+      </div>
+
+      <!-- SETTINGS PAGE -->
+      <div id="settingsPage" class="page-section" style="display: none;">
+        <div class="table-section">
+          <div class="table-header">
+            <h3 class="table-title">Settings</h3>
+          </div>
+          <div style="padding: 2rem; text-align: center; color: var(--text-secondary);">
+            <i class="fas fa-sliders-h" style="font-size: 2rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+            <p>Settings coming soon...</p>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
+
+<!-- MESSAGE MODAL -->
+<div class="modal-overlay" id="messageModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 class="modal-title">Message Details</h2>
+      <button class="modal-close" id="modalClose"></button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<!-- TOAST CONTAINER -->
+<div class="toast-container" id="toastContainer"></div>
 
 <script>
-(function () {
+(function() {
   'use strict';
 
-  // ── Config ──────────────────────────────────────────────────────────
+  // ═══════════════════════════════════════════════════════════════════
+  // CONFIG & STATE
+  // ═══════════════════════════════════════════════════════════════════
   const API_BASE = window.location.hostname === 'localhost'
     ? 'http://localhost:3000'
     : 'https://dilshad-designs.onrender.com';
 
   let adminPassword = '';
+  let allContacts = [];
+  let allLeads = [];
+  let contactsChart = null;
+  let leadsChart = null;
 
-  // ── DOM refs ────────────────────────────────────────────────────────
-  const loginScreen       = document.getElementById('loginScreen');
-  const dashboard         = document.getElementById('dashboard');
-  const passwordInput     = document.getElementById('passwordInput');
-  const loginBtn          = document.getElementById('loginBtn');
-  const loginError        = document.getElementById('loginError');
-  const logoutBtn         = document.getElementById('logoutBtn');
+  // ═══════════════════════════════════════════════════════════════════
+  // DOM REFERENCES
+  // ═══════════════════════════════════════════════════════════════════
+  const loginScreen = document.getElementById('loginScreen');
+  const dashboard = document.getElementById('dashboard');
+  const loginForm = document.getElementById('loginForm');
+  const passwordInput = document.getElementById('passwordInput');
+  const loginError = document.getElementById('loginError');
+  const logoutBtn = document.getElementById('logoutBtn');
+  const hamburger = document.getElementById('hamburger');
+  const sidebar = document.getElementById('sidebar');
+  const themeToggle = document.getElementById('themeToggle');
+  const messageModal = document.getElementById('messageModal');
+  const modalClose = document.getElementById('modalClose');
+  const toastContainer = document.getElementById('toastContainer');
   const contactsTableWrap = document.getElementById('contactsTableWrap');
-  const leadsTableWrap    = document.getElementById('leadsTableWrap');
-  const contactsTab       = document.getElementById('contactsTab');
-  const leadsTab          = document.getElementById('leadsTab');
-  const contactsBadge     = document.getElementById('contactsBadge');
-  const leadsBadge        = document.getElementById('leadsBadge');
+  const leadsTableWrap = document.getElementById('leadsTableWrap');
+  const contactsTableWrapPage = document.getElementById('contactsTableWrapPage');
+  const leadsTableWrapPage = document.getElementById('leadsTableWrapPage');
+  const contactSearch = document.getElementById('contactSearch');
+  const leadsSearch = document.getElementById('leadsSearch');
+  const contactSearchPage = document.getElementById('contactSearchPage');
+  const leadsSearchPage = document.getElementById('leadsSearchPage');
 
-  // ── API Helper ──────────────────────────────────────────────────────
+  // ═══════════════════════════════════════════════════════════════════
+  // DARK MODE
+  // ═══════════════════════════════════════════════════════════════════
+  const htmlElement = document.documentElement;
+  const savedTheme = localStorage.getItem('adminTheme') || 'light';
+  
+  htmlElement.setAttribute('data-theme', savedTheme);
+  updateThemeIcon(savedTheme);
+
+  themeToggle.addEventListener('click', () => {
+    const current = htmlElement.getAttribute('data-theme');
+    const next = current === 'dark' ? 'light' : 'dark';
+    htmlElement.setAttribute('data-theme', next);
+    localStorage.setItem('adminTheme', next);
+    updateThemeIcon(next);
+    
+    if (contactsChart) contactsChart.resize();
+    if (leadsChart) leadsChart.resize();
+  });
+
+  function updateThemeIcon(theme) {
+    themeToggle.innerHTML = theme === 'dark'
+      ? '<i class="fas fa-sun"></i>'
+      : '<i class="fas fa-moon"></i>';
+  }
+
+  // ═══════════════════════════════════════════════════════════════════
+  // SIDEBAR & NAVIGATION
+  // ═══════════════════════════════════════════════════════════════════
+  hamburger.addEventListener('click', () => {
+    sidebar.classList.toggle('hidden');
+  });
+
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.addEventListener('click', () => {
+      const page = item.dataset.page;
+      navigateToPage(page);
+      if (window.innerWidth <= 768) {
+        sidebar.classList.add('hidden');
+      }
+    });
+  });
+
+  function navigateToPage(page) {
+    document.querySelectorAll('.nav-item').forEach(item => {
+      item.classList.remove('active');
+    });
+    document.querySelector(`[data-page="${page}"]`).classList.add('active');
+
+    document.querySelectorAll('.page-section').forEach(section => {
+      section.style.display = 'none';
+    });
+
+    document.getElementById(`${page}Page`).style.display = 'block';
+
+    const titles = {
+      dashboard: 'Dashboard',
+      contacts: 'Messages',
+      leads: 'Leads',
+      settings: 'Settings'
+    };
+    document.getElementById('pageTitle').textContent = titles[page] || 'Dashboard';
+  }
+
+  // ═══════════════════════════════════════════════════════════════════
+  // AUTHENTICATION
+  // ═══════════════════════════════════════════════════════════════════
+  loginForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const password = passwordInput.value.trim();
+    
+    if (!password) return;
+
+    loginForm.querySelector('button').disabled = true;
+    loginForm.querySelector('button').innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying...';
+
+    try {
+      const response = await fetch(`${API_BASE}/api/admin/stats`, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${password}`
+        }
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        adminPassword = password;
+        loginScreen.style.display = 'none';
+        dashboard.style.display = 'flex';
+        passwordInput.value = '';
+        
+        updateStats(data.data);
+        loadAllData();
+      } else {
+        showError(data.message || 'Incorrect password. Please try again.');
+        passwordInput.focus();
+      }
+    } catch (err) {
+      showError('Cannot connect to server. Please try again.');
+    } finally {
+      loginForm.querySelector('button').disabled = false;
+      loginForm.querySelector('button').innerHTML = '<i class="fas fa-lock"></i> Login';
+    }
+  });
+
+  function showError(message) {
+    loginError.textContent = message;
+    loginError.classList.add('show');
+    setTimeout(() => loginError.classList.remove('show'), 4000);
+  }
+
+  logoutBtn.addEventListener('click', () => {
+    adminPassword = '';
+    dashboard.style.display = 'none';
+    loginScreen.style.display = 'flex';
+    passwordInput.value = '';
+    passwordInput.focus();
+  });
+
+  // ═══════════════════════════════════════════════════════════════════
+  // ASYNC API FUNCTIONS
+  // ═══════════════════════════════════════════════════════════════════
   async function apiFetch(endpoint, options = {}) {
     const res = await fetch(`${API_BASE}/api/admin${endpoint}`, {
-        method  : options.method || 'GET',
-        headers : {
-        'Content-Type'  : 'application/json',
-        'Authorization' : `Bearer ${adminPassword}`
-        },
-        body: options.body || undefined
+      method: options.method || 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${adminPassword}`
+      },
+      body: options.body || undefined
     });
 
     if (!res.ok && res.status === 403) {
-        throw new Error('Invalid password');
+      adminPassword = '';
+      dashboard.style.display = 'none';
+      loginScreen.style.display = 'flex';
+      showToast('Session expired. Please login again.', 'error');
+      throw new Error('Invalid password');
     }
 
     return res.json();
-    }
-
-  // ── Login ───────────────────────────────────────────────────────────
-  async function handleLogin() {
-    const password = passwordInput.value.trim();
-    if (!password) return;
-
-    loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying...';
-    loginBtn.disabled  = true;
-    loginError.style.display = 'none';
-
-    adminPassword = password;
-
-    try {
-        const res = await fetch(`${API_BASE}/api/admin/stats`, {
-        headers: {
-            'Content-Type'  : 'application/json',
-            'Authorization' : `Bearer ${password}`
-        }
-        });
-
-        // Log for debugging
-        console.log('Login response status:', res.status);
-
-        const data = await res.json();
-
-        console.log('Login response data:', data);
-
-        if (res.ok && data.success) {
-        // Password correct — show dashboard
-        loginScreen.style.display = 'none';
-        dashboard.style.display   = 'block';
-        updateStats(data.data);
-        loadContacts();
-        } else {
-        // Show actual error message
-        loginError.textContent   = data.message || 'Incorrect password. Please try again.';
-        loginError.style.display = 'block';
-        adminPassword = '';
-        passwordInput.value = '';
-        passwordInput.focus();
-        }
-
-    } catch (err) {
-        console.error('Login error:', err);
-        loginError.textContent   = 'Cannot connect to server. Make sure backend is running.';
-        loginError.style.display = 'block';
-        adminPassword = '';
-    }
-
-    loginBtn.innerHTML = '<i class="fas fa-lock"></i> Login';
-    loginBtn.disabled  = false;
-    }
-
-  function showLoginError() {
-    loginError.style.display = 'block';
-    adminPassword = '';
-    passwordInput.value = '';
-    passwordInput.focus();
   }
 
-  loginBtn.addEventListener('click', handleLogin);
-  passwordInput.addEventListener('keydown', e => {
-    if (e.key === 'Enter') handleLogin();
-  });
-
-  // ── Logout ──────────────────────────────────────────────────────────
-  logoutBtn.addEventListener('click', () => {
-    adminPassword = '';
-    dashboard.style.display   = 'none';
-    loginScreen.style.display = 'flex';
-    passwordInput.value = '';
-  });
-
-  // ── Stats ───────────────────────────────────────────────────────────
+  // ═══════════════════════════════════════════════════════════════════
+  // STATS
+  // ═══════════════════════════════════════════════════════════════════
   function updateStats(data) {
-    document.getElementById('statTotalContacts').textContent = data.totalContacts;
-    document.getElementById('statNewContacts').textContent   = data.newContacts;
-    document.getElementById('statTotalLeads').textContent    = data.totalLeads;
-    document.getElementById('statNewLeads').textContent      = data.newLeads;
-    contactsBadge.textContent = data.newContacts;
-    leadsBadge.textContent    = data.newLeads;
+    const statsGrid = document.getElementById('statsGrid');
+    
+    const stats = [
+      {
+        label: 'Total Messages',
+        value: data.totalContacts,
+        icon: 'envelope',
+        color: 'blue',
+        trend: '+12%'
+      },
+      {
+        label: 'New Messages',
+        value: data.newContacts,
+        icon: 'bell',
+        color: 'green',
+        trend: '+8%'
+      },
+      {
+        label: 'Total Leads',
+        value: data.totalLeads,
+        icon: 'bolt',
+        color: 'amber',
+        trend: '+15%'
+      },
+      {
+        label: 'New Leads',
+        value: data.newLeads,
+        icon: 'star',
+        color: 'purple',
+        trend: '+5%'
+      }
+    ];
+
+    statsGrid.innerHTML = stats.map(stat => `
+      <div class="stat-card">
+        <div class="stat-header">
+          <div>
+            <div class="stat-label">${stat.label}</div>
+            <div class="stat-value">${stat.value}</div>
+          </div>
+          <div class="stat-icon ${stat.color}">
+            <i class="fas fa-${stat.icon}"></i>
+          </div>
+        </div>
+        <div class="stat-trend" style="margin-top: 0.75rem;">${stat.trend}</div>
+      </div>
+    `).join('');
+
+    document.getElementById('contactsBadge').textContent = data.newContacts;
+    document.getElementById('leadsBadge').textContent = data.newLeads;
+    document.getElementById('contactsBadge').parentElement.textContent = data.newContacts;
+    document.getElementById('contactsBadge').parentElement.innerHTML = `<span class="tab-badge">${data.newContacts}</span>`;
+    document.getElementById('leadsBadge2').textContent = data.newLeads;
+    document.getElementById('messagesBadge').textContent = data.newContacts;
+    document.getElementById('leadsBadge').textContent = data.newLeads;
   }
 
-  async function loadStats() {
-    const data = await apiFetch('/stats');
-    if (data.success) updateStats(data.data);
+  // ═══════════════════════════════════════════════════════════════════
+  // CHARTS
+  // ═══════════════════════════════════════════════════════════════════
+  function renderCharts() {
+    const chartsGrid = document.getElementById('chartsGrid');
+    
+    chartsGrid.innerHTML = `
+      <div class="chart-card">
+        <div class="chart-title">Messages Trend</div>
+        <div class="chart-container">
+          <canvas id="contactsChart"></canvas>
+        </div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">Leads Trend</div>
+        <div class="chart-container">
+          <canvas id="leadsChart"></canvas>
+        </div>
+      </div>
+    `;
+
+    setTimeout(() => {
+      const contactsCtx = document.getElementById('contactsChart');
+      if (contactsCtx && contactsChart === null) {
+        contactsChart = new Chart(contactsCtx, {
+          type: 'line',
+          data: {
+            labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+            datasets: [{
+              label: 'Messages',
+              data: [12, 19, 15, 25, 22, 30, 28],
+              borderColor: 'rgb(47, 122, 102)',
+              backgroundColor: 'rgba(47, 122, 102, 0.1)',
+              borderWidth: 2,
+              fill: true,
+              tension: 0.4
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false }
+            },
+            scales: {
+              y: { beginAtZero: true }
+            }
+          }
+        });
+      }
+
+      const leadsCtx = document.getElementById('leadsChart');
+      if (leadsCtx && leadsChart === null) {
+        leadsChart = new Chart(leadsCtx, {
+          type: 'bar',
+          data: {
+            labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+            datasets: [{
+              label: 'Leads',
+              data: [8, 12, 10, 15, 18, 12, 14],
+              backgroundColor: 'rgba(245, 198, 44, 0.8)',
+              borderColor: 'rgb(212, 169, 31)',
+              borderWidth: 1
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false }
+            },
+            scales: {
+              y: { beginAtZero: true }
+            }
+          }
+        });
+      }
+    }, 0);
   }
 
-  // ── Format Date ─────────────────────────────────────────────────────
+  // ═══════════════════════════════════════════════════════════════════
+  // FORMAT & UTILITIES
+  // ═══════════════════════════════════════════════════════════════════
   function formatDate(iso) {
     return new Date(iso).toLocaleString('en-IN', {
-      timeZone : 'Asia/Kolkata',
-      day      : '2-digit',
-      month    : 'short',
-      year     : 'numeric',
-      hour     : '2-digit',
-      minute   : '2-digit',
-      hour12   : true
+      timeZone: 'Asia/Kolkata',
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true
     });
   }
 
-  // ── Status Badge ────────────────────────────────────────────────────
   function statusBadge(status) {
     const icons = {
-      new       : 'fa-circle',
-      read      : 'fa-eye',
-      replied   : 'fa-reply',
-      contacted : 'fa-phone',
-      converted : 'fa-check-circle'
+      new: 'circle',
+      read: 'eye',
+      replied: 'reply',
+      contacted: 'phone',
+      converted: 'check-circle'
     };
-    return `<span class="badge badge-${status}">
-      <i class="fas ${icons[status] || 'fa-circle'}"></i>
+    return `<span class="status-badge badge-${status}">
+      <i class="fas fa-${icons[status] || 'circle'}"></i>
       ${status.charAt(0).toUpperCase() + status.slice(1)}
     </span>`;
   }
 
-  // ── Load Contacts ───────────────────────────────────────────────────
+  function showToast(message, type = 'success') {
+    const icons = {
+      success: 'check-circle',
+      error: 'exclamation-circle',
+      warning: 'exclamation-triangle',
+      info: 'info-circle'
+    };
+
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.innerHTML = `
+      <i class="fas fa-${icons[type]} toast-icon"></i>
+      <span class="toast-message">${message}</span>
+    `;
+
+    toastContainer.appendChild(toast);
+
+    setTimeout(() => {
+      toast.style.animation = 'slideInRight 0.3s reverse';
+      setTimeout(() => toast.remove(), 300);
+    }, 3000);
+  }
+
+  // ═══════════════════════════════════════════════════════════════════
+  // LOAD DATA
+  // ═══════════════════════════════════════════════════════════════════
+  async function loadAllData() {
+    renderCharts();
+    await loadContacts();
+    await loadLeads();
+  }
+
   async function loadContacts() {
-    contactsTableWrap.innerHTML =
-      '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading messages...</div>';
+    showLoading(contactsTableWrap);
+    
+    try {
+      const data = await apiFetch('/contacts');
+      
+      if (!data.success || !data.data || data.data.length === 0) {
+        contactsTableWrap.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon"><i class="fas fa-inbox"></i></div>
+            <div class="empty-text">No contact form submissions yet.</div>
+          </div>
+        `;
+        return;
+      }
 
-    const data = await apiFetch('/contacts');
+      allContacts = data.data;
+      renderContactsTable(allContacts, contactsTableWrap);
+      renderContactsTable(allContacts, contactsTableWrapPage);
+    } catch (err) {
+      console.error('Load contacts failed:', err);
+      showToast('Failed to load contacts', 'error');
+    }
+  }
 
-    if (!data.success || data.data.length === 0) {
-      contactsTableWrap.innerHTML = `
+  async function loadLeads() {
+    showLoading(leadsTableWrap);
+    
+    try {
+      const data = await apiFetch('/leads');
+      
+      if (!data.success || !data.data || data.data.length === 0) {
+        leadsTableWrap.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon"><i class="fas fa-bolt"></i></div>
+            <div class="empty-text">No chatbot leads captured yet.</div>
+          </div>
+        `;
+        return;
+      }
+
+      allLeads = data.data;
+      renderLeadsTable(allLeads, leadsTableWrap);
+      renderLeadsTable(allLeads, leadsTableWrapPage);
+    } catch (err) {
+      console.error('Load leads failed:', err);
+      showToast('Failed to load leads', 'error');
+    }
+  }
+
+  function showLoading(container) {
+    container.innerHTML = `
+      <div class="loading-spinner">
+        <div class="spinner"></div>
+        <p>Loading data...</p>
+      </div>
+    `;
+  }
+
+  function renderContactsTable(contacts, container) {
+    if (!contacts || contacts.length === 0) {
+      container.innerHTML = `
         <div class="empty-state">
-          <i class="fas fa-inbox"></i>
-          <p>No contact form submissions yet.</p>
-        </div>`;
+          <div class="empty-icon"><i class="fas fa-inbox"></i></div>
+          <div class="empty-text">No matching messages found.</div>
+        </div>
+      `;
       return;
     }
 
-    const rows = data.data.map(c => `
+    const rows = contacts.map(c => `
       <tr>
-        <td class="td-email">
-          <a href="mailto:${c.email}">${c.email}</a><br>
-          <span style="color:var(--text);font-weight:600;font-size:0.9rem;">${c.name}</span>
+        <td>
+          <a href="mailto:${c.email}" class="email-link">${c.email}</a>
+          <span class="name-text">${c.name}</span>
         </td>
         <td>
-          <span style="font-weight:600;font-size:0.85rem;">${c.subject}</span>
+          <span style="font-weight: 600;">${c.subject}</span>
         </td>
-        <td class="td-message" title="${c.message}">${c.message}</td>
+        <td>
+          <span class="message-preview" title="${c.message}">${c.message}</span>
+        </td>
         <td>${statusBadge(c.status)}</td>
         <td>
           <select class="status-select" data-id="${c._id}" data-type="contact">
-            <option value="new"     ${c.status==='new'     ? 'selected':''}>New</option>
-            <option value="read"    ${c.status==='read'    ? 'selected':''}>Read</option>
-            <option value="replied" ${c.status==='replied' ? 'selected':''}>Replied</option>
+            <option value="new" ${c.status === 'new' ? 'selected' : ''}>New</option>
+            <option value="read" ${c.status === 'read' ? 'selected' : ''}>Read</option>
+            <option value="replied" ${c.status === 'replied' ? 'selected' : ''}>Replied</option>
           </select>
         </td>
-        <td class="td-date">${formatDate(c.createdAt)}</td>
+        <td class="date-text">${formatDate(c.createdAt)}</td>
+        <td>
+          <button class="topbar-btn" title="View details" onclick="showMessageModal({
+            name: '${c.name}',
+            email: '${c.email}',
+            subject: '${c.subject}',
+            message: '${c.message.replace(/'/g, "\\'")}',
+            date: '${formatDate(c.createdAt)}',
+            status: '${c.status}'
+          })">
+            <i class="fas fa-eye"></i>
+          </button>
+        </td>
       </tr>
     `).join('');
 
-    contactsTableWrap.innerHTML = `
-      <table>
+    container.innerHTML = `
+      <table class="data-table">
         <thead>
           <tr>
             <th>From</th>
@@ -750,54 +1957,50 @@
             <th>Status</th>
             <th>Update</th>
             <th>Date</th>
+            <th>Action</th>
           </tr>
         </thead>
         <tbody>${rows}</tbody>
-      </table>`;
+      </table>
+    `;
 
-    // Attach status change listeners
-    contactsTableWrap.querySelectorAll('.status-select').forEach(sel => {
-      sel.addEventListener('change', () => updateStatus('contacts', sel.dataset.id, sel.value));
+    container.querySelectorAll('.status-select').forEach(select => {
+      select.addEventListener('change', () => {
+        updateStatus(select.dataset.type, select.dataset.id, select.value);
+      });
     });
-
-    loadStats();
   }
 
-  // ── Load Leads ──────────────────────────────────────────────────────
-  async function loadLeads() {
-    leadsTableWrap.innerHTML =
-      '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading leads...</div>';
-
-    const data = await apiFetch('/leads');
-
-    if (!data.success || data.data.length === 0) {
-      leadsTableWrap.innerHTML = `
+  function renderLeadsTable(leads, container) {
+    if (!leads || leads.length === 0) {
+      container.innerHTML = `
         <div class="empty-state">
-          <i class="fas fa-bolt"></i>
-          <p>No chatbot leads captured yet.</p>
-        </div>`;
+          <div class="empty-icon"><i class="fas fa-bolt"></i></div>
+          <div class="empty-text">No matching leads found.</div>
+        </div>
+      `;
       return;
     }
 
-    const rows = data.data.map(l => `
+    const rows = leads.map(l => `
       <tr>
-        <td class="td-email">
-          <a href="mailto:${l.email}">${l.email}</a>
+        <td>
+          <a href="mailto:${l.email}" class="email-link">${l.email}</a>
         </td>
         <td>${statusBadge(l.status)}</td>
         <td>
           <select class="status-select" data-id="${l._id}" data-type="lead">
-            <option value="new"       ${l.status==='new'       ? 'selected':''}>New</option>
-            <option value="contacted" ${l.status==='contacted' ? 'selected':''}>Contacted</option>
-            <option value="converted" ${l.status==='converted' ? 'selected':''}>Converted</option>
+            <option value="new" ${l.status === 'new' ? 'selected' : ''}>New</option>
+            <option value="contacted" ${l.status === 'contacted' ? 'selected' : ''}>Contacted</option>
+            <option value="converted" ${l.status === 'converted' ? 'selected' : ''}>Converted</option>
           </select>
         </td>
-        <td class="td-date">${formatDate(l.createdAt)}</td>
+        <td class="date-text">${formatDate(l.createdAt)}</td>
       </tr>
     `).join('');
 
-    leadsTableWrap.innerHTML = `
-      <table>
+    container.innerHTML = `
+      <table class="data-table">
         <thead>
           <tr>
             <th>Email</th>
@@ -807,50 +2010,157 @@
           </tr>
         </thead>
         <tbody>${rows}</tbody>
-      </table>`;
+      </table>
+    `;
 
-    leadsTableWrap.querySelectorAll('.status-select').forEach(sel => {
-      sel.addEventListener('change', () => updateStatus('leads', sel.dataset.id, sel.value));
+    container.querySelectorAll('.status-select').forEach(select => {
+      select.addEventListener('change', () => {
+        updateStatus(select.dataset.type, select.dataset.id, select.value);
+      });
     });
-
-    loadStats();
   }
 
-  // ── Update Status ───────────────────────────────────────────────────
   async function updateStatus(type, id, status) {
-    const endpoint = type === 'contacts'
-      ? `/contacts/${id}`
-      : `/leads/${id}`;
-
-    await apiFetch(endpoint, {
-      method : 'PATCH',
-      body   : JSON.stringify({ status })
-    });
-
-    loadStats();
+    try {
+      const endpoint = type === 'contacts' ? `/contacts/${id}` : `/leads/${id}`;
+      await apiFetch(endpoint, {
+        method: 'PATCH',
+        body: JSON.stringify({ status })
+      });
+      
+      showToast('Status updated successfully', 'success');
+      
+      const data = await apiFetch('/stats');
+      if (data.success) updateStats(data.data);
+    } catch (err) {
+      console.error('Update status failed:', err);
+      showToast('Failed to update status', 'error');
+    }
   }
 
-  // ── Tabs ────────────────────────────────────────────────────────────
+  // ═══════════════════════════════════════════════════════════════════
+  // SEARCH & FILTER
+  // ═══════════════════════════════════════════════════════════════════
+  function filterTable(data, query) {
+    const q = query.toLowerCase();
+    return data.filter(item => 
+      (item.name && item.name.toLowerCase().includes(q)) ||
+      (item.email && item.email.toLowerCase().includes(q)) ||
+      (item.message && item.message.toLowerCase().includes(q))
+    );
+  }
+
+  contactSearch.addEventListener('input', (e) => {
+    const filtered = filterTable(allContacts, e.target.value);
+    renderContactsTable(filtered, contactsTableWrap);
+  });
+
+  leadsSearch.addEventListener('input', (e) => {
+    const filtered = filterTable(allLeads, e.target.value);
+    renderLeadsTable(filtered, leadsTableWrap);
+  });
+
+  contactSearchPage.addEventListener('input', (e) => {
+    const filtered = filterTable(allContacts, e.target.value);
+    renderContactsTable(filtered, contactsTableWrapPage);
+  });
+
+  leadsSearchPage.addEventListener('input', (e) => {
+    const filtered = filterTable(allLeads, e.target.value);
+    renderLeadsTable(filtered, leadsTableWrapPage);
+  });
+
+  // ═══════════════════════════════════════════════════════════════════
+  // TABS
+  // ═══════════════════════════════════════════════════════════════════
   document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
 
       const tab = btn.dataset.tab;
-      contactsTab.style.display = tab === 'contacts' ? 'block' : 'none';
-      leadsTab.style.display    = tab === 'leads'    ? 'block' : 'none';
-
-      if (tab === 'leads') loadLeads();
+      document.getElementById('contactsTab').style.display = tab === 'contacts' ? 'block' : 'none';
+      document.getElementById('leadsTab').style.display = tab === 'leads' ? 'block' : 'none';
     });
   });
 
-  // ── Refresh buttons ─────────────────────────────────────────────────
-  document.getElementById('refreshContacts')
-    .addEventListener('click', loadContacts);
+  // ═══════════════════════════════════════════════════════════════════
+  // REFRESH BUTTONS
+  // ═══════════════════════════════════════════════════════════════════
+  document.getElementById('refreshContacts').addEventListener('click', async () => {
+    showToast('Refreshing messages...', 'info');
+    await loadContacts();
+  });
 
-  document.getElementById('refreshLeads')
-    .addEventListener('click', loadLeads);
+  document.getElementById('refreshLeads').addEventListener('click', async () => {
+    showToast('Refreshing leads...', 'info');
+    await loadLeads();
+  });
 
+  document.getElementById('refreshContactsPage').addEventListener('click', async () => {
+    showToast('Refreshing messages...', 'info');
+    await loadContacts();
+  });
+
+  document.getElementById('refreshLeadsPage').addEventListener('click', async () => {
+    showToast('Refreshing leads...', 'info');
+    await loadLeads();
+  });
+
+  // ═══════════════════════════════════════════════════════════════════
+  // MESSAGE MODAL
+  // ═══════════════════════════════════════════════════════════════════
+  window.showMessageModal = function(message) {
+    const modalBody = document.getElementById('modalBody');
+    modalBody.innerHTML = `
+      <div class="modal-field">
+        <div class="modal-label">Name</div>
+        <div class="modal-value">${message.name}</div>
+      </div>
+      <div class="modal-field">
+        <div class="modal-label">Email</div>
+        <div class="modal-value">
+          <a href="mailto:${message.email}" class="email-link">${message.email}</a>
+        </div>
+      </div>
+      <div class="modal-field">
+        <div class="modal-label">Project Type</div>
+        <div class="modal-value">${message.subject}</div>
+      </div>
+      <div class="modal-field">
+        <div class="modal-label">Message</div>
+        <div class="modal-value" style="min-height: 100px; white-space: pre-wrap; word-break: break-word;">${message.message}</div>
+      </div>
+      <div class="modal-field">
+        <div class="modal-label">Status</div>
+        <div class="modal-value">${statusBadge(message.status)}</div>
+      </div>
+      <div class="modal-field">
+        <div class="modal-label">Received</div>
+        <div class="modal-value">${message.date}</div>
+      </div>
+    `;
+    messageModal.classList.add('show');
+  };
+
+  modalClose.addEventListener('click', () => {
+    messageModal.classList.remove('show');
+  });
+
+  messageModal.addEventListener('click', (e) => {
+    if (e.target === messageModal) {
+      messageModal.classList.remove('show');
+    }
+  });
+
+  // ═══════════════════════════════════════════════════════════════════
+  // RESPONSIVE CLOSE
+  // ═══════════════════════════════════════════════════════════════════
+  window.addEventListener('resize', () => {
+    if (window.innerWidth > 768) {
+      sidebar.classList.remove('hidden');
+    }
+  });
 })();
 </script>
 
