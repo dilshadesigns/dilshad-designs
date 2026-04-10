@@ -20,7 +20,14 @@ const PORT = process.env.PORT || 3000;
 // ===================================================================
 mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log('✅ MongoDB connected successfully'))
-  .catch(err => console.error('❌ MongoDB connection failed:', err.message));
+  .catch(err => {
+    console.error('❌ MongoDB connection failed:', err.message);
+    console.error('❌ Check that MONGODB_URI is set correctly in Render environment variables');
+  });
+
+mongoose.connection.on('error', err => {
+  console.error('❌ MongoDB runtime error:', err.message);
+});
 
 // ===================================================================
 // TRUST PROXY — Required for Render
@@ -38,12 +45,14 @@ const allowedOrigins = process.env.ALLOWED_ORIGINS
 
 app.use(cors({
   origin: function (origin, callback) {
-    if (!origin) return callback(null, true);
+    if (!origin) return callback(null, true);  // allow server-to-server / curl
     if (allowedOrigins.includes(origin)) return callback(null, true);
+    console.warn('[CORS] Blocked origin:', origin);
     callback(new Error('CORS: Origin not allowed — ' + origin));
   },
-  methods      : ['GET', 'POST', 'PATCH'],
+  methods       : ['GET', 'POST', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials   : true,
 }));
 
 // ===================================================================
@@ -94,18 +103,22 @@ app.get('/api/health', (_req, res) => {
 // ===================================================================
 // SERVE FRONTEND
 // ===================================================================
-const frontendPath = path.join(__dirname, '..', 'frontend');
+const frontendPath = path.join(__dirname);
 app.use(express.static(frontendPath));
 
-app.get('*', (_req, res) => {
+app.get('/', (_req, res) => {
   res.sendFile(path.join(frontendPath, 'index.html'));
+});
+
+app.get('/admin', (_req, res) => {
+  res.sendFile(path.join(frontendPath, 'admin.html'));
 });
 
 // ===================================================================
 // GLOBAL ERROR HANDLER
 // ===================================================================
-app.use((err, _req, res, _next) => {
-  console.error('[ERROR]', err.message || err);
+app.use((err, req, res, _next) => {
+  console.error('[ERROR]', req.method, req.path, '→', err.message || err);
   const status = err.status || 500;
   res.status(status).json({
     success : false,
