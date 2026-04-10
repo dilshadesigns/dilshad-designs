@@ -103,15 +103,8 @@ app.get('/api/health', (_req, res) => {
 // ===================================================================
 // SERVE FRONTEND
 // ===================================================================
-const frontendPath = path.join(__dirname);
-app.use(express.static(frontendPath));
-
 app.get('/', (_req, res) => {
-  res.sendFile(path.join(frontendPath, 'index.html'));
-});
-
-app.get('/admin', (_req, res) => {
-  res.sendFile(path.join(frontendPath, 'admin.html'));
+  res.json({ success: true, message: 'Dilshad Designs API is running.' });
 });
 
 // ===================================================================
