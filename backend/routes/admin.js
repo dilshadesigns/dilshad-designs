@@ -28,4 +28,7 @@ router.patch('/contacts/:id', adminCtrl.updateContactStatus);
 // PATCH /api/admin/leads/:id    — update lead status
 router.patch('/leads/:id',    adminCtrl.updateLeadStatus);
 
+router.delete('/contacts/:id', adminCtrl.deleteContact);
+router.delete('/leads/:id',    adminCtrl.deleteLead);
+
 module.exports = router;

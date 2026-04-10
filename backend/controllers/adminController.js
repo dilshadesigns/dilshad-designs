@@ -42,6 +42,25 @@ exports.getStats = async (req, res, next) => {
   }
 };
 
+
+exports.deleteContact = async (req, res, next) => {
+  try {
+    await Contact.findByIdAndDelete(req.params.id);
+    return res.status(200).json({ success: true });
+  } catch(err) {
+    return next({ status: 500, message: 'Failed to delete.' });
+  }
+};
+
+exports.deleteLead = async (req, res, next) => {
+  try {
+    await Lead.findByIdAndDelete(req.params.id);
+    return res.status(200).json({ success: true });
+  } catch(err) {
+    return next({ status: 500, message: 'Failed to delete.' });
+  }
+};
+
 // -----------------------------------------------------------------------
 // GET /api/admin/contacts
 // Returns all contact form submissions newest first

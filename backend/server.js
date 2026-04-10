@@ -50,7 +50,7 @@ app.use(cors({
     console.warn('[CORS] Blocked origin:', origin);
     callback(new Error('CORS: Origin not allowed — ' + origin));
   },
-  methods       : ['GET', 'POST', 'PATCH'],
+  methods      : ['GET', 'POST', 'PATCH', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials   : true,
 }));
