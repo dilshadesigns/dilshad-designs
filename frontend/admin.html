@@ -1391,16 +1391,22 @@
   async function updateStatus(type, id, status) {
     const endpoint = type === 'contacts' ? `/contacts/${id}` : `/leads/${id}`;
     try {
-      await apiFetch(endpoint, { method: 'PATCH', body: JSON.stringify({ status }) });
+      const result = await apiFetch(endpoint, { method: 'PATCH', body: JSON.stringify({ status }) });
+      if (!result.success) {
+        showToast('Failed to update status', 'error');
+        return;
+      }
       showToast(`Status updated to "${status}" ✓`);
 
-      // Update local data without full reload
+      // Update local array and re-render the correct table
       if (type === 'contacts') {
         const c = allContacts.find(x => x._id === id);
         if (c) c.status = status;
+        renderContactsTable(applyContactFilters());
       } else {
         const l = allLeads.find(x => x._id === id);
         if (l) l.status = status;
+        renderLeadsTable(applyLeadFilters());
       }
       loadStats();
     } catch(e) {
