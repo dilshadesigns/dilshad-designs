@@ -572,46 +572,72 @@
   // ── API Helper ──────────────────────────────────────────────────────
   async function apiFetch(endpoint, options = {}) {
     const res = await fetch(`${API_BASE}/api/admin${endpoint}`, {
-      ...options,
-      headers: {
+        method  : options.method || 'GET',
+        headers : {
         'Content-Type'  : 'application/json',
-        'Authorization' : `Bearer ${adminPassword}`,
-        ...options.headers
-      }
+        'Authorization' : `Bearer ${adminPassword}`
+        },
+        body: options.body || undefined
     });
+
+    if (!res.ok && res.status === 403) {
+        throw new Error('Invalid password');
+    }
+
     return res.json();
-  }
+    }
 
   // ── Login ───────────────────────────────────────────────────────────
   async function handleLogin() {
     const password = passwordInput.value.trim();
     if (!password) return;
 
-    loginBtn.textContent = 'Verifying...';
-    loginBtn.disabled    = true;
+    loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying...';
+    loginBtn.disabled  = true;
     loginError.style.display = 'none';
 
     adminPassword = password;
 
     try {
-      const data = await apiFetch('/stats');
+        const res = await fetch(`${API_BASE}/api/admin/stats`, {
+        headers: {
+            'Content-Type'  : 'application/json',
+            'Authorization' : `Bearer ${password}`
+        }
+        });
 
-      if (data.success) {
+        // Log for debugging
+        console.log('Login response status:', res.status);
+
+        const data = await res.json();
+
+        console.log('Login response data:', data);
+
+        if (res.ok && data.success) {
         // Password correct — show dashboard
         loginScreen.style.display = 'none';
         dashboard.style.display   = 'block';
         updateStats(data.data);
         loadContacts();
-      } else {
-        showLoginError();
-      }
+        } else {
+        // Show actual error message
+        loginError.textContent   = data.message || 'Incorrect password. Please try again.';
+        loginError.style.display = 'block';
+        adminPassword = '';
+        passwordInput.value = '';
+        passwordInput.focus();
+        }
+
     } catch (err) {
-      showLoginError();
+        console.error('Login error:', err);
+        loginError.textContent   = 'Cannot connect to server. Make sure backend is running.';
+        loginError.style.display = 'block';
+        adminPassword = '';
     }
 
-    loginBtn.textContent = 'Login';
-    loginBtn.disabled    = false;
-  }
+    loginBtn.innerHTML = '<i class="fas fa-lock"></i> Login';
+    loginBtn.disabled  = false;
+    }
 
   function showLoginError() {
     loginError.style.display = 'block';
