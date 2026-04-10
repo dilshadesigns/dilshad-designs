@@ -115,9 +115,9 @@ function emailFooter() {
       ">
         © ${new Date().getFullYear()} Dilshad Designs | New Delhi, India
         &nbsp;·&nbsp;
-        <a href="https://dilshadesigns.netlify.app"
+        <a href="https://dilshadesigns.vercel.app"
            style="color: #2F7A66; text-decoration: none;">
-          dilshadesigns.netlify.app
+          dilshadesigns.vercel.app
         </a>
       </p>
     </div>
@@ -175,7 +175,7 @@ exports.sendContactEmail = async (req, res, next) => {
       replyTo : email,
       subject : `[New Enquiry] ${subject} — from ${name}`,
       text    : `
-You have a new contact form submission from dilshadesigns.netlify.app
+You have a new contact form submission from dilshadesigns.vercel.app
 
 Name:          ${name}
 Email:         ${email}
@@ -200,7 +200,7 @@ Sent via the Dilshad Designs contact form.
 
   <div style="max-width: 560px; margin: 0 auto;">
 
-    ${emailHeader('📩 New Contact Form Submission', 'dilshadesigns.netlify.app')}
+    ${emailHeader('📩 New Contact Form Submission', 'dilshadesigns.vercel.app')}
 
     <div style="
       background: #ffffff;
@@ -284,7 +284,7 @@ Thank you for getting in touch with Dilshad Designs!
 I have received your message about "${subject}" and will get back to you within 2-4 hours.
 
 While you wait check out my work:
-Portfolio : https://dilshadesigns.netlify.app
+Portfolio : https://dilshadesigns.vercel.app
 Fiverr    : https://www.fiverr.com/dilshadesigns
 Instagram : https://www.instagram.com/dilshadesigns
 
@@ -346,9 +346,9 @@ Dilshad Designs | New Delhi, India
         ">While you wait check out my work:</p>
 
         <p style="margin:6px 0; font-size:0.9rem;">
-          🌐 <a href="https://dilshadesigns.netlify.app"
+          🌐 <a href="https://dilshadesigns.vercel.app"
                 style="color:#2F7A66; font-weight:600; text-decoration:none;">
-            dilshadesigns.netlify.app
+            dilshadesigns.vercel.app
           </a>
         </p>
         <p style="margin:6px 0; font-size:0.9rem;">
@@ -428,13 +428,13 @@ exports.sendLeadEmail = async (req, res, next) => {
       from    : `"Dilshad Designs Website" <${process.env.SMTP_USER}>`,
       to      : process.env.OWNER_EMAIL,
       replyTo : email,
-      subject : `🔥 New Chatbot Lead — dilshadesigns.netlify.app`,
+      subject : `🔥 New Chatbot Lead — dilshadesigns.vercel.app`,
       text    : `
 New chatbot lead captured!
 
 Email  : ${email}
 Time   : ${getISTTime()} IST
-Source : Chatbot Lead Capture — dilshadesigns.netlify.app
+Source : Chatbot Lead Capture — dilshadesigns.vercel.app
 
 Reply to them quickly — leads go cold fast!
       `.trim(),
@@ -451,7 +451,7 @@ Reply to them quickly — leads go cold fast!
 
   <div style="max-width: 560px; margin: 0 auto;">
 
-    ${emailHeader('🔥 New Chatbot Lead!', 'dilshadesigns.netlify.app')}
+    ${emailHeader('🔥 New Chatbot Lead!', 'dilshadesigns.vercel.app')}
 
     <div style="
       background: #ffffff;
@@ -526,7 +526,7 @@ Thank you for your interest in Dilshad Designs!
 I have received your email and will reach out to you shortly.
 
 While you wait check out my work:
-Portfolio : https://dilshadesigns.netlify.app
+Portfolio : https://dilshadesigns.vercel.app
 Fiverr    : https://www.fiverr.com/dilshadesigns
 Instagram : https://www.instagram.com/dilshadesigns
 
@@ -586,9 +586,9 @@ Dilshad Designs | New Delhi, India
         ">While you wait check out my work:</p>
 
         <p style="margin:6px 0; font-size:0.9rem;">
-          🌐 <a href="https://dilshadesigns.netlify.app"
+          🌐 <a href="https://dilshadesigns.vercel.app"
                 style="color:#2F7A66; font-weight:600; text-decoration:none;">
-            dilshadesigns.netlify.app
+            dilshadesigns.vercel.app
           </a>
         </p>
         <p style="margin:6px 0; font-size:0.9rem;">

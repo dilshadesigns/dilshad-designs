@@ -124,7 +124,7 @@ Open `backend/.env` and fill in your credentials:
 PORT=3000
 NODE_ENV=development
 
-ALLOWED_ORIGINS=http://localhost:3000,https://dilshadesigns.netlify.app
+ALLOWED_ORIGINS=http://localhost:3000,https://dilshadesigns.vercel.app
 
 # Gmail SMTP — use App Password, NOT your regular password
 SMTP_HOST=smtp.gmail.com
@@ -285,5 +285,5 @@ And run backend separately on a different port.
 **Dilshad Designs**  
 📧 dilshadesign.co@gmail.com  
 📱 +91 11499 53616  
-🌐 https://dilshadesigns.netlify.app  
+🌐 https://dilshadesigns.vercel.app
 🛒 https://www.fiverr.com/dilshadesigns

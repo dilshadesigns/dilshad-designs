@@ -41,7 +41,7 @@ app.use(helmet({ contentSecurityPolicy: false }));
 
 const allowedOrigins = process.env.ALLOWED_ORIGINS
   ? process.env.ALLOWED_ORIGINS.split(',').map(o => o.trim())
-  : ['http://localhost:3000', 'https://dilshadesigns.netlify.app'];
+  : ['http://localhost:3000', 'https://dilshadesigns.vercel.app'];
 
 app.use(cors({
   origin: function (origin, callback) {
