@@ -10,6 +10,9 @@
 
 'use strict';
 
+const Contact = require('../models/Contact');
+const Lead    = require('../models/Lead');
+
 const nodemailer = require('nodemailer');
 
 // -----------------------------------------------------------------------
@@ -382,6 +385,16 @@ Dilshad Designs | New Delhi, India
       `.trim()
     };
 
+    // Save to MongoDB
+    await Contact.create({
+      name,
+      email,
+      subject,
+      message,
+      source: 'contact-form'
+    });
+
+    // Send both emails concurrently
     await Promise.all([
       transporter.sendMail(ownerMailOptions),
       transporter.sendMail(autoReplyOptions),
@@ -612,6 +625,14 @@ Dilshad Designs | New Delhi, India
       `.trim()
     };
 
+    // Save to MongoDB (upsert — skip if email already exists)
+    await Lead.findOneAndUpdate(
+      { email },
+      { email, source: 'chatbot' },
+      { upsert: true, new: true }
+    );
+
+    // Send both emails concurrently
     await Promise.all([
       transporter.sendMail(ownerMailOptions),
       transporter.sendMail(autoReplyOptions),

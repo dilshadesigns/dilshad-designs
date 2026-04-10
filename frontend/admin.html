@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard — Dilshad Designs</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" href="photo/favicon (2).png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <style>
+    /* ── Reset ── */
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    html { scroll-behavior: smooth; }
+
+    /* ── Variables ── */
+    :root {
+      --brand      : #2F7A66;
+      --brand-dark : #1e5548;
+      --brand-light: #e8f5f1;
+      --gold       : #f5c62c;
+      --bg         : #f4f7f6;
+      --surface    : #ffffff;
+      --border     : #e5ede9;
+      --text       : #1a2e26;
+      --text-muted : #5a7a6e;
+      --radius     : 12px;
+      --shadow     : 0 4px 24px rgba(47,122,102,0.08);
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background  : var(--bg);
+      color       : var(--text);
+      min-height  : 100vh;
+    }
+
+    /* ── Login Screen ── */
+    #loginScreen {
+      min-height  : 100vh;
+      display     : flex;
+      align-items : center;
+      justify-content: center;
+      padding     : 1rem;
+    }
+
+    .login-card {
+      background    : var(--surface);
+      border        : 1px solid var(--border);
+      border-radius : 20px;
+      padding       : 2.5rem;
+      width         : 100%;
+      max-width     : 400px;
+      box-shadow    : var(--shadow);
+      text-align    : center;
+    }
+
+    .login-logo {
+      font-family : 'Syne', sans-serif;
+      font-size   : 1.8rem;
+      font-weight : 800;
+      margin-bottom: 0.5rem;
+    }
+    .login-logo .gold  { color: var(--gold); }
+    .login-logo .green { color: var(--brand); }
+
+    .login-card p {
+      color        : var(--text-muted);
+      font-size    : 0.9rem;
+      margin-bottom: 2rem;
+    }
+
+    .login-input {
+      width         : 100%;
+      padding       : 0.85rem 1rem;
+      border        : 1.5px solid var(--border);
+      border-radius : 8px;
+      font-size     : 0.95rem;
+      font-family   : inherit;
+      color         : var(--text);
+      outline       : none;
+      margin-bottom : 1rem;
+      transition    : border-color 0.3s;
+    }
+    .login-input:focus { border-color: var(--brand); }
+
+    .login-btn {
+      width         : 100%;
+      padding       : 0.9rem;
+      background    : var(--brand);
+      color         : #fff;
+      border        : none;
+      border-radius : 8px;
+      font-size     : 1rem;
+      font-weight   : 600;
+      font-family   : inherit;
+      cursor        : pointer;
+      transition    : background 0.3s;
+    }
+    .login-btn:hover { background: var(--brand-dark); }
+
+    .login-error {
+      color       : #dc2626;
+      font-size   : 0.85rem;
+      margin-top  : 0.75rem;
+      display     : none;
+    }
+
+    /* ── Dashboard ── */
+    #dashboard { display: none; }
+
+    /* ── Top Bar ── */
+    .topbar {
+      background    : #0d1a15;
+      padding       : 0 2rem;
+      height        : 64px;
+      display       : flex;
+      align-items   : center;
+      justify-content: space-between;
+      position      : sticky;
+      top           : 0;
+      z-index       : 100;
+    }
+
+    .topbar-logo {
+      font-family : 'Syne', sans-serif;
+      font-size   : 1.2rem;
+      font-weight : 800;
+    }
+    .topbar-logo .gold  { color: var(--gold); }
+    .topbar-logo .green { color: #8ec4b4; }
+    .topbar-badge {
+      background    : var(--brand);
+      color         : #fff;
+      font-size     : 0.7rem;
+      font-weight   : 600;
+      padding       : 0.2rem 0.6rem;
+      border-radius : 99px;
+      margin-left   : 0.5rem;
+      letter-spacing: 0.05em;
+    }
+
+    .logout-btn {
+      background    : rgba(255,255,255,0.08);
+      color         : rgba(255,255,255,0.7);
+      border        : 1px solid rgba(255,255,255,0.15);
+      padding       : 0.4rem 1rem;
+      border-radius : 99px;
+      font-size     : 0.85rem;
+      font-family   : inherit;
+      cursor        : pointer;
+      transition    : all 0.3s;
+      display       : flex;
+      align-items   : center;
+      gap           : 0.4rem;
+    }
+    .logout-btn:hover {
+      background : rgba(220,38,38,0.3);
+      color      : #fff;
+      border-color: rgba(220,38,38,0.5);
+    }
+
+    /* ── Main Content ── */
+    .main {
+      max-width : 1200px;
+      margin    : 0 auto;
+      padding   : 2rem 1.5rem;
+    }
+
+    /* ── Stats Grid ── */
+    .stats-grid {
+      display               : grid;
+      grid-template-columns : repeat(4, 1fr);
+      gap                   : 1.25rem;
+      margin-bottom         : 2.5rem;
+    }
+
+    .stat-card {
+      background    : var(--surface);
+      border        : 1px solid var(--border);
+      border-radius : var(--radius);
+      padding       : 1.5rem;
+      display       : flex;
+      align-items   : center;
+      gap           : 1rem;
+      box-shadow    : var(--shadow);
+    }
+
+    .stat-icon {
+      width         : 52px;
+      height        : 52px;
+      border-radius : 12px;
+      display       : flex;
+      align-items   : center;
+      justify-content: center;
+      font-size     : 1.3rem;
+      flex-shrink   : 0;
+    }
+
+    .stat-icon.green  { background: var(--brand-light); color: var(--brand); }
+    .stat-icon.gold   { background: rgba(245,198,44,0.12); color: #d4a91f; }
+    .stat-icon.blue   { background: rgba(59,130,246,0.1); color: #3b82f6; }
+    .stat-icon.purple { background: rgba(139,92,246,0.1); color: #8b5cf6; }
+
+    .stat-num {
+      font-family : 'Syne', sans-serif;
+      font-size   : 2rem;
+      font-weight : 800;
+      color       : var(--text);
+      line-height : 1;
+    }
+    .stat-label {
+      font-size  : 0.82rem;
+      color      : var(--text-muted);
+      margin-top : 0.2rem;
+      font-weight: 500;
+    }
+
+    /* ── Tabs ── */
+    .tabs {
+      display       : flex;
+      gap           : 0.5rem;
+      margin-bottom : 1.5rem;
+      border-bottom : 2px solid var(--border);
+      padding-bottom: 0;
+    }
+
+    .tab-btn {
+      padding       : 0.7rem 1.5rem;
+      border        : none;
+      background    : transparent;
+      font-size     : 0.9rem;
+      font-weight   : 600;
+      font-family   : inherit;
+      color         : var(--text-muted);
+      cursor        : pointer;
+      border-bottom : 2px solid transparent;
+      margin-bottom : -2px;
+      transition    : all 0.3s;
+      display       : flex;
+      align-items   : center;
+      gap           : 0.4rem;
+    }
+    .tab-btn:hover   { color: var(--brand); }
+    .tab-btn.active  {
+      color        : var(--brand);
+      border-color : var(--brand);
+    }
+
+    .tab-badge {
+      background    : var(--brand);
+      color         : #fff;
+      font-size     : 0.7rem;
+      padding       : 0.1rem 0.45rem;
+      border-radius : 99px;
+      font-weight   : 700;
+    }
+
+    /* ── Table ── */
+    .table-wrap {
+      background    : var(--surface);
+      border        : 1px solid var(--border);
+      border-radius : var(--radius);
+      overflow      : hidden;
+      box-shadow    : var(--shadow);
+    }
+
+    .table-header {
+      padding         : 1.25rem 1.5rem;
+      border-bottom   : 1px solid var(--border);
+      display         : flex;
+      align-items     : center;
+      justify-content : space-between;
+    }
+
+    .table-title {
+      font-family : 'Syne', sans-serif;
+      font-size   : 1rem;
+      font-weight : 700;
+      color       : var(--text);
+    }
+
+    .refresh-btn {
+      background    : var(--brand-light);
+      color         : var(--brand);
+      border        : 1px solid rgba(47,122,102,0.2);
+      padding       : 0.4rem 1rem;
+      border-radius : 99px;
+      font-size     : 0.82rem;
+      font-weight   : 600;
+      font-family   : inherit;
+      cursor        : pointer;
+      transition    : all 0.3s;
+      display       : flex;
+      align-items   : center;
+      gap           : 0.35rem;
+    }
+    .refresh-btn:hover { background: var(--brand); color: #fff; }
+
+    table {
+      width           : 100%;
+      border-collapse : collapse;
+    }
+
+    th {
+      background    : var(--bg);
+      padding       : 0.85rem 1.25rem;
+      text-align    : left;
+      font-size     : 0.78rem;
+      font-weight   : 700;
+      color         : var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      border-bottom : 1px solid var(--border);
+    }
+
+    td {
+      padding     : 1rem 1.25rem;
+      font-size   : 0.88rem;
+      color       : var(--text);
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: var(--bg); }
+
+    .td-email a {
+      color          : var(--brand);
+      font-weight    : 600;
+      text-decoration: none;
+    }
+    .td-email a:hover { text-decoration: underline; }
+
+    .td-message {
+      max-width   : 280px;
+      white-space : nowrap;
+      overflow    : hidden;
+      text-overflow: ellipsis;
+      color       : var(--text-muted);
+    }
+
+    .td-date {
+      color     : var(--text-muted);
+      font-size : 0.82rem;
+      white-space: nowrap;
+    }
+
+    /* ── Status Badges ── */
+    .badge {
+      display       : inline-flex;
+      align-items   : center;
+      gap           : 0.3rem;
+      padding       : 0.25rem 0.75rem;
+      border-radius : 99px;
+      font-size     : 0.75rem;
+      font-weight   : 700;
+      white-space   : nowrap;
+    }
+
+    .badge-new       { background: rgba(59,130,246,0.1); color: #2563eb; }
+    .badge-read      { background: rgba(245,198,44,0.15); color: #d4a91f; }
+    .badge-replied   { background: rgba(47,122,102,0.12); color: var(--brand); }
+    .badge-contacted { background: rgba(245,198,44,0.15); color: #d4a91f; }
+    .badge-converted { background: rgba(47,122,102,0.12); color: var(--brand); }
+
+    /* ── Status Select ── */
+    .status-select {
+      padding       : 0.3rem 0.6rem;
+      border        : 1.5px solid var(--border);
+      border-radius : 6px;
+      font-size     : 0.8rem;
+      font-family   : inherit;
+      color         : var(--text);
+      background    : var(--surface);
+      cursor        : pointer;
+      outline       : none;
+    }
+    .status-select:focus { border-color: var(--brand); }
+
+    /* ── Empty State ── */
+    .empty-state {
+      text-align : center;
+      padding    : 4rem 2rem;
+      color      : var(--text-muted);
+    }
+    .empty-state i {
+      font-size    : 2.5rem;
+      margin-bottom: 1rem;
+      opacity      : 0.4;
+      display      : block;
+    }
+    .empty-state p { font-size: 0.95rem; }
+
+    /* ── Loading ── */
+    .loading {
+      text-align : center;
+      padding    : 3rem;
+      color      : var(--text-muted);
+      font-size  : 0.9rem;
+    }
+    .loading i { margin-right: 0.5rem; }
+
+    /* ── Responsive ── */
+    @media (max-width: 768px) {
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .topbar     { padding: 0 1rem; }
+      .main       { padding: 1.5rem 1rem; }
+      td, th      { padding: 0.75rem 0.85rem; }
+      .td-message { max-width: 140px; }
+    }
+
+    @media (max-width: 480px) {
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ==================== LOGIN SCREEN ==================== -->
+<div id="loginScreen">
+  <div class="login-card">
+    <div class="login-logo">
+      <span class="gold">Dilshad</span><span class="green">esigns</span>
+    </div>
+    <p>Admin Dashboard — Enter your password to continue</p>
+
+    <input
+      type="password"
+      id="passwordInput"
+      class="login-input"
+      placeholder="Enter admin password"
+      autocomplete="current-password"
+    >
+
+    <button class="login-btn" id="loginBtn">
+      <i class="fas fa-lock"></i> Login
+    </button>
+
+    <p class="login-error" id="loginError">
+      <i class="fas fa-exclamation-circle"></i>
+      Incorrect password. Please try again.
+    </p>
+  </div>
+</div>
+
+<!-- ==================== DASHBOARD ==================== -->
+<div id="dashboard">
+
+  <!-- Top Bar -->
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:0.5rem;">
+      <div class="topbar-logo">
+        <span class="gold">Dilshad</span><span class="green">esigns</span>
+      </div>
+      <span class="topbar-badge">ADMIN</span>
+    </div>
+    <button class="logout-btn" id="logoutBtn">
+      <i class="fas fa-sign-out-alt"></i> Logout
+    </button>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main">
+
+    <!-- Stats -->
+    <div class="stats-grid" id="statsGrid">
+      <div class="stat-card">
+        <div class="stat-icon green"><i class="fas fa-envelope"></i></div>
+        <div>
+          <div class="stat-num" id="statTotalContacts">—</div>
+          <div class="stat-label">Total Messages</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon blue"><i class="fas fa-bell"></i></div>
+        <div>
+          <div class="stat-num" id="statNewContacts">—</div>
+          <div class="stat-label">New Messages</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon gold"><i class="fas fa-bolt"></i></div>
+        <div>
+          <div class="stat-num" id="statTotalLeads">—</div>
+          <div class="stat-label">Total Leads</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon purple"><i class="fas fa-star"></i></div>
+        <div>
+          <div class="stat-num" id="statNewLeads">—</div>
+          <div class="stat-label">New Leads</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="contacts" id="tabContacts">
+        <i class="fas fa-envelope"></i>
+        Messages
+        <span class="tab-badge" id="contactsBadge">0</span>
+      </button>
+      <button class="tab-btn" data-tab="leads" id="tabLeads">
+        <i class="fas fa-bolt"></i>
+        Leads
+        <span class="tab-badge" id="leadsBadge">0</span>
+      </button>
+    </div>
+
+    <!-- Contacts Table -->
+    <div id="contactsTab">
+      <div class="table-wrap">
+        <div class="table-header">
+          <div class="table-title">Contact Form Submissions</div>
+          <button class="refresh-btn" id="refreshContacts">
+            <i class="fas fa-sync-alt"></i> Refresh
+          </button>
+        </div>
+        <div id="contactsTableWrap">
+          <div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading messages...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Leads Table -->
+    <div id="leadsTab" style="display:none;">
+      <div class="table-wrap">
+        <div class="table-header">
+          <div class="table-title">Chatbot Lead Captures</div>
+          <button class="refresh-btn" id="refreshLeads">
+            <i class="fas fa-sync-alt"></i> Refresh
+          </button>
+        </div>
+        <div id="leadsTableWrap">
+          <div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading leads...</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  // ── Config ──────────────────────────────────────────────────────────
+  const API_BASE = window.location.hostname === 'localhost'
+    ? 'http://localhost:3000'
+    : 'https://dilshad-designs-backend.onrender.com';
+
+  let adminPassword = '';
+
+  // ── DOM refs ────────────────────────────────────────────────────────
+  const loginScreen       = document.getElementById('loginScreen');
+  const dashboard         = document.getElementById('dashboard');
+  const passwordInput     = document.getElementById('passwordInput');
+  const loginBtn          = document.getElementById('loginBtn');
+  const loginError        = document.getElementById('loginError');
+  const logoutBtn         = document.getElementById('logoutBtn');
+  const contactsTableWrap = document.getElementById('contactsTableWrap');
+  const leadsTableWrap    = document.getElementById('leadsTableWrap');
+  const contactsTab       = document.getElementById('contactsTab');
+  const leadsTab          = document.getElementById('leadsTab');
+  const contactsBadge     = document.getElementById('contactsBadge');
+  const leadsBadge        = document.getElementById('leadsBadge');
+
+  // ── API Helper ──────────────────────────────────────────────────────
+  async function apiFetch(endpoint, options = {}) {
+    const res = await fetch(`${API_BASE}/api/admin${endpoint}`, {
+      ...options,
+      headers: {
+        'Content-Type'  : 'application/json',
+        'Authorization' : `Bearer ${adminPassword}`,
+        ...options.headers
+      }
+    });
+    return res.json();
+  }
+
+  // ── Login ───────────────────────────────────────────────────────────
+  async function handleLogin() {
+    const password = passwordInput.value.trim();
+    if (!password) return;
+
+    loginBtn.textContent = 'Verifying...';
+    loginBtn.disabled    = true;
+    loginError.style.display = 'none';
+
+    adminPassword = password;
+
+    try {
+      const data = await apiFetch('/stats');
+
+      if (data.success) {
+        // Password correct — show dashboard
+        loginScreen.style.display = 'none';
+        dashboard.style.display   = 'block';
+        updateStats(data.data);
+        loadContacts();
+      } else {
+        showLoginError();
+      }
+    } catch (err) {
+      showLoginError();
+    }
+
+    loginBtn.textContent = 'Login';
+    loginBtn.disabled    = false;
+  }
+
+  function showLoginError() {
+    loginError.style.display = 'block';
+    adminPassword = '';
+    passwordInput.value = '';
+    passwordInput.focus();
+  }
+
+  loginBtn.addEventListener('click', handleLogin);
+  passwordInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter') handleLogin();
+  });
+
+  // ── Logout ──────────────────────────────────────────────────────────
+  logoutBtn.addEventListener('click', () => {
+    adminPassword = '';
+    dashboard.style.display   = 'none';
+    loginScreen.style.display = 'flex';
+    passwordInput.value = '';
+  });
+
+  // ── Stats ───────────────────────────────────────────────────────────
+  function updateStats(data) {
+    document.getElementById('statTotalContacts').textContent = data.totalContacts;
+    document.getElementById('statNewContacts').textContent   = data.newContacts;
+    document.getElementById('statTotalLeads').textContent    = data.totalLeads;
+    document.getElementById('statNewLeads').textContent      = data.newLeads;
+    contactsBadge.textContent = data.newContacts;
+    leadsBadge.textContent    = data.newLeads;
+  }
+
+  async function loadStats() {
+    const data = await apiFetch('/stats');
+    if (data.success) updateStats(data.data);
+  }
+
+  // ── Format Date ─────────────────────────────────────────────────────
+  function formatDate(iso) {
+    return new Date(iso).toLocaleString('en-IN', {
+      timeZone : 'Asia/Kolkata',
+      day      : '2-digit',
+      month    : 'short',
+      year     : 'numeric',
+      hour     : '2-digit',
+      minute   : '2-digit',
+      hour12   : true
+    });
+  }
+
+  // ── Status Badge ────────────────────────────────────────────────────
+  function statusBadge(status) {
+    const icons = {
+      new       : 'fa-circle',
+      read      : 'fa-eye',
+      replied   : 'fa-reply',
+      contacted : 'fa-phone',
+      converted : 'fa-check-circle'
+    };
+    return `<span class="badge badge-${status}">
+      <i class="fas ${icons[status] || 'fa-circle'}"></i>
+      ${status.charAt(0).toUpperCase() + status.slice(1)}
+    </span>`;
+  }
+
+  // ── Load Contacts ───────────────────────────────────────────────────
+  async function loadContacts() {
+    contactsTableWrap.innerHTML =
+      '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading messages...</div>';
+
+    const data = await apiFetch('/contacts');
+
+    if (!data.success || data.data.length === 0) {
+      contactsTableWrap.innerHTML = `
+        <div class="empty-state">
+          <i class="fas fa-inbox"></i>
+          <p>No contact form submissions yet.</p>
+        </div>`;
+      return;
+    }
+
+    const rows = data.data.map(c => `
+      <tr>
+        <td class="td-email">
+          <a href="mailto:${c.email}">${c.email}</a><br>
+          <span style="color:var(--text);font-weight:600;font-size:0.9rem;">${c.name}</span>
+        </td>
+        <td>
+          <span style="font-weight:600;font-size:0.85rem;">${c.subject}</span>
+        </td>
+        <td class="td-message" title="${c.message}">${c.message}</td>
+        <td>${statusBadge(c.status)}</td>
+        <td>
+          <select class="status-select" data-id="${c._id}" data-type="contact">
+            <option value="new"     ${c.status==='new'     ? 'selected':''}>New</option>
+            <option value="read"    ${c.status==='read'    ? 'selected':''}>Read</option>
+            <option value="replied" ${c.status==='replied' ? 'selected':''}>Replied</option>
+          </select>
+        </td>
+        <td class="td-date">${formatDate(c.createdAt)}</td>
+      </tr>
+    `).join('');
+
+    contactsTableWrap.innerHTML = `
+      <table>
+        <thead>
+          <tr>
+            <th>From</th>
+            <th>Project Type</th>
+            <th>Message</th>
+            <th>Status</th>
+            <th>Update</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>`;
+
+    // Attach status change listeners
+    contactsTableWrap.querySelectorAll('.status-select').forEach(sel => {
+      sel.addEventListener('change', () => updateStatus('contacts', sel.dataset.id, sel.value));
+    });
+
+    loadStats();
+  }
+
+  // ── Load Leads ──────────────────────────────────────────────────────
+  async function loadLeads() {
+    leadsTableWrap.innerHTML =
+      '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading leads...</div>';
+
+    const data = await apiFetch('/leads');
+
+    if (!data.success || data.data.length === 0) {
+      leadsTableWrap.innerHTML = `
+        <div class="empty-state">
+          <i class="fas fa-bolt"></i>
+          <p>No chatbot leads captured yet.</p>
+        </div>`;
+      return;
+    }
+
+    const rows = data.data.map(l => `
+      <tr>
+        <td class="td-email">
+          <a href="mailto:${l.email}">${l.email}</a>
+        </td>
+        <td>${statusBadge(l.status)}</td>
+        <td>
+          <select class="status-select" data-id="${l._id}" data-type="lead">
+            <option value="new"       ${l.status==='new'       ? 'selected':''}>New</option>
+            <option value="contacted" ${l.status==='contacted' ? 'selected':''}>Contacted</option>
+            <option value="converted" ${l.status==='converted' ? 'selected':''}>Converted</option>
+          </select>
+        </td>
+        <td class="td-date">${formatDate(l.createdAt)}</td>
+      </tr>
+    `).join('');
+
+    leadsTableWrap.innerHTML = `
+      <table>
+        <thead>
+          <tr>
+            <th>Email</th>
+            <th>Status</th>
+            <th>Update Status</th>
+            <th>Date Captured</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>`;
+
+    leadsTableWrap.querySelectorAll('.status-select').forEach(sel => {
+      sel.addEventListener('change', () => updateStatus('leads', sel.dataset.id, sel.value));
+    });
+
+    loadStats();
+  }
+
+  // ── Update Status ───────────────────────────────────────────────────
+  async function updateStatus(type, id, status) {
+    const endpoint = type === 'contacts'
+      ? `/contacts/${id}`
+      : `/leads/${id}`;
+
+    await apiFetch(endpoint, {
+      method : 'PATCH',
+      body   : JSON.stringify({ status })
+    });
+
+    loadStats();
+  }
+
+  // ── Tabs ────────────────────────────────────────────────────────────
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      const tab = btn.dataset.tab;
+      contactsTab.style.display = tab === 'contacts' ? 'block' : 'none';
+      leadsTab.style.display    = tab === 'leads'    ? 'block' : 'none';
+
+      if (tab === 'leads') loadLeads();
+    });
+  });
+
+  // ── Refresh buttons ─────────────────────────────────────────────────
+  document.getElementById('refreshContacts')
+    .addEventListener('click', loadContacts);
+
+  document.getElementById('refreshLeads')
+    .addEventListener('click', loadLeads);
+
+})();
+</script>
+
+</body>
+</html>
