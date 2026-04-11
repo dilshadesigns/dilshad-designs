@@ -21,14 +21,15 @@ const nodemailer = require('nodemailer');
 function createTransporter() {
   return nodemailer.createTransport({
     host   : process.env.SMTP_HOST,
-    port   : parseInt(process.env.SMTP_PORT, 10) || 587,
+    port   : parseInt(process.env.SMTP_PORT, 10) || 2525,
     secure : false,
     auth   : {
       user : process.env.SMTP_USER,
       pass : process.env.SMTP_PASS,
     },
     tls: {
-      rejectUnauthorized: false
+      rejectUnauthorized: false,
+      ciphers: 'SSLv3'
     }
   });
 }
