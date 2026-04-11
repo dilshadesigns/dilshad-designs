@@ -18,15 +18,18 @@ const nodemailer = require('nodemailer');
 // -----------------------------------------------------------------------
 // Build Nodemailer transporter from environment variables
 // -----------------------------------------------------------------------
+const dns = require('dns');
+
 function createTransporter() {
   return nodemailer.createTransport({
-    host   : process.env.SMTP_HOST,
-    port   : parseInt(process.env.SMTP_PORT, 10) || 587,
-    secure : false,
-    auth   : {
-      user : process.env.SMTP_USER,
-      pass : process.env.SMTP_PASS,
+    host: process.env.SMTP_HOST,
+    port: parseInt(process.env.SMTP_PORT, 10) || 587,
+    secure: false,
+    auth: {
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS,
     },
+    family: 4, // ✅ FORCE IPv4 (IMPORTANT FIX)
     tls: {
       rejectUnauthorized: false
     }
