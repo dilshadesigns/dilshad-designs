@@ -406,7 +406,18 @@ Dilshad Designs | New Delhi, India
     });
 
   } catch (err) {
+    // AFTER — full error details visible in Render logs
     console.error('[contactController] Contact email failed:', err.message);
+    console.error('[contactController] Full error:', JSON.stringify({
+      code    : err.code,
+      command : err.command,
+      response: err.response,
+      host    : process.env.SMTP_HOST,
+      port    : process.env.SMTP_PORT,
+      user    : process.env.SMTP_USER ? process.env.SMTP_USER.slice(0,5) + '***' : 'NOT SET',
+      pass    : process.env.SMTP_PASS ? 'SET (' + process.env.SMTP_PASS.length + ' chars)' : 'NOT SET',
+      owner   : process.env.OWNER_EMAIL ? 'SET' : 'NOT SET',
+    }, null, 2));
     return next({
       status  : 500,
       message : 'Failed to send email. Please try again or contact directly at dilshadesign.co@gmail.com.'

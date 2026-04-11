@@ -518,12 +518,8 @@
       });
 
       if (!response.ok) {
-        // Backend unavailable — fall back to EmailJS
-        if (typeof emailjs !== 'undefined') {
-          await emailjs.sendForm("service_6smw61c", "template_b58qu1r", contactForm);
-        } else {
-          throw new Error('Both backend and EmailJS unavailable');
-        }
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || 'Server error: ' + response.status);
       }
 
       contactForm.style.display = 'none';
