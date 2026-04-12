@@ -150,8 +150,6 @@ exports.sendContactEmail = async (req, res, next) => {
       });
     }
 
-    const transporter = createTransporter();
-
     // ── Email to site owner ─────────────────────────────────────────────
     const ownerMailOptions = {
       from    : `"Dilshad Designs Website" <${process.env.SMTP_USER}>`,
@@ -418,8 +416,6 @@ Dilshad Designs | New Delhi, India
 exports.sendLeadEmail = async (req, res, next) => {
   try {
     const email = sanitize(req.body.email);
-
-    const transporter = createTransporter();
 
     // ── Email to site owner notifying of new lead ───────────────────────
     const ownerMailOptions = {
