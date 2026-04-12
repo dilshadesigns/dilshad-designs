@@ -628,8 +628,21 @@ Dilshad Designs | New Delhi, India
 
     // Send both emails concurrently
     await Promise.all([
-      transporter.sendMail(ownerMailOptions),
-      transporter.sendMail(autoReplyOptions),
+      resend.emails.send({
+        from   : 'Dilshad Designs <onboarding@resend.dev>',
+        to     : process.env.OWNER_EMAIL,
+        replyTo: email,
+        subject: `🔥 New Chatbot Lead — dilshadesigns.vercel.app`,
+        html   : ownerMailOptions.html,
+        text   : ownerMailOptions.text,
+      }),
+      resend.emails.send({
+        from   : 'Dilshad Designs <onboarding@resend.dev>',
+        to     : email,
+        subject: `Thanks for your interest! — Dilshad Designs`,
+        html   : autoReplyOptions.html,
+        text   : autoReplyOptions.text,
+      }),
     ]);
 
     return res.status(200).json({
