@@ -34,9 +34,7 @@
   //    Key is kept here only as a fallback. For production, use the
   //    backend /api/contact route to avoid exposing credentials.
   // ===================================================================
-  if (typeof emailjs !== 'undefined') {
-    emailjs.init("nmolriEnOMAEwi_WZ");
-  }
+
 
   // ===================================================================
   // 2. DARK MODE
