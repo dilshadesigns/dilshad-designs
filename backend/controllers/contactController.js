@@ -13,9 +13,25 @@
 const Contact = require('../models/Contact');
 const Lead    = require('../models/Lead');
 
-// ADD this instead:
-const { Resend } = require('resend');
-const resend = new Resend(process.env.RESEND_API_KEY);
+const nodemailer = require('nodemailer');
+
+// -----------------------------------------------------------------------
+// Build Nodemailer transporter from environment variables
+// -----------------------------------------------------------------------
+function createTransporter() {
+  return nodemailer.createTransport({
+    host   : process.env.SMTP_HOST,
+    port   : parseInt(process.env.SMTP_PORT, 10) || 465,
+    secure : true,
+    auth   : {
+      user : process.env.SMTP_USER,
+      pass : process.env.SMTP_PASS,
+    },
+    tls: {
+      rejectUnauthorized: false
+    }
+  });
+}
 
 // -----------------------------------------------------------------------
 // Sanitize a plain-text string
@@ -378,22 +394,10 @@ Dilshad Designs | New Delhi, India
       source: 'contact-form'
     });
 
+    // Send both emails concurrently
     await Promise.all([
-      resend.emails.send({
-        from   : 'Dilshad Designs <onboarding@resend.dev>',
-        to     : process.env.OWNER_EMAIL,
-        replyTo: email,
-        subject: `[New Enquiry] ${subject} — from ${name}`,
-        html   : ownerMailOptions.html,
-        text   : ownerMailOptions.text,
-      }),
-      resend.emails.send({
-        from   : 'Dilshad Designs <onboarding@resend.dev>',
-        to     : email,
-        subject: `Thanks for reaching out, ${name}! — Dilshad Designs`,
-        html   : autoReplyOptions.html,
-        text   : autoReplyOptions.text,
-      }),
+      transporter.sendMail(ownerMailOptions),
+      transporter.sendMail(autoReplyOptions),
     ]);
 
     return res.status(200).json({
