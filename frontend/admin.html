@@ -51,168 +51,170 @@
       transition  : background 0.3s, color 0.3s;
     }
 
-    /* ════════════════════════════════════════════
+    /* ════════════════════════════════════════
        SPLASH SCREEN
-    ════════════════════════════════════════════ */
+    ════════════════════════════════════════ */
     #splashScreen {
-      position: fixed;
-      inset: 0;
-      z-index: 9000;
-      display: flex;
+      position   : fixed;
+      inset      : 0;
+      z-index    : 9999;
+      display    : flex;
       align-items: center;
       justify-content: center;
       flex-direction: column;
-      background: #0d1a15;
-      overflow: hidden;
+      background : #0d1a15;
+      overflow   : hidden;
+      transition : opacity 0.6s ease, transform 0.6s ease;
     }
 
-    /* animated mesh gradient background */
-    #splashScreen::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background:
-        radial-gradient(ellipse 80% 60% at 20% 30%, rgba(47,122,102,0.25) 0%, transparent 60%),
-        radial-gradient(ellipse 60% 80% at 80% 70%, rgba(245,198,44,0.08) 0%, transparent 60%),
-        radial-gradient(ellipse 100% 50% at 50% 100%, rgba(47,122,102,0.12) 0%, transparent 60%);
-      animation: meshShift 4s ease-in-out infinite alternate;
-    }
-
-    @keyframes meshShift {
-      0%   { transform: scale(1) rotate(0deg); opacity: 0.7; }
-      100% { transform: scale(1.08) rotate(2deg); opacity: 1; }
-    }
-
-    /* floating orbs */
-    .splash-orb {
-      position: absolute;
-      border-radius: 50%;
-      filter: blur(60px);
-      animation: orbFloat 6s ease-in-out infinite alternate;
+    #splashScreen.hide {
+      opacity  : 0;
+      transform: translateY(-20px);
       pointer-events: none;
     }
-    .splash-orb-1 { width: 300px; height: 300px; background: rgba(47,122,102,0.15); top: -80px; left: -80px; animation-delay: 0s; }
-    .splash-orb-2 { width: 200px; height: 200px; background: rgba(245,198,44,0.08); bottom: -50px; right: -50px; animation-delay: 1.5s; }
-    .splash-orb-3 { width: 150px; height: 150px; background: rgba(47,122,102,0.1); top: 60%; left: 10%; animation-delay: 0.8s; }
+
+    /* Animated gradient orbs */
+    .splash-orb {
+      position    : absolute;
+      border-radius: 50%;
+      filter      : blur(80px);
+      animation   : orbFloat 6s ease-in-out infinite;
+      pointer-events: none;
+    }
+    .splash-orb-1 {
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(47,122,102,0.35) 0%, transparent 70%);
+      top: -100px; left: -100px;
+      animation-delay: 0s;
+    }
+    .splash-orb-2 {
+      width: 300px; height: 300px;
+      background: radial-gradient(circle, rgba(245,198,44,0.2) 0%, transparent 70%);
+      bottom: -80px; right: -80px;
+      animation-delay: -3s;
+    }
+    .splash-orb-3 {
+      width: 200px; height: 200px;
+      background: radial-gradient(circle, rgba(47,122,102,0.2) 0%, transparent 70%);
+      top: 50%; right: 10%;
+      animation-delay: -1.5s;
+    }
 
     @keyframes orbFloat {
-      0%   { transform: translate(0, 0) scale(1); }
-      100% { transform: translate(30px, -20px) scale(1.1); }
+      0%, 100% { transform: translate(0,0) scale(1); }
+      33%       { transform: translate(20px,-20px) scale(1.05); }
+      66%       { transform: translate(-15px,15px) scale(0.95); }
+    }
+
+    /* Noise grain texture */
+    .splash-grain {
+      position: absolute; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none;
+      opacity: 0.4;
     }
 
     .splash-content {
-      position: relative;
-      z-index: 1;
+      position  : relative;
       text-align: center;
+      z-index   : 1;
     }
 
+    /* Brand text reveal */
     .splash-brand {
-      font-family: 'Syne', sans-serif;
-      font-size: clamp(2.2rem, 8vw, 4rem);
-      font-weight: 800;
-      letter-spacing: -0.02em;
-      line-height: 1;
-      overflow: hidden;
-      display: flex;
-      gap: 0;
+      font-family  : 'Syne', sans-serif;
+      font-size    : clamp(2.2rem, 7vw, 4rem);
+      font-weight  : 800;
+      letter-spacing: 0.04em;
+      display      : flex;
+      gap          : 0;
+      overflow     : hidden;
     }
 
-    .splash-char {
-      display: inline-block;
-      opacity: 0;
-      transform: translateY(30px) scale(0.8);
-      animation: charReveal 0.5s cubic-bezier(0.34,1.56,0.64,1) forwards;
+    .splash-brand .letter {
+      display   : inline-block;
+      opacity   : 0;
+      transform : translateY(30px);
+      animation : letterReveal 0.05s ease forwards;
     }
 
-    @keyframes charReveal {
-      to { opacity: 1; transform: translateY(0) scale(1); }
-    }
+    .splash-brand .gold-letter  { color: #f5c62c; }
+    .splash-brand .green-letter { color: #8ec4b4; }
 
-    .splash-char.gold  { color: #f5c62c; }
-    .splash-char.green { color: #8ec4b4; }
-
-    /* glow pulse under text */
-    .splash-glow {
-      position: absolute;
-      bottom: -20px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 80%;
-      height: 2px;
-      background: linear-gradient(90deg, transparent, #f5c62c, #2F7A66, transparent);
-      border-radius: 2px;
-      opacity: 0;
-      animation: glowLine 0.6s ease forwards;
-      animation-delay: 1.2s;
-    }
-
-    @keyframes glowLine {
-      to { opacity: 1; box-shadow: 0 0 20px rgba(245,198,44,0.4), 0 0 40px rgba(47,122,102,0.3); }
-    }
-
-    .splash-tagline {
-      margin-top: 1.5rem;
-      font-size: 0.85rem;
-      color: rgba(255,255,255,0.35);
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      opacity: 0;
-      transform: translateY(10px);
-      animation: fadeUp 0.5s ease forwards;
-      animation-delay: 1.4s;
-    }
-
-    @keyframes fadeUp {
+    @keyframes letterReveal {
       to { opacity: 1; transform: translateY(0); }
     }
 
-    /* loading dots */
-    .splash-dots {
-      display: flex;
-      gap: 6px;
-      justify-content: center;
-      margin-top: 2.5rem;
-      opacity: 0;
-      animation: fadeUp 0.4s ease forwards;
-      animation-delay: 1.6s;
+    /* Glow under text */
+    .splash-glow {
+      width    : 300px;
+      height   : 2px;
+      margin   : 1rem auto 0;
+      background: linear-gradient(90deg, transparent, #f5c62c, #2F7A66, transparent);
+      transform : scaleX(0);
+      animation : glowReveal 0.5s ease 1.2s forwards;
     }
+
+    @keyframes glowReveal {
+      to { transform: scaleX(1); }
+    }
+
+    .splash-sub {
+      margin-top : 1.2rem;
+      color      : rgba(142,196,180,0.7);
+      font-size  : 0.85rem;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      opacity    : 0;
+      animation  : fadeInUp 0.5s ease 1.3s forwards;
+    }
+
+    /* Loading dots */
+    .splash-dots {
+      display    : flex;
+      gap        : 0.4rem;
+      justify-content: center;
+      margin-top : 2.5rem;
+      opacity    : 0;
+      animation  : fadeInUp 0.4s ease 1.5s forwards;
+    }
+
     .splash-dot {
-      width: 6px; height: 6px;
+      width        : 6px;
+      height       : 6px;
       border-radius: 50%;
-      background: rgba(47,122,102,0.5);
-      animation: dotPulse 1.2s ease-in-out infinite;
+      background   : rgba(47,122,102,0.6);
+      animation    : dotPulse 1s ease-in-out infinite;
     }
     .splash-dot:nth-child(1) { animation-delay: 0s; }
     .splash-dot:nth-child(2) { animation-delay: 0.2s; }
     .splash-dot:nth-child(3) { animation-delay: 0.4s; }
 
     @keyframes dotPulse {
-      0%, 100% { transform: scale(1); background: rgba(47,122,102,0.5); }
-      50% { transform: scale(1.5); background: #f5c62c; }
+      0%,100% { transform: scale(1); background: rgba(47,122,102,0.4); }
+      50%     { transform: scale(1.4); background: #f5c62c; }
     }
 
-    /* Splash exit animation */
-    #splashScreen.fade-out {
-      animation: splashExit 0.6s cubic-bezier(0.4,0,0.2,1) forwards;
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
     }
 
-    @keyframes splashExit {
-      0%   { opacity: 1; transform: scale(1); }
-      100% { opacity: 0; transform: scale(1.05); pointer-events: none; }
-    }
-
-    /* ── Login Screen ── */
+    /* ════════════════════════════════════════
+       LOGIN SCREEN
+    ════════════════════════════════════════ */
     #loginScreen {
       min-height     : 100vh;
-      display        : none;
+      display        : flex;
       align-items    : center;
       justify-content: center;
       padding        : 1rem;
       opacity        : 0;
       transition     : opacity 0.5s ease;
     }
-    #loginScreen.visible { display: flex; }
-    #loginScreen.fade-in { opacity: 1; }
+
+    #loginScreen.visible { opacity: 1; }
 
     .login-card {
       background    : var(--surface);
@@ -223,11 +225,11 @@
       max-width     : 400px;
       box-shadow    : var(--shadow), 0 0 0 1px rgba(47,122,102,0.05);
       text-align    : center;
-      animation     : cardIn 0.5s cubic-bezier(0.34,1.2,0.64,1) both;
+      animation     : cardFloat 0.6s cubic-bezier(0.34,1.56,0.64,1);
     }
 
-    @keyframes cardIn {
-      from { transform: translateY(20px) scale(0.97); opacity: 0; }
+    @keyframes cardFloat {
+      from { transform: translateY(30px) scale(0.96); opacity: 0; }
       to   { transform: translateY(0) scale(1); opacity: 1; }
     }
 
@@ -242,11 +244,11 @@
       font-size: 0.95rem; font-family: inherit;
       color: var(--text); background: var(--surface);
       outline: none; margin-bottom: 1rem;
-      transition: border-color 0.25s, box-shadow 0.25s;
+      transition: border-color 0.3s, box-shadow 0.3s;
     }
     .login-input:focus {
       border-color: var(--brand);
-      box-shadow: 0 0 0 3px rgba(47,122,102,0.12);
+      box-shadow: 0 0 0 3px rgba(47,122,102,0.1);
     }
 
     .login-btn {
@@ -258,6 +260,12 @@
       transition: background 0.25s, transform 0.15s, box-shadow 0.25s;
       position: relative; overflow: hidden;
     }
+    .login-btn::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: rgba(255,255,255,0);
+      transition: background 0.3s;
+    }
     .login-btn:hover {
       background: var(--brand-dark);
       transform: translateY(-1px);
@@ -266,26 +274,28 @@
     .login-btn:active { transform: translateY(0); }
     .login-btn:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
 
-    /* ripple */
-    .login-btn .ripple {
-      position: absolute; border-radius: 50%;
+    /* Ripple */
+    .ripple-effect {
+      position: absolute;
+      border-radius: 50%;
       background: rgba(255,255,255,0.3);
-      transform: scale(0); animation: rippleOut 0.5s ease-out;
+      transform: scale(0);
+      animation: ripple 0.5s linear;
       pointer-events: none;
     }
-    @keyframes rippleOut {
+    @keyframes ripple {
       to { transform: scale(4); opacity: 0; }
     }
 
     .login-error {
       color: #dc2626; font-size: 0.85rem;
       margin-top: 0.75rem; display: none;
-      animation: shakeX 0.4s ease;
+      animation: shake 0.4s ease;
     }
-    @keyframes shakeX {
+    @keyframes shake {
       0%,100% { transform: translateX(0); }
-      25% { transform: translateX(-6px); }
-      75% { transform: translateX(6px); }
+      20%,60% { transform: translateX(-6px); }
+      40%,80% { transform: translateX(6px); }
     }
 
     /* ── Session timer ── */
@@ -296,17 +306,18 @@
     .session-timer.warning { color: #f59e0b; }
     .session-timer.danger  { color: #ef4444; }
 
-    /* ── Dashboard ── */
-    #dashboard { display: none; animation: dashIn 0.4s ease; }
-    @keyframes dashIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    /* ════════════════════════════════════════
+       DASHBOARD
+    ════════════════════════════════════════ */
+    #dashboard { display: none; animation: fadeIn 0.4s ease; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
     /* ── Top Bar ── */
     .topbar {
       background: var(--topbar-bg); padding: 0 2rem; height: 64px;
       display: flex; align-items: center; justify-content: space-between;
       position: sticky; top: 0; z-index: 100;
-      border-bottom: 1px solid rgba(255,255,255,0.05);
-      backdrop-filter: blur(10px);
+      box-shadow: 0 1px 0 rgba(255,255,255,0.04);
     }
     .topbar-left { display: flex; align-items: center; gap: 0.5rem; }
     .topbar-logo { font-family: 'Syne', sans-serif; font-size: 1.2rem; font-weight: 800; }
@@ -338,55 +349,60 @@
       transition: all 0.25s;
       display: flex; align-items: center; gap: 0.4rem;
     }
-    .logout-btn:hover { background: rgba(220,38,38,0.3); color: #fff; border-color: rgba(220,38,38,0.5); transform: translateY(-1px); }
+    .logout-btn:hover { background: rgba(220,38,38,0.3); color: #fff; border-color: rgba(220,38,38,0.5); }
 
-    /* ── Mobile menu ── */
+    /* ── Mobile menu (hamburger) ── */
     .mobile-menu-btn {
       display: none;
-      background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.7);
+      background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.8);
       border: 1px solid rgba(255,255,255,0.15);
-      width: 36px; height: 36px; border-radius: 8px;
+      width: 38px; height: 38px; border-radius: 8px;
       font-size: 1rem; cursor: pointer;
       align-items: center; justify-content: center;
-      transition: all 0.25s;
+      transition: all 0.25s; flex-shrink: 0;
     }
-    .mobile-menu-btn:hover { background: rgba(255,255,255,0.15); color: #fff; }
+    .mobile-menu-btn:hover { background: rgba(255,255,255,0.15); }
 
     .mobile-dropdown {
       display: none;
       position: absolute;
       top: 68px; right: 1rem;
-      background: #111f18;
+      background: #0d1a15;
       border: 1px solid rgba(255,255,255,0.1);
       border-radius: 12px;
       padding: 0.5rem;
-      min-width: 200px;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+      min-width: 220px;
       z-index: 200;
-      animation: dropIn 0.2s cubic-bezier(0.34,1.2,0.64,1);
-    }
-    @keyframes dropIn {
-      from { opacity: 0; transform: translateY(-8px) scale(0.97); }
-      to   { opacity: 1; transform: translateY(0) scale(1); }
+      box-shadow: 0 16px 40px rgba(0,0,0,0.4);
+      animation: dropdownIn 0.2s cubic-bezier(0.34,1.56,0.64,1);
     }
     .mobile-dropdown.open { display: block; }
 
-    .mobile-menu-item {
-      display: flex; align-items: center; gap: 0.6rem;
-      padding: 0.65rem 0.9rem; border-radius: 8px;
-      color: rgba(255,255,255,0.7); font-size: 0.88rem; font-weight: 500;
-      cursor: pointer; transition: all 0.2s; width: 100%;
-      background: none; border: none; font-family: inherit;
+    @keyframes dropdownIn {
+      from { opacity: 0; transform: translateY(-8px) scale(0.97); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
     }
-    .mobile-menu-item:hover { background: rgba(255,255,255,0.08); color: #fff; }
-    .mobile-menu-item.danger:hover { background: rgba(220,38,38,0.2); color: #f87171; }
-    .mobile-menu-item i { width: 16px; text-align: center; }
-    .mobile-menu-divider { height: 1px; background: rgba(255,255,255,0.08); margin: 0.3rem 0; }
+
+    .mobile-dropdown-item {
+      display: flex; align-items: center; gap: 0.75rem;
+      padding: 0.65rem 0.85rem; border-radius: 8px;
+      color: rgba(255,255,255,0.7); font-size: 0.875rem;
+      cursor: pointer; transition: all 0.2s; border: none;
+      background: none; width: 100%; font-family: inherit;
+      text-align: left;
+    }
+    .mobile-dropdown-item:hover { background: rgba(255,255,255,0.07); color: #fff; }
+    .mobile-dropdown-item.danger:hover { background: rgba(220,38,38,0.2); color: #ff6b6b; }
+
+    .mobile-dropdown-divider {
+      height: 1px; background: rgba(255,255,255,0.08); margin: 0.35rem 0;
+    }
 
     .mobile-session-info {
-      padding: 0.5rem 0.9rem; font-size: 0.78rem;
+      padding: 0.5rem 0.85rem;
       color: rgba(255,255,255,0.35);
-      display: flex; align-items: center; gap: 0.4rem;
+      font-size: 0.75rem;
+      display: flex; align-items: center; gap: 0.5rem;
     }
 
     /* ── Main Content ── */
@@ -396,6 +412,11 @@
     .welcome-bar {
       display: flex; align-items: center; justify-content: space-between;
       margin-bottom: 2rem; flex-wrap: wrap; gap: 0.75rem;
+      animation: slideDown 0.4s ease 0.1s both;
+    }
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-12px); }
+      to   { opacity: 1; transform: translateY(0); }
     }
     .welcome-bar h2 { font-family: 'Syne', sans-serif; font-size: 1.4rem; font-weight: 800; }
     .welcome-bar p  { color: var(--text-muted); font-size: 0.88rem; margin-top: 0.2rem; }
@@ -405,60 +426,58 @@
     .stats-grid {
       display: grid; grid-template-columns: repeat(5, 1fr);
       gap: 1.25rem; margin-bottom: 2.5rem;
+      animation: slideDown 0.4s ease 0.15s both;
     }
     .stat-card {
       background: var(--surface); border: 1px solid var(--border);
       border-radius: var(--radius); padding: 1.25rem 1.5rem;
       display: flex; align-items: center; gap: 1rem;
       box-shadow: var(--shadow);
-      transition: transform 0.25s cubic-bezier(0.34,1.2,0.64,1), box-shadow 0.25s, border-color 0.25s;
+      transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
       cursor: default;
-      /* staggered fade in */
-      opacity: 0;
-      animation: statCardIn 0.5s ease forwards;
+      position: relative; overflow: hidden;
     }
-    .stat-card:nth-child(1) { animation-delay: 0.05s; }
-    .stat-card:nth-child(2) { animation-delay: 0.10s; }
-    .stat-card:nth-child(3) { animation-delay: 0.15s; }
-    .stat-card:nth-child(4) { animation-delay: 0.20s; }
-    .stat-card:nth-child(5) { animation-delay: 0.25s; }
-
-    @keyframes statCardIn {
-      from { opacity: 0; transform: translateY(16px); }
-      to   { opacity: 1; transform: translateY(0); }
+    .stat-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, var(--brand), var(--gold));
+      transform: scaleX(0); transform-origin: left;
+      transition: transform 0.3s ease;
     }
-
     .stat-card:hover {
-      transform: translateY(-4px) scale(1.01);
-      box-shadow: 0 12px 32px rgba(47,122,102,0.14);
-      border-color: rgba(47,122,102,0.2);
+      transform: translateY(-4px);
+      box-shadow: 0 12px 32px rgba(47,122,102,0.15);
+      border-color: rgba(47,122,102,0.25);
     }
+    .stat-card:hover::before { transform: scaleX(1); }
+
     .stat-icon {
       width: 48px; height: 48px; border-radius: 12px;
       display: flex; align-items: center; justify-content: center;
       font-size: 1.2rem; flex-shrink: 0;
-      transition: transform 0.3s;
+      transition: transform 0.3s ease;
     }
-    .stat-card:hover .stat-icon { transform: scale(1.1) rotate(-5deg); }
-
+    .stat-card:hover .stat-icon { transform: scale(1.1) rotate(5deg); }
     .stat-icon.green  { background: var(--brand-light); color: var(--brand); }
     .stat-icon.gold   { background: rgba(245,198,44,0.12); color: #d4a91f; }
     .stat-icon.blue   { background: rgba(59,130,246,0.1); color: #3b82f6; }
     .stat-icon.purple { background: rgba(139,92,246,0.1); color: #8b5cf6; }
     .stat-icon.teal   { background: rgba(20,184,166,0.1); color: #0d9488; }
-
     .stat-num { font-family: 'Syne', sans-serif; font-size: 1.8rem; font-weight: 800; line-height: 1; }
     .stat-label { font-size: 0.8rem; color: var(--text-muted); margin-top: 0.2rem; font-weight: 500; }
 
     /* ── Tabs ── */
-    .tabs { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; border-bottom: 2px solid var(--border); }
+    .tabs {
+      display: flex; gap: 0.5rem; margin-bottom: 1.5rem;
+      border-bottom: 2px solid var(--border);
+      animation: slideDown 0.4s ease 0.2s both;
+    }
     .tab-btn {
       padding: 0.7rem 1.5rem; border: none; background: transparent;
       font-size: 0.9rem; font-weight: 600; font-family: inherit;
       color: var(--text-muted); cursor: pointer;
       border-bottom: 2px solid transparent; margin-bottom: -2px;
       transition: all 0.25s; display: flex; align-items: center; gap: 0.4rem;
-      position: relative;
     }
     .tab-btn:hover  { color: var(--brand); }
     .tab-btn.active { color: var(--brand); border-color: var(--brand); }
@@ -466,9 +485,19 @@
       background: var(--brand); color: #fff;
       font-size: 0.7rem; padding: 0.1rem 0.45rem;
       border-radius: 99px; font-weight: 700;
-      transition: transform 0.2s;
+      transition: transform 0.2s, background 0.2s;
     }
     .tab-btn.active .tab-badge { transform: scale(1.1); }
+
+    /* ── Table wrap animation ── */
+    .table-wrap {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); overflow: hidden;
+      box-shadow: var(--shadow);
+      animation: slideDown 0.4s ease 0.25s both;
+      transition: box-shadow 0.25s;
+    }
+    .table-wrap:hover { box-shadow: 0 8px 32px rgba(47,122,102,0.1); }
 
     /* ── Table controls ── */
     .table-header {
@@ -495,7 +524,6 @@
       transition: border-color 0.25s;
     }
     .filter-select:focus { border-color: var(--brand); }
-
     .action-btn {
       background: var(--brand-light); color: var(--brand);
       border: 1px solid rgba(47,122,102,0.2); padding: 0.45rem 1rem;
@@ -503,6 +531,7 @@
       font-family: inherit; cursor: pointer;
       transition: all 0.25s;
       display: flex; align-items: center; gap: 0.35rem; white-space: nowrap;
+      position: relative; overflow: hidden;
     }
     .action-btn:hover {
       background: var(--brand); color: #fff;
@@ -512,21 +541,14 @@
     .action-btn:active { transform: translateY(0); }
 
     /* ── Table ── */
-    .table-wrap {
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: var(--radius); overflow: hidden;
-      box-shadow: var(--shadow);
-      transition: box-shadow 0.25s;
-    }
-    .table-wrap:hover { box-shadow: 0 8px 32px rgba(47,122,102,0.1); }
     .table-scroll { overflow-x: auto; }
     table { width: 100%; border-collapse: collapse; min-width: 600px; }
     th {
       background: var(--bg); padding: 0.85rem 1.25rem;
       text-align: left; font-size: 0.75rem; font-weight: 700;
       color: var(--text-muted); text-transform: uppercase;
-      letter-spacing: 0.06em; border-bottom: 1px solid var(--border);
-      white-space: nowrap; position: sticky; top: 0; z-index: 1;
+      letter-spacing: 0.06em; border-bottom: 1px solid var(--border); white-space: nowrap;
+      position: sticky; top: 64px; z-index: 10;
     }
     td {
       padding: 0.95rem 1.25rem; font-size: 0.88rem;
@@ -546,7 +568,7 @@
       color: var(--text-muted); font-size: 0.78rem;
       padding: 2px 5px; border-radius: 4px; transition: all 0.2s;
     }
-    .copy-btn:hover { color: var(--brand); background: var(--brand-light); transform: scale(1.1); }
+    .copy-btn:hover { color: var(--brand); background: var(--brand-light); }
 
     .delete-btn {
       background: none; border: none; cursor: pointer; color: #dc2626;
@@ -587,30 +609,25 @@
     .note-cell { display: flex; align-items: center; gap: 6px; }
     .note-text { font-size: 0.8rem; color: var(--text-muted); max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-    /* ── Skeleton Loading ── */
-    .skeleton-table { padding: 0; }
+    /* ── Skeleton loading ── */
+    .skeleton-wrap { padding: 1rem 1.25rem; }
     .skeleton-row {
-      display: flex; gap: 1rem; padding: 1rem 1.25rem;
-      border-bottom: 1px solid var(--border); align-items: center;
+      display: flex; align-items: center; gap: 1rem;
+      padding: 0.75rem 0; border-bottom: 1px solid var(--border);
     }
     .skeleton-row:last-child { border-bottom: none; }
     .skeleton-cell {
       height: 14px; border-radius: 6px;
-      background: linear-gradient(90deg, var(--border) 25%, rgba(47,122,102,0.06) 50%, var(--border) 75%);
+      background: linear-gradient(90deg, var(--border) 25%, rgba(47,122,102,0.05) 50%, var(--border) 75%);
       background-size: 200% 100%;
-      animation: shimmer 1.5s infinite;
+      animation: shimmer 1.4s infinite;
     }
     @keyframes shimmer { to { background-position: -200% 0; } }
-    .sk-w1 { width: 18%; flex-shrink: 0; }
-    .sk-w2 { width: 14%; flex-shrink: 0; }
-    .sk-w3 { width: 28%; flex-shrink: 0; }
-    .sk-w4 { width: 12%; flex-shrink: 0; }
-    .sk-w5 { width: 10%; flex-shrink: 0; }
 
     /* ── Empty / Loading ── */
     .empty-state { text-align: center; padding: 4rem 2rem; color: var(--text-muted); }
     .empty-state i { font-size: 2.5rem; margin-bottom: 1rem; opacity: 0.3; display: block; }
-    .empty-state p { font-size: 0.92rem; }
+    .empty-state p { font-size: 0.9rem; }
     .loading { text-align: center; padding: 3rem; color: var(--text-muted); font-size: 0.9rem; }
     .loading i { margin-right: 0.5rem; }
     .no-results { text-align: center; padding: 2.5rem; color: var(--text-muted); font-size: 0.9rem; }
@@ -618,23 +635,28 @@
     /* ── Message Modal ── */
     .modal-overlay {
       display: none; position: fixed; inset: 0;
-      background: rgba(0,0,0,0.55); z-index: 500;
+      background: rgba(0,0,0,0.6); z-index: 500;
       align-items: center; justify-content: center; padding: 1rem;
       backdrop-filter: blur(4px);
     }
     .modal-overlay.open { display: flex; }
     .modal-box {
-      background: var(--surface); border-radius: 16px; padding: 2rem;
-      width: 100%; max-width: 580px; max-height: 85vh; overflow-y: auto;
+      background: var(--surface); border-radius: 20px; padding: 2rem;
+      width: 100%; max-width: 580px; max-height: 88vh; overflow-y: auto;
       border: 1px solid var(--border);
-      animation: modalIn 0.3s cubic-bezier(0.34,1.2,0.64,1);
+      animation: modalSlideIn 0.3s cubic-bezier(0.34,1.56,0.64,1);
+      box-shadow: 0 24px 64px rgba(0,0,0,0.2);
     }
-    @keyframes modalIn {
-      from { transform: scale(0.92) translateY(20px); opacity: 0; }
-      to   { transform: scale(1) translateY(0); opacity: 1; }
+    @keyframes modalSlideIn {
+      from { transform: translateY(30px) scale(0.95); opacity: 0; }
+      to   { transform: translateY(0) scale(1); opacity: 1; }
     }
     .modal-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.25rem; gap: 1rem; }
-    .modal-close-btn { background: none; border: none; cursor: pointer; color: var(--text-muted); font-size: 1.2rem; padding: 4px; border-radius: 6px; transition: all 0.2s; }
+    .modal-close-btn {
+      background: none; border: none; cursor: pointer; color: var(--text-muted);
+      font-size: 1.2rem; padding: 6px; border-radius: 8px; transition: all 0.2s;
+      line-height: 1;
+    }
     .modal-close-btn:hover { color: var(--text); background: var(--bg); transform: rotate(90deg); }
     .modal-name { font-family: 'Syne', sans-serif; font-size: 1.15rem; font-weight: 800; }
     .modal-meta { font-size: 0.83rem; color: var(--text-muted); margin-top: 2px; }
@@ -648,29 +670,44 @@
     .modal-reply-btn { background: var(--brand); color: #fff; border: none; padding: 0.65rem 1.25rem; border-radius: 8px; font-family: inherit; font-size: 0.88rem; font-weight: 600; cursor: pointer; transition: all 0.25s; display: flex; align-items: center; gap: 0.4rem; text-decoration: none; }
     .modal-reply-btn:hover { background: var(--brand-dark); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(47,122,102,0.3); }
     .modal-save-note-btn { background: var(--bg); color: var(--text); border: 1px solid var(--border); padding: 0.65rem 1.25rem; border-radius: 8px; font-family: inherit; font-size: 0.88rem; font-weight: 600; cursor: pointer; transition: all 0.25s; }
-    .modal-save-note-btn:hover { border-color: var(--brand); color: var(--brand); transform: translateY(-1px); }
+    .modal-save-note-btn:hover { border-color: var(--brand); color: var(--brand); background: var(--brand-light); }
 
     /* ── Confirm Delete Modal ── */
-    .confirm-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 600; align-items: center; justify-content: center; padding: 1rem; backdrop-filter: blur(4px); }
-    .confirm-overlay.open { display: flex; }
-    .confirm-box { background: var(--surface); border-radius: 14px; padding: 2rem; width: 100%; max-width: 380px; border: 1px solid var(--border); text-align: center; animation: modalIn 0.3s cubic-bezier(0.34,1.2,0.64,1); }
-    .confirm-box i { font-size: 2rem; color: #dc2626; margin-bottom: 0.75rem; display: block; animation: iconShake 0.4s ease 0.2s both; }
-    @keyframes iconShake {
-      0%,100% { transform: rotate(0deg); }
-      25% { transform: rotate(-10deg); }
-      75% { transform: rotate(10deg); }
+    .confirm-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.6); z-index: 600;
+      align-items: center; justify-content: center; padding: 1rem;
+      backdrop-filter: blur(4px);
     }
+    .confirm-overlay.open { display: flex; }
+    .confirm-box {
+      background: var(--surface); border-radius: 16px; padding: 2rem;
+      width: 100%; max-width: 380px; border: 1px solid var(--border);
+      text-align: center;
+      animation: modalSlideIn 0.3s cubic-bezier(0.34,1.56,0.64,1);
+      box-shadow: 0 24px 64px rgba(0,0,0,0.2);
+    }
+    .confirm-box i { font-size: 2rem; color: #dc2626; margin-bottom: 0.75rem; display: block; }
     .confirm-box h3 { font-family: 'Syne',sans-serif; font-size: 1.1rem; margin-bottom: 0.5rem; }
     .confirm-box p  { color: var(--text-muted); font-size: 0.88rem; margin-bottom: 1.5rem; }
     .confirm-actions { display: flex; gap: 0.75rem; justify-content: center; }
     .btn-cancel { padding: 0.6rem 1.5rem; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); color: var(--text); font-family: inherit; font-size: 0.88rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
-    .btn-cancel:hover { background: var(--bg); }
+    .btn-cancel:hover { background: var(--bg); border-color: var(--text-muted); }
     .btn-delete { padding: 0.6rem 1.5rem; border: none; border-radius: 8px; background: #dc2626; color: #fff; font-family: inherit; font-size: 0.88rem; font-weight: 600; cursor: pointer; transition: all 0.25s; }
     .btn-delete:hover { background: #b91c1c; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(220,38,38,0.3); }
 
     /* ── Toast ── */
-    .toast { position: fixed; bottom: 2rem; right: 2rem; padding: 0.75rem 1.25rem; border-radius: 10px; font-size: 0.88rem; font-weight: 600; transform: translateY(80px); opacity: 0; transition: all 0.35s cubic-bezier(0.34,1.56,0.64,1); z-index: 9999; display: flex; align-items: center; gap: 0.5rem; box-shadow: 0 8px 24px rgba(0,0,0,0.15); pointer-events: none; }
-    .toast.show { transform: translateY(0); opacity: 1; }
+    .toast {
+      position: fixed; bottom: 2rem; right: 2rem;
+      padding: 0.75rem 1.25rem; border-radius: 12px;
+      font-size: 0.88rem; font-weight: 600;
+      transform: translateY(80px) scale(0.9);
+      opacity: 0; transition: all 0.35s cubic-bezier(0.34,1.56,0.64,1);
+      z-index: 9999; display: flex; align-items: center; gap: 0.5rem;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.15); pointer-events: none;
+      max-width: 320px;
+    }
+    .toast.show { transform: translateY(0) scale(1); opacity: 1; }
     .toast.success { background: var(--brand); color: #fff; }
     .toast.error   { background: #dc2626; color: #fff; }
     .toast.info    { background: #3b82f6; color: #fff; }
@@ -679,35 +716,66 @@
     /* ── Refresh indicator ── */
     .refresh-indicator { display: flex; align-items: center; gap: 0.4rem; font-size: 0.78rem; color: var(--text-muted); }
     .refresh-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--brand); animation: pulse 2s infinite; }
-    @keyframes pulse { 0%,100%{opacity:1; transform:scale(1);} 50%{opacity:0.3; transform:scale(0.8);} }
+    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.85)} }
 
-    /* ── Responsive ── */
-    @media (max-width: 900px) { .stats-grid { grid-template-columns: repeat(3, 1fr); } }
+    /* ══════════════════════════════════════
+       RESPONSIVE
+    ══════════════════════════════════════ */
+    @media (max-width: 900px) {
+      .stats-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+
     @media (max-width: 640px) {
       .stats-grid { grid-template-columns: repeat(2, 1fr); }
       .topbar { padding: 0 1rem; }
-      .topbar-time, .session-timer, .dark-toggle, .logout-btn { display: none !important; }
-      .mobile-menu-btn { display: flex !important; }
+      .topbar-time { display: none; }
+      .session-timer { display: none; }
+      .logout-btn { display: none; }
+      .dark-toggle { display: none; }
+      .mobile-menu-btn { display: flex; }
+
       .main { padding: 1.25rem 1rem; }
       .welcome-bar { flex-direction: column; align-items: flex-start; }
       .search-input { width: 100%; }
       .table-header { flex-direction: column; align-items: flex-start; }
       .table-controls { width: 100%; }
+
       table thead { display: none; }
       table, tbody { display: block; }
+
       tr.clickable-row {
         display: block; background: var(--surface);
         border: 1px solid var(--border); border-radius: var(--radius);
-        margin-bottom: 0.75rem; padding: 1rem; cursor: pointer;
+        margin-bottom: 1rem; padding: 1rem; cursor: pointer;
         transition: all 0.2s;
+        box-shadow: 0 2px 8px rgba(47,122,102,0.04);
       }
-      tr.clickable-row:hover { background: var(--brand-light); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(47,122,102,0.1); }
-      td { display: block; border: none; padding: 0.3rem 0; font-size: 0.88rem; }
-      td::before { content: attr(data-label); font-weight: 700; font-size: 0.72rem; color: var(--text-muted); display: block; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px; }
+      tr.clickable-row:hover {
+        background: var(--brand-light);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(47,122,102,0.1);
+      }
+      td {
+        display: block; border: none; padding: 0.3rem 0; font-size: 0.88rem;
+      }
+      td::before {
+        content: attr(data-label); font-weight: 700; font-size: 0.72rem;
+        color: var(--text-muted); display: block;
+        text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px;
+      }
       .td-message { max-width: 100%; white-space: normal; }
-      .toast { bottom: 1rem; right: 1rem; left: 1rem; }
+
+      /* Non-clickable rows on mobile */
+      tbody tr:not(.clickable-row) {
+        display: block; background: var(--surface);
+        border: 1px solid var(--border); border-radius: var(--radius);
+        margin-bottom: 1rem; padding: 1rem;
+      }
     }
-    @media (max-width: 400px) { .stats-grid { grid-template-columns: 1fr 1fr; } }
+
+    @media (max-width: 400px) {
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+    }
   </style>
 </head>
 <body>
@@ -717,11 +785,12 @@
   <div class="splash-orb splash-orb-1"></div>
   <div class="splash-orb splash-orb-2"></div>
   <div class="splash-orb splash-orb-3"></div>
+  <div class="splash-grain"></div>
 
   <div class="splash-content">
     <div class="splash-brand" id="splashBrand"></div>
     <div class="splash-glow"></div>
-    <p class="splash-tagline">Admin Dashboard</p>
+    <p class="splash-sub">Admin Dashboard</p>
     <div class="splash-dots">
       <div class="splash-dot"></div>
       <div class="splash-dot"></div>
@@ -780,28 +849,29 @@
       <button class="logout-btn" id="logoutBtn">
         <i class="fas fa-sign-out-alt"></i> Logout
       </button>
-      <!-- Mobile only -->
-      <button class="mobile-menu-btn" id="mobileMenuBtn" title="Menu">
+      <!-- Mobile hamburger -->
+      <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Menu">
         <i class="fas fa-ellipsis-v"></i>
       </button>
     </div>
+  </div>
 
-    <!-- Mobile Dropdown -->
-    <div class="mobile-dropdown" id="mobileDropdown">
-      <div class="mobile-session-info" id="mobileSessionInfo">
-        <i class="fas fa-shield-alt"></i>
-        <span id="mobileSessionCountdown">--:--</span> remaining
-      </div>
-      <div class="mobile-menu-divider"></div>
-      <button class="mobile-menu-item" id="mobileDarkToggle">
-        <i class="fas fa-moon"></i>
-        <span id="mobileDarkLabel">Dark Mode</span>
-      </button>
-      <div class="mobile-menu-divider"></div>
-      <button class="mobile-menu-item danger" id="mobileLogoutBtn">
-        <i class="fas fa-sign-out-alt"></i> Logout
-      </button>
+  <!-- Mobile Dropdown Menu -->
+  <div class="mobile-dropdown" id="mobileDropdown">
+    <div class="mobile-session-info">
+      <i class="fas fa-shield-alt"></i>
+      <span>Session: <span id="mobileSessionCountdown">60:00</span></span>
     </div>
+    <div class="mobile-dropdown-divider"></div>
+    <button class="mobile-dropdown-item" id="mobileDarkToggle">
+      <i class="fas fa-moon" id="mobileDarkIcon"></i>
+      <span id="mobileDarkLabel">Dark Mode</span>
+    </button>
+    <div class="mobile-dropdown-divider"></div>
+    <button class="mobile-dropdown-item danger" id="mobileLogoutBtn">
+      <i class="fas fa-sign-out-alt"></i>
+      <span>Logout</span>
+    </button>
   </div>
 
   <!-- Main Content -->
@@ -874,9 +944,7 @@
           </div>
         </div>
         <div class="table-scroll" id="contactsTableWrap">
-          <div class="skeleton-table" id="contactsSkeleton">
-            <!-- skeleton rows injected by JS -->
-          </div>
+          <div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading messages...</div>
         </div>
       </div>
     </div>
@@ -899,7 +967,7 @@
           </div>
         </div>
         <div class="table-scroll" id="leadsTableWrap">
-          <div class="skeleton-table"></div>
+          <div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading leads...</div>
         </div>
       </div>
     </div>
@@ -958,9 +1026,8 @@
     ? 'http://localhost:3000'
     : 'https://dilshad-designs.onrender.com';
 
-  const TOKEN_KEY    = 'dd_admin_token';
+  const TOKEN_KEY     = 'dd_admin_token';
   const TOKEN_EXP_KEY = 'dd_admin_exp';
-  const SPLASH_KEY   = 'dd_splash_shown';
 
   let allContacts   = [];
   let allLeads      = [];
@@ -970,9 +1037,9 @@
   let sessionTimer = null;
 
   // ── DOM refs ──────────────────────────────────────────────────────────
-  const splashScreen      = document.getElementById('splashScreen');
   const loginScreen       = document.getElementById('loginScreen');
   const dashboard         = document.getElementById('dashboard');
+  const splashScreen      = document.getElementById('splashScreen');
   const passwordInput     = document.getElementById('passwordInput');
   const loginBtn          = document.getElementById('loginBtn');
   const loginError        = document.getElementById('loginError');
@@ -991,64 +1058,66 @@
   const lastUpdated       = document.getElementById('lastUpdated');
   const sessionTimerEl    = document.getElementById('sessionTimer');
   const sessionCountdown  = document.getElementById('sessionCountdown');
+  const mobileMenuBtn     = document.getElementById('mobileMenuBtn');
+  const mobileDropdown    = document.getElementById('mobileDropdown');
+  const mobileDarkToggle  = document.getElementById('mobileDarkToggle');
+  const mobileLogoutBtn   = document.getElementById('mobileLogoutBtn');
+  const mobileSessionCD   = document.getElementById('mobileSessionCountdown');
 
-  // ── Skeleton helper ───────────────────────────────────────────────────
-  function skeletonHTML(rows = 5) {
-    let html = '<div class="skeleton-table">';
-    for (let i = 0; i < rows; i++) {
-      html += `<div class="skeleton-row">
-        <div class="skeleton-cell sk-w1"></div>
-        <div class="skeleton-cell sk-w2"></div>
-        <div class="skeleton-cell sk-w3"></div>
-        <div class="skeleton-cell sk-w4"></div>
-        <div class="skeleton-cell sk-w5"></div>
-      </div>`;
-    }
-    html += '</div>';
-    return html;
-  }
+  // ── SPLASH SCREEN ─────────────────────────────────────────────────────
+  const SPLASH_KEY = 'dd_splash_shown';
 
-  // ── Splash Screen ─────────────────────────────────────────────────────
-  function runSplash(callback) {
-    const brand = document.getElementById('splashBrand');
-    const text = 'Dilshadesigns';
-    const goldEnd = 7; // "Dilshad" = 7 chars
+  function runSplash(onDone) {
+    const brand = 'Dilshadesigns';
+    const goldCount = 7; // 'Dilshad'
+    const container = document.getElementById('splashBrand');
 
-    // Build characters
-    text.split('').forEach((ch, i) => {
+    brand.split('').forEach((char, i) => {
       const span = document.createElement('span');
-      span.className = 'splash-char ' + (i < goldEnd ? 'gold' : 'green');
-      span.textContent = ch;
-      span.style.animationDelay = (0.05 + i * 0.06) + 's';
-      brand.appendChild(span);
+      span.className = 'letter ' + (i < goldCount ? 'gold-letter' : 'green-letter');
+      span.textContent = char;
+      // stagger each letter
+      span.style.animationDelay = (0.08 + i * 0.06) + 's';
+      span.style.animationDuration = '0.4s';
+      container.appendChild(span);
     });
 
-    // Total anim time: last char at ~0.05 + 12*0.06 = 0.77s + 0.5s anim = 1.27s
-    // Show for ~0.4s then exit
-    const exitDelay = 1800; // ms before fade out
+    // After all letters + a brief pause, fade out splash
+    const totalDelay = 0.08 + (brand.length * 0.06) + 0.8; // letters + hold
 
     setTimeout(() => {
-      splashScreen.classList.add('fade-out');
+      splashScreen.classList.add('hide');
       setTimeout(() => {
         splashScreen.style.display = 'none';
-        callback();
+        onDone();
       }, 600);
-    }, exitDelay);
+    }, totalDelay * 1000);
   }
 
-  function showLoginScreen() {
+  function initApp() {
     loginScreen.classList.add('visible');
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        loginScreen.classList.add('fade-in');
-        passwordInput.focus();
-      });
-    });
+    // If already logged in, show dashboard immediately
+    if (getToken() && getSecondsRemaining() > 0) {
+      loginScreen.style.display  = 'none';
+      dashboard.style.display    = 'block';
+      startSessionCountdown();
+      loadStats();
+      loadContacts();
+      startAutoRefresh();
+    }
   }
 
-  function showDashboard() {
-    loginScreen.style.display = 'none';
-    dashboard.style.display = 'block';
+  // Skip splash if already logged in (token exists)
+  if (getToken && localStorage.getItem(TOKEN_KEY) && getSecondsRemainingRaw() > 0) {
+    splashScreen.style.display = 'none';
+    initApp();
+  } else {
+    runSplash(initApp);
+  }
+
+  function getSecondsRemainingRaw() {
+    const exp = parseInt(localStorage.getItem(TOKEN_EXP_KEY) || '0', 10);
+    return Math.max(0, Math.floor((exp - Date.now()) / 1000));
   }
 
   // ── Dark Mode ─────────────────────────────────────────────────────────
@@ -1056,7 +1125,7 @@
   document.documentElement.setAttribute('data-theme', savedTheme);
   updateDarkIcon(savedTheme);
 
-  function toggleDark() {
+  function toggleTheme() {
     const cur  = document.documentElement.getAttribute('data-theme');
     const next = cur === 'dark' ? 'light' : 'dark';
     document.documentElement.setAttribute('data-theme', next);
@@ -1064,24 +1133,20 @@
     updateDarkIcon(next);
   }
 
-  darkToggle.addEventListener('click', toggleDark);
+  darkToggle.addEventListener('click', toggleTheme);
+  mobileDarkToggle.addEventListener('click', () => {
+    toggleTheme();
+    mobileDropdown.classList.remove('open');
+  });
 
   function updateDarkIcon(theme) {
-    const icon = theme === 'dark' ? 'fa-sun' : 'fa-moon';
-    darkToggle.innerHTML = `<i class="fas ${icon}"></i>`;
-    const lbl = document.getElementById('mobileDarkLabel');
-    if (lbl) lbl.textContent = theme === 'dark' ? 'Light Mode' : 'Dark Mode';
-    const mdi = document.querySelector('#mobileDarkToggle i');
-    if (mdi) { mdi.className = `fas ${icon}`; }
+    const icon = theme === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+    darkToggle.innerHTML = icon;
+    document.getElementById('mobileDarkIcon').className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+    document.getElementById('mobileDarkLabel').textContent = theme === 'dark' ? 'Light Mode' : 'Dark Mode';
   }
 
   // ── Mobile Menu ───────────────────────────────────────────────────────
-  const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-  const mobileDropdown = document.getElementById('mobileDropdown');
-  const mobileDarkToggle = document.getElementById('mobileDarkToggle');
-  const mobileLogoutBtn = document.getElementById('mobileLogoutBtn');
-  const mobileSessionCountdown = document.getElementById('mobileSessionCountdown');
-
   mobileMenuBtn.addEventListener('click', (e) => {
     e.stopPropagation();
     mobileDropdown.classList.toggle('open');
@@ -1091,11 +1156,6 @@
     if (!mobileDropdown.contains(e.target) && e.target !== mobileMenuBtn) {
       mobileDropdown.classList.remove('open');
     }
-  });
-
-  mobileDarkToggle.addEventListener('click', () => {
-    toggleDark();
-    mobileDropdown.classList.remove('open');
   });
 
   mobileLogoutBtn.addEventListener('click', () => {
@@ -1124,7 +1184,9 @@
   }
 
   // ── Token helpers ─────────────────────────────────────────────────────
-  function getToken() { return localStorage.getItem(TOKEN_KEY); }
+  function getToken() {
+    return localStorage.getItem(TOKEN_KEY);
+  }
 
   function saveToken(token, expiresIn) {
     const expTs = Date.now() + expiresIn * 1000;
@@ -1149,9 +1211,9 @@
       const secs = getSecondsRemaining();
       const mins = Math.floor(secs / 60);
       const s    = secs % 60;
-      const fmt  = `${String(mins).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-      sessionCountdown.textContent = fmt;
-      if (mobileSessionCountdown) mobileSessionCountdown.textContent = fmt;
+      const display = `${String(mins).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+      sessionCountdown.textContent = display;
+      if (mobileSessionCD) mobileSessionCD.textContent = display;
 
       sessionTimerEl.className = 'session-timer';
       if (secs <= 0) {
@@ -1174,10 +1236,12 @@
   // ── API Helper ────────────────────────────────────────────────────────
   async function apiFetch(endpoint, options = {}) {
     const token = getToken();
+
     if (!token || getSecondsRemaining() <= 0) {
       handleSessionExpiry();
       throw new Error('No valid token');
     }
+
     const res = await fetch(`${API_BASE}/api/admin${endpoint}`, {
       method  : options.method || 'GET',
       headers : {
@@ -1186,6 +1250,7 @@
       },
       body: options.body || undefined
     });
+
     if (res.status === 401) {
       const data = await res.json().catch(() => ({}));
       if (data.expired) {
@@ -1196,19 +1261,23 @@
       }
       throw new Error('Unauthorized');
     }
+
     return res.json();
   }
 
-  // ── Login button ripple ───────────────────────────────────────────────
-  loginBtn.addEventListener('click', function(e) {
-    const rect = loginBtn.getBoundingClientRect();
-    const ripple = document.createElement('span');
-    ripple.className = 'ripple';
-    const size = Math.max(rect.width, rect.height);
-    ripple.style.cssText = `width:${size}px;height:${size}px;left:${e.clientX-rect.left-size/2}px;top:${e.clientY-rect.top-size/2}px`;
-    loginBtn.appendChild(ripple);
-    setTimeout(() => ripple.remove(), 500);
-  });
+  // ── Ripple effect helper ──────────────────────────────────────────────
+  function addRipple(btn) {
+    btn.addEventListener('click', function(e) {
+      const r = document.createElement('span');
+      r.className = 'ripple-effect';
+      const rect = btn.getBoundingClientRect();
+      const size = Math.max(rect.width, rect.height);
+      r.style.cssText = `width:${size}px;height:${size}px;left:${e.clientX-rect.left-size/2}px;top:${e.clientY-rect.top-size/2}px`;
+      btn.appendChild(r);
+      r.addEventListener('animationend', () => r.remove());
+    });
+  }
+  addRipple(document.getElementById('loginBtn'));
 
   // ── Login ─────────────────────────────────────────────────────────────
   async function handleLogin() {
@@ -1238,11 +1307,8 @@
         startAutoRefresh();
       } else {
         loginErrorText.textContent = data.message || 'Invalid credentials.';
-        loginError.style.display   = 'flex';
-        loginError.style.alignItems = 'center';
-        loginError.style.gap = '0.4rem';
-        loginError.style.justifyContent = 'center';
-        // re-trigger shake animation
+        loginError.style.display   = 'block';
+        // Re-trigger shake animation
         loginError.style.animation = 'none';
         loginError.offsetHeight; // reflow
         loginError.style.animation = '';
@@ -1251,7 +1317,7 @@
       }
     } catch (err) {
       loginErrorText.textContent = 'Cannot connect to server. Please try again.';
-      loginError.style.display   = 'flex';
+      loginError.style.display   = 'block';
     }
 
     loginBtn.innerHTML = '<i class="fas fa-lock"></i> Login';
@@ -1270,210 +1336,195 @@
     allLeads    = [];
     dashboard.style.display   = 'none';
     loginScreen.style.display = 'flex';
-    loginScreen.style.opacity = '1';
+    loginScreen.classList.add('visible');
     passwordInput.value = '';
   }
 
   logoutBtn.addEventListener('click', doLogout);
 
-  // ── Page Init: splash → login or dashboard ─────────────────────────────
-  if (getToken() && getSecondsRemaining() > 0) {
-    // Already logged in — skip splash, go straight to dashboard
-    splashScreen.style.display = 'none';
-    loginScreen.style.display  = 'none';
-    dashboard.style.display    = 'block';
-    startSessionCountdown();
-    loadStats();
-    loadContacts();
-    startAutoRefresh();
-  } else {
-    // Show splash then login
-    runSplash(showLoginScreen);
-  }
-
   // ── Auto Refresh ──────────────────────────────────────────────────────
   function startAutoRefresh() {
     clearInterval(autoRefreshTimer);
     autoRefreshTimer = setInterval(() => {
-      if (getSecondsRemaining() <= 0) return;
-      loadStats();
       const activeTab = document.querySelector('.tab-btn.active').dataset.tab;
+      loadStats(false);
       if (activeTab === 'contacts') loadContacts(false);
       else loadLeads(false);
     }, 60000);
   }
 
-  // ── Stats ─────────────────────────────────────────────────────────────
-  function updateStats(data) {
-    // Animate numbers
-    function animateNum(el, target) {
-      const start = parseInt(el.textContent) || 0;
-      const duration = 600;
-      const startTime = performance.now();
-      function step(now) {
-        const progress = Math.min((now - startTime) / duration, 1);
-        const eased = 1 - Math.pow(1 - progress, 3);
-        el.textContent = Math.round(start + (target - start) * eased);
-        if (progress < 1) requestAnimationFrame(step);
-      }
-      requestAnimationFrame(step);
-    }
-
-    animateNum(document.getElementById('statTotalContacts'), data.totalContacts);
-    animateNum(document.getElementById('statNewContacts'),   data.newContacts);
-    animateNum(document.getElementById('statTotalLeads'),    data.totalLeads);
-    animateNum(document.getElementById('statNewLeads'),      data.newLeads);
-
-    contactsBadge.textContent = data.newContacts;
-    leadsBadge.textContent    = data.newLeads;
-
-    const converted = allLeads.filter(l => l.status === 'converted').length;
-    const total      = allLeads.length;
-    document.getElementById('statConvRate').textContent =
-      total > 0 ? Math.round((converted / total) * 100) + '%' : '—';
-
-    lastUpdated.textContent = 'Updated ' + new Date().toLocaleTimeString('en-IN', {
-      timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit', hour12: true
-    });
-  }
-
-  async function loadStats() {
-    try {
-      const data = await apiFetch('/stats');
-      if (data.success) updateStats(data.data);
-    } catch(e) {}
-  }
+  // ── Notes (localStorage) ──────────────────────────────────────────────
+  const NOTES_KEY = 'dd_admin_notes';
+  function getNotes() { try { return JSON.parse(localStorage.getItem(NOTES_KEY) || '{}'); } catch { return {}; } }
+  function getNote(id) { return getNotes()[id] || ''; }
+  function saveNote(id, text) { const n = getNotes(); n[id] = text; localStorage.setItem(NOTES_KEY, JSON.stringify(n)); }
 
   // ── Helpers ───────────────────────────────────────────────────────────
   function formatDate(iso) {
-    return new Date(iso).toLocaleString('en-IN', {
-      timeZone: 'Asia/Kolkata', day: '2-digit', month: 'short', year: 'numeric',
-      hour: '2-digit', minute: '2-digit', hour12: true
-    });
+    if (!iso) return '—';
+    return new Date(iso).toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit', hour12:true, timeZone:'Asia/Kolkata' });
   }
 
   function statusBadge(status) {
-    const icons = { new: 'fa-circle', read: 'fa-eye', replied: 'fa-reply', contacted: 'fa-phone', converted: 'fa-check-circle' };
-    return `<span class="badge badge-${status}">
-      <i class="fas ${icons[status] || 'fa-circle'}"></i>
-      ${status.charAt(0).toUpperCase() + status.slice(1)}
-    </span>`;
+    const map = {
+      new       : ['badge-new',       '<i class="fas fa-circle" style="font-size:0.5rem"></i> New'],
+      read      : ['badge-read',      '<i class="fas fa-eye"></i> Read'],
+      replied   : ['badge-replied',   '<i class="fas fa-check"></i> Replied'],
+      contacted : ['badge-contacted', '<i class="fas fa-phone"></i> Contacted'],
+      converted : ['badge-converted', '<i class="fas fa-star"></i> Converted'],
+    };
+    const [cls, label] = map[status] || ['badge-new', status];
+    return `<span class="badge ${cls}">${label}</span>`;
   }
 
   function serviceBadge(subject) {
-    const s = (subject || '').toLowerCase();
-    let cls = 'svc-other';
-    if (s.includes('brand') || s.includes('logo'))       cls = 'svc-branding';
-    else if (s.includes('web') || s.includes('landing')) cls = 'svc-web';
-    else if (s.includes('market') || s.includes('advert')) cls = 'svc-marketing';
-    else if (s.includes('social'))                        cls = 'svc-social';
-    else if (s.includes('packag'))                        cls = 'svc-packaging';
-    else if (s.includes('ui') || s.includes('ux'))        cls = 'svc-ui';
-    return `<span class="service-badge ${cls}">${subject}</span>`;
+    if (!subject) return '';
+    const s = subject.toLowerCase();
+    if (s.includes('brand'))   return `<span class="service-badge svc-branding">${subject}</span>`;
+    if (s.includes('web'))     return `<span class="service-badge svc-web">${subject}</span>`;
+    if (s.includes('market'))  return `<span class="service-badge svc-marketing">${subject}</span>`;
+    if (s.includes('social'))  return `<span class="service-badge svc-social">${subject}</span>`;
+    if (s.includes('pack'))    return `<span class="service-badge svc-packaging">${subject}</span>`;
+    if (s.includes('ui') || s.includes('ux')) return `<span class="service-badge svc-ui">${subject}</span>`;
+    return `<span class="service-badge svc-other">${subject}</span>`;
   }
 
-  function getNote(id) { return localStorage.getItem('note_' + id) || ''; }
-  function saveNote(id, text) { localStorage.setItem('note_' + id, text); }
-
-  function escHtml(str) {
-    if (typeof str !== 'string') return '';
-    return str
-      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-      .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  // ── Skeleton loader ───────────────────────────────────────────────────
+  function skeletonHTML(rows = 5, cols = [20, 15, 30, 12, 10]) {
+    const rowsHTML = Array.from({length: rows}, () =>
+      `<div class="skeleton-row">${cols.map(w =>
+        `<div class="skeleton-cell" style="width:${w}%;flex-shrink:0"></div>`
+      ).join('')}</div>`
+    ).join('');
+    return `<div class="skeleton-wrap">${rowsHTML}</div>`;
   }
 
-  // ── Render Contacts ───────────────────────────────────────────────────
-  function renderContactsTable(data) {
-    if (!data || data.length === 0) {
-      contactsTableWrap.innerHTML = `<div class="no-results"><i class="fas fa-search" style="font-size:1.5rem;opacity:0.3;display:block;margin-bottom:0.5rem;"></i>No matching messages found.</div>`;
+  // ── Stats ─────────────────────────────────────────────────────────────
+  async function loadStats() {
+    try {
+      const data = await apiFetch('/stats');
+      if (!data.success) return;
+      const s = data.data;
+      document.getElementById('statTotalContacts').textContent = s.totalContacts ?? '—';
+      document.getElementById('statNewContacts').textContent   = s.newContacts   ?? '—';
+      document.getElementById('statTotalLeads').textContent    = s.totalLeads    ?? '—';
+      document.getElementById('statNewLeads').textContent      = s.newLeads      ?? '—';
+      const rate = s.totalLeads ? Math.round((s.convertedLeads / s.totalLeads) * 100) : 0;
+      document.getElementById('statConvRate').textContent = rate + '%';
+      contactsBadge.textContent = s.newContacts ?? 0;
+      leadsBadge.textContent    = s.newLeads    ?? 0;
+      lastUpdated.textContent   = 'Updated ' + new Date().toLocaleTimeString('en-IN', {timeZone:'Asia/Kolkata', hour:'2-digit', minute:'2-digit', hour12:true});
+    } catch(e) { /* silent */ }
+  }
+
+  // ── Contacts ──────────────────────────────────────────────────────────
+  function renderContactsTable(contacts) {
+    if (!contacts.length) {
+      contactsTableWrap.innerHTML = '<div class="no-results"><i class="fas fa-search" style="margin-right:0.4rem;opacity:0.4"></i>No contacts match your filters.</div>';
       return;
     }
-    const rows = data.map(c => {
+
+    const rows = contacts.map(c => {
       const note = getNote(c._id);
       return `<tr class="clickable-row"
-          data-id="${c._id}" data-name="${escHtml(c.name)}" data-email="${escHtml(c.email)}"
-          data-subject="${escHtml(c.subject)}" data-message="${escHtml(c.message)}" data-date="${escHtml(formatDate(c.createdAt))}">
-        <td data-label="From" class="td-email">
-          <div style="display:flex;align-items:center;gap:5px;">
-            <a href="mailto:${escHtml(c.email)}" onclick="event.stopPropagation()">${escHtml(c.email)}</a>
-            <button class="copy-btn" onclick="event.stopPropagation();copyText('${escHtml(c.email)}')" title="Copy email"><i class="fas fa-copy"></i></button>
-          </div>
-          <span style="color:var(--text);font-weight:600;font-size:0.88rem;">${escHtml(c.name)}</span>
+        data-name="${encodeURIComponent(c.name)}"
+        data-email="${encodeURIComponent(c.email)}"
+        data-subject="${encodeURIComponent(c.subject||'')}"
+        data-message="${encodeURIComponent(c.message||'')}"
+        data-date="${encodeURIComponent(formatDate(c.createdAt))}"
+        data-id="${c._id}">
+        <td data-label="Name"><strong>${c.name}</strong></td>
+        <td data-label="Email" class="td-email">
+          <a href="mailto:${c.email}" onclick="event.stopPropagation()">${c.email}</a>
+          <button class="copy-btn" onclick="event.stopPropagation();copyText('${c.email}')" title="Copy"><i class="fas fa-copy"></i></button>
         </td>
         <td data-label="Service">${serviceBadge(c.subject)}</td>
-        <td data-label="Message" class="td-message">${escHtml(c.message)}</td>
-        <td data-label="Note" class="note-cell">
-          <span class="note-text" title="${escHtml(note)}">${note ? escHtml(note) : '<span style="opacity:0.4;font-style:italic;">No note</span>'}</span>
-        </td>
+        <td data-label="Message" class="td-message">${c.message || ''}</td>
         <td data-label="Status">${statusBadge(c.status)}</td>
-        <td data-label="Update" onclick="event.stopPropagation()">
+        <td data-label="Update">
           <select class="status-select" data-id="${c._id}" data-type="contacts">
             <option value="new"     ${c.status==='new'     ?'selected':''}>New</option>
             <option value="read"    ${c.status==='read'    ?'selected':''}>Read</option>
             <option value="replied" ${c.status==='replied' ?'selected':''}>Replied</option>
           </select>
         </td>
+        <td data-label="Note">
+          <div class="note-cell">
+            <span class="note-text" title="${note}">${note || '<span style="opacity:0.4">—</span>'}</span>
+          </div>
+        </td>
         <td data-label="Date" class="td-date">${formatDate(c.createdAt)}</td>
-        <td data-label="Delete" onclick="event.stopPropagation()">
+        <td data-label="Delete">
           <button class="delete-btn" data-id="${c._id}" data-type="contacts" title="Delete"><i class="fas fa-trash-alt"></i></button>
         </td>
       </tr>`;
     }).join('');
 
     contactsTableWrap.innerHTML = `<table>
-      <thead><tr><th>From</th><th>Service</th><th>Message</th><th>Note</th><th>Status</th><th>Update</th><th>Date</th><th></th></tr></thead>
+      <thead><tr>
+        <th>Name</th><th>Email</th><th>Service</th><th>Message</th>
+        <th>Status</th><th>Update Status</th><th>Note</th><th>Date</th><th></th>
+      </tr></thead>
       <tbody>${rows}</tbody></table>`;
+
+    contactsTableWrap.querySelectorAll('.clickable-row').forEach(row =>
+      row.addEventListener('click', e => {
+        if (['SELECT','BUTTON','A'].includes(e.target.tagName) || e.target.closest('button,a,select')) return;
+        openMsgModal({
+          id     : row.dataset.id,
+          name   : decodeURIComponent(row.dataset.name),
+          email  : decodeURIComponent(row.dataset.email),
+          subject: decodeURIComponent(row.dataset.subject),
+          message: decodeURIComponent(row.dataset.message),
+          date   : decodeURIComponent(row.dataset.date),
+        });
+      })
+    );
 
     contactsTableWrap.querySelectorAll('.status-select').forEach(sel =>
       sel.addEventListener('change', () => updateStatus('contacts', sel.dataset.id, sel.value)));
     contactsTableWrap.querySelectorAll('.delete-btn').forEach(btn =>
-      btn.addEventListener('click', e => { e.stopPropagation(); openConfirmDelete(btn.dataset.type, btn.dataset.id); }));
-    contactsTableWrap.querySelectorAll('.clickable-row').forEach(row =>
-      row.addEventListener('click', () => openMsgModal(row.dataset)));
+      btn.addEventListener('click', () => openConfirmDelete(btn.dataset.type, btn.dataset.id)));
   }
 
   async function loadContacts(showLoader = true) {
     if (showLoader) contactsTableWrap.innerHTML = skeletonHTML(5);
     try {
       const data = await apiFetch('/contacts');
-      if (!data.success) {
-        contactsTableWrap.innerHTML = `<div class="empty-state"><i class="fas fa-inbox"></i><p>No contact form submissions yet.</p></div>`;
-        return;
-      }
+      if (!data.success) { contactsTableWrap.innerHTML = '<div class="empty-state"><i class="fas fa-inbox"></i><p>No contact submissions yet.</p></div>'; return; }
       allContacts = data.data;
       renderContactsTable(applyContactFilters());
       loadStats();
     } catch(e) {
       if (e.message !== 'Unauthorized' && e.message !== 'No valid token')
-        contactsTableWrap.innerHTML = `<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><p>Failed to load. Please refresh.</p></div>`;
+        contactsTableWrap.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><p>Failed to load. Please refresh.</p></div>';
     }
   }
 
   function applyContactFilters() {
     const search = (document.getElementById('contactSearch').value || '').toLowerCase();
     const status = document.getElementById('contactStatusFilter').value;
-    return allContacts.filter(c => {
-      const matchSearch = !search || c.name.toLowerCase().includes(search) || c.email.toLowerCase().includes(search) || c.subject.toLowerCase().includes(search);
-      return matchSearch && (!status || c.status === status);
-    });
+    return allContacts.filter(c =>
+      (!search || c.name.toLowerCase().includes(search) || c.email.toLowerCase().includes(search)) &&
+      (!status || c.status === status)
+    );
   }
 
   document.getElementById('contactSearch').addEventListener('input', () => renderContactsTable(applyContactFilters()));
   document.getElementById('contactStatusFilter').addEventListener('change', () => renderContactsTable(applyContactFilters()));
 
-  // ── Render Leads ──────────────────────────────────────────────────────
-  function renderLeadsTable(data) {
-    if (!data || data.length === 0) {
-      leadsTableWrap.innerHTML = `<div class="no-results"><i class="fas fa-search" style="font-size:1.5rem;opacity:0.3;display:block;margin-bottom:0.5rem;"></i>No matching leads found.</div>`;
+  // ── Leads ─────────────────────────────────────────────────────────────
+  function renderLeadsTable(leads) {
+    if (!leads.length) {
+      leadsTableWrap.innerHTML = '<div class="no-results"><i class="fas fa-search" style="margin-right:0.4rem;opacity:0.4"></i>No leads match your filters.</div>';
       return;
     }
-    const rows = data.map(l => `
+
+    const rows = leads.map(l => `
       <tr>
         <td data-label="Email" class="td-email">
-          <div style="display:flex;align-items:center;gap:5px;">
-            <a href="mailto:${escHtml(l.email)}" onclick="event.stopPropagation()">${escHtml(l.email)}</a>
-            <button class="copy-btn" onclick="copyText('${escHtml(l.email)}')" title="Copy email"><i class="fas fa-copy"></i></button>
-          </div>
+          <a href="mailto:${l.email}" onclick="event.stopPropagation()">${l.email}</a>
+          <button class="copy-btn" onclick="copyText('${l.email}')" title="Copy"><i class="fas fa-copy"></i></button>
         </td>
         <td data-label="Status">${statusBadge(l.status)}</td>
         <td data-label="Update">
@@ -1500,19 +1551,16 @@
   }
 
   async function loadLeads(showLoader = true) {
-    if (showLoader) leadsTableWrap.innerHTML = skeletonHTML(5);
+    if (showLoader) leadsTableWrap.innerHTML = skeletonHTML(4, [40, 15, 20, 15, 5]);
     try {
       const data = await apiFetch('/leads');
-      if (!data.success) {
-        leadsTableWrap.innerHTML = `<div class="empty-state"><i class="fas fa-bolt"></i><p>No chatbot leads captured yet.</p></div>`;
-        return;
-      }
+      if (!data.success) { leadsTableWrap.innerHTML = '<div class="empty-state"><i class="fas fa-bolt"></i><p>No chatbot leads captured yet.</p></div>'; return; }
       allLeads = data.data;
       renderLeadsTable(applyLeadFilters());
       loadStats();
     } catch(e) {
       if (e.message !== 'Unauthorized' && e.message !== 'No valid token')
-        leadsTableWrap.innerHTML = `<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><p>Failed to load. Please refresh.</p></div>`;
+        leadsTableWrap.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><p>Failed to load. Please refresh.</p></div>';
     }
   }
 
@@ -1646,7 +1694,11 @@
 
   // ── Keyboard shortcuts ────────────────────────────────────────────────
   document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') { msgModal.classList.remove('open'); confirmModal.classList.remove('open'); mobileDropdown.classList.remove('open'); }
+    if (e.key === 'Escape') {
+      msgModal.classList.remove('open');
+      confirmModal.classList.remove('open');
+      mobileDropdown.classList.remove('open');
+    }
     if (dashboard.style.display === 'none') return;
     if (['INPUT','TEXTAREA','SELECT'].includes(e.target.tagName)) return;
     if (e.key === 'r' || e.key === 'R') {
