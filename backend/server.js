@@ -22,7 +22,7 @@ mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log('✅ MongoDB connected successfully'))
   .catch(err => {
     console.error('❌ MongoDB connection failed:', err.message);
-    console.error('❌ Check that MONGODB_URI is set correctly in Render environment variables');
+    console.error('❌ Check that MONGODB_URI is set correctly in environment variables');
   });
 
 mongoose.connection.on('error', err => {
@@ -30,27 +30,33 @@ mongoose.connection.on('error', err => {
 });
 
 // ===================================================================
-// TRUST PROXY — Required for Render
+// TRUST PROXY — Required for Render / reverse proxies
 // ===================================================================
 app.set('trust proxy', 1);
 
 // ===================================================================
-// SECURITY MIDDLEWARE
+// SECURITY HEADERS (helmet)
 // ===================================================================
-app.use(helmet({ contentSecurityPolicy: false }));
+app.use(helmet({
+  contentSecurityPolicy: false,  // disable CSP if you serve mixed content
+  crossOriginEmbedderPolicy: false
+}));
 
+// ===================================================================
+// CORS
+// ===================================================================
 const allowedOrigins = process.env.ALLOWED_ORIGINS
   ? process.env.ALLOWED_ORIGINS.split(',').map(o => o.trim())
   : ['http://localhost:3000', 'https://dilshadesigns.vercel.app'];
 
 app.use(cors({
   origin: function (origin, callback) {
-    if (!origin) return callback(null, true);  // allow server-to-server / curl
+    if (!origin) return callback(null, true);      // allow server-to-server / curl
     if (allowedOrigins.includes(origin)) return callback(null, true);
     console.warn('[CORS] Blocked origin:', origin);
     callback(new Error('CORS: Origin not allowed — ' + origin));
   },
-  methods      : ['GET', 'POST', 'PATCH', 'DELETE'],
+  methods       : ['GET', 'POST', 'PATCH', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials   : true,
 }));
@@ -66,7 +72,7 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 // ===================================================================
-// RATE LIMITING
+// GLOBAL RATE LIMITING
 // ===================================================================
 const globalLimiter = rateLimit({
   windowMs        : 15 * 60 * 1000,
@@ -77,6 +83,7 @@ const globalLimiter = rateLimit({
 });
 app.use(globalLimiter);
 
+// Contact form — stricter limit
 const contactLimiter = rateLimit({
   windowMs        : 60 * 60 * 1000,
   max             : 5,
@@ -90,7 +97,7 @@ app.use('/api/contact', contactLimiter);
 // ROUTES
 // ===================================================================
 app.use('/api/contact', contactRouter);
-app.use('/api/admin',   adminRouter);
+app.use('/api/admin',   adminRouter);   // login is public; all others require JWT
 
 app.get('/api/health', (_req, res) => {
   res.json({
@@ -101,7 +108,7 @@ app.get('/api/health', (_req, res) => {
 });
 
 // ===================================================================
-// SERVE FRONTEND
+// ROOT
 // ===================================================================
 app.get('/', (_req, res) => {
   res.json({ success: true, message: 'Dilshad Designs API is running.' });
@@ -115,6 +122,7 @@ app.use((err, req, res, _next) => {
   const status = err.status || 500;
   res.status(status).json({
     success : false,
+    // Never expose stack traces or internal messages in production
     message : process.env.NODE_ENV === 'production'
       ? 'Something went wrong. Please try again.'
       : err.message,

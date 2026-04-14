@@ -1,54 +1,76 @@
 /**
  * config/adminAuth.js
- * Simple password based protection for admin routes
+ * JWT-based authentication middleware for admin routes
  */
 
 'use strict';
 
-exports.authAdmin = (req, res, next) => {
-  // Get auth header
-  const authHeader = req.headers['authorization'] || req.headers['Authorization'];
+const jwt = require('jsonwebtoken');
 
-  // No header sent
-  if (!authHeader) {
+/**
+ * verifyAdminToken
+ * Extracts and verifies the JWT from the Authorization header.
+ * Rejects with appropriate HTTP codes for missing / invalid / expired tokens.
+ */
+exports.verifyAdminToken = (req, res, next) => {
+  const authHeader =
+    req.headers['authorization'] || req.headers['Authorization'];
+
+  // ── 1. Header missing ────────────────────────────────────────────────
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return res.status(401).json({
       success : false,
-      message : 'Authorization header missing.'
+      message : 'Unauthorized access. No token provided.'
     });
   }
 
-  // Handle both "Bearer password" and just "password"
-  let password;
-  if (authHeader.startsWith('Bearer ')) {
-    password = authHeader.slice(7).trim();
-  } else {
-    password = authHeader.trim();
-  }
+  const token = authHeader.slice(7).trim();
 
-  // No password after stripping Bearer
-  if (!password) {
+  if (!token) {
     return res.status(401).json({
       success : false,
-      message : 'Password is empty.'
+      message : 'Unauthorized access. Token is empty.'
     });
   }
 
-  // ADMIN_PASSWORD not set in .env
-  if (!process.env.ADMIN_PASSWORD) {
-    console.error('[adminAuth] ADMIN_PASSWORD is not set in .env');
+  // ── 2. Verify JWT_SECRET is configured ───────────────────────────────
+  if (!process.env.JWT_SECRET) {
+    console.error('[adminAuth] JWT_SECRET is not set in .env');
     return res.status(500).json({
       success : false,
       message : 'Server configuration error.'
     });
   }
 
-  // Compare passwords
-  if (password !== process.env.ADMIN_PASSWORD) {
-    return res.status(403).json({
+  // ── 3. Verify token ───────────────────────────────────────────────────
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    // Only allow tokens with role: 'admin'
+    if (decoded.role !== 'admin') {
+      return res.status(403).json({
+        success : false,
+        message : 'Unauthorized access. Insufficient privileges.'
+      });
+    }
+
+    req.admin = decoded; // attach payload for downstream use
+    return next();
+
+  } catch (err) {
+    // Expired token → tell frontend to re-login
+    if (err.name === 'TokenExpiredError') {
+      return res.status(401).json({
+        success  : false,
+        message  : 'Session expired. Please log in again.',
+        expired  : true
+      });
+    }
+
+    // Any other JWT error (tampered, malformed, wrong secret)
+    return res.status(401).json({
       success : false,
-      message : 'Incorrect password. Please try again.'
+      message : 'Unauthorized access. Invalid token.'
     });
   }
-
-  return next();
 };
