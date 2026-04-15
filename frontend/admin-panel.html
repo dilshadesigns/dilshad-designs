@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard — Dilshad Designs</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" href="photo/favicon (2).png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="admin-panel.css">
+</head>
+<body>
+
+<!-- ==================== SPLASH SCREEN ==================== -->
+<div id="splashScreen">
+  <div class="splash-orb splash-orb-1"></div>
+  <div class="splash-orb splash-orb-2"></div>
+  <div class="splash-orb splash-orb-3"></div>
+  <div class="splash-content">
+    <div class="splash-brand" id="splashBrand"></div>
+    <div class="splash-glow"></div>
+    <p class="splash-tagline">Admin Dashboard</p>
+    <div class="splash-dots">
+      <div class="splash-dot"></div>
+      <div class="splash-dot"></div>
+      <div class="splash-dot"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== LOGIN SCREEN ==================== -->
+<div id="loginScreen">
+  <div class="login-card">
+    <div class="login-logo">
+      <span class="gold">Dilshad</span><span class="green">esigns</span>
+    </div>
+    <p class="login-sub">Admin Dashboard — Enter your password to continue</p>
+
+    <div class="login-input-wrap">
+      <i class="fas fa-lock login-input-icon"></i>
+      <input
+        type="password"
+        id="passwordInput"
+        class="login-input"
+        placeholder="Enter admin password"
+        autocomplete="current-password"
+      >
+    </div>
+
+    <button class="login-btn" id="loginBtn">
+      <i class="fas fa-lock"></i> Login
+    </button>
+
+    <p class="login-error" id="loginError">
+      <i class="fas fa-exclamation-circle"></i>
+      <span id="loginErrorText">Incorrect password. Please try again.</span>
+    </p>
+  </div>
+</div>
+
+<!-- ==================== DASHBOARD ==================== -->
+<div id="dashboard">
+
+  <!-- ── Top Bar ── -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="topbar-logo">
+        <span class="gold">Dilshad</span><span class="green">esigns</span>
+      </div>
+      <span class="topbar-badge">ADMIN</span>
+    </div>
+
+    <div class="topbar-right">
+      <span class="topbar-time" id="liveTime"></span>
+
+      <div class="session-timer" id="sessionTimer" title="Session time remaining">
+        <i class="fas fa-shield-alt"></i>
+        <span id="sessionCountdown">60:00</span>
+      </div>
+
+      <button class="topbar-icon-btn" id="darkToggle" title="Toggle dark mode">
+        <i class="fas fa-moon"></i>
+      </button>
+
+      <button class="logout-btn" id="logoutBtn">
+        <i class="fas fa-sign-out-alt"></i> Logout
+      </button>
+
+      <!-- Mobile only -->
+      <button class="mobile-menu-btn" id="mobileMenuBtn" title="Menu">
+        <i class="fas fa-ellipsis-v"></i>
+      </button>
+    </div>
+
+    <!-- Mobile Dropdown -->
+    <div class="mobile-dropdown" id="mobileDropdown">
+      <div class="mobile-session-info">
+        <i class="fas fa-shield-alt"></i>
+        <span id="mobileSessionCountdown">--:--</span> remaining
+      </div>
+      <div class="mobile-menu-divider"></div>
+      <button class="mobile-menu-item" id="mobileDarkToggle">
+        <i class="fas fa-moon"></i>
+        <span id="mobileDarkLabel">Dark Mode</span>
+      </button>
+      <div class="mobile-menu-divider"></div>
+      <button class="mobile-menu-item danger" id="mobileLogoutBtn">
+        <i class="fas fa-sign-out-alt"></i> Logout
+      </button>
+    </div>
+  </div><!-- /topbar -->
+
+  <!-- ── Main Content ── -->
+  <div class="main">
+
+    <!-- Welcome Bar -->
+    <div class="welcome-bar">
+      <div>
+        <h2>Dashboard Overview</h2>
+        <p>Manage all enquiries and leads from Dilshad Designs</p>
+      </div>
+      <div class="welcome-meta">
+        <div class="refresh-indicator">
+          <span class="refresh-dot" id="refreshDot"></span>
+          <span>Auto-refresh every 60s</span>
+        </div>
+        <span class="last-updated" id="lastUpdated"></span>
+      </div>
+    </div>
+
+    <!-- Stats Grid -->
+    <div class="stats-grid" id="statsGrid">
+      <div class="stat-card">
+        <div class="stat-icon green"><i class="fas fa-envelope"></i></div>
+        <div>
+          <div class="stat-num" id="statTotalContacts">—</div>
+          <div class="stat-label">Total Messages</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon blue"><i class="fas fa-bell"></i></div>
+        <div>
+          <div class="stat-num" id="statNewContacts">—</div>
+          <div class="stat-label">New Messages</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon gold"><i class="fas fa-bolt"></i></div>
+        <div>
+          <div class="stat-num" id="statTotalLeads">—</div>
+          <div class="stat-label">Total Leads</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon purple"><i class="fas fa-star"></i></div>
+        <div>
+          <div class="stat-num" id="statNewLeads">—</div>
+          <div class="stat-label">New Leads</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon teal"><i class="fas fa-chart-line"></i></div>
+        <div>
+          <div class="stat-num" id="statConvRate">—</div>
+          <div class="stat-label">Conversion Rate</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="charts-row">
+      <div class="chart-card">
+        <div class="chart-title"><i class="fas fa-chart-area"></i> Messages — Last 7 Days</div>
+        <div class="chart-canvas-wrap">
+          <canvas id="contactsChart" style="width:100%;height:100%;display:block;"></canvas>
+        </div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title"><i class="fas fa-circle-dot"></i> Lead Status Distribution</div>
+        <div class="chart-canvas-wrap" style="justify-content:center;gap:1.5rem;">
+          <canvas id="leadsChart" style="width:120px;height:120px;flex-shrink:0;"></canvas>
+          <div style="display:flex;flex-direction:column;gap:0.4rem;font-size:0.78rem;color:var(--text-muted);" id="leadsLegend">
+            <span><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#3b82f6;margin-right:5px;"></span>New</span>
+            <span><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#d97706;margin-right:5px;"></span>Contacted</span>
+            <span><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#2F7A66;margin-right:5px;"></span>Converted</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="contacts">
+        <i class="fas fa-envelope"></i> Messages
+        <span class="tab-badge" id="contactsBadge">0</span>
+      </button>
+      <button class="tab-btn" data-tab="leads">
+        <i class="fas fa-bolt"></i> Leads
+        <span class="tab-badge" id="leadsBadge">0</span>
+      </button>
+    </div>
+
+    <!-- ── Contacts Tab ── -->
+    <div id="contactsTab">
+      <div class="table-wrap">
+
+        <!-- Bulk Toolbar -->
+        <div class="bulk-toolbar" id="contactsBulkToolbar">
+          <i class="fas fa-check-square"></i>
+          <span id="bulkSelectedCount">0 selected</span>
+          <button class="action-btn" id="bulkExportContacts">
+            <i class="fas fa-download"></i> Export Selected
+          </button>
+          <button class="action-btn danger" id="bulkDeleteContacts">
+            <i class="fas fa-trash-alt"></i> Delete Selected
+          </button>
+        </div>
+
+        <div class="table-header">
+          <div class="table-title">Contact Form Submissions</div>
+          <div class="table-controls">
+            <div class="search-wrap">
+              <i class="fas fa-search search-icon"></i>
+              <input
+                type="text"
+                id="contactSearch"
+                class="search-input"
+                placeholder="Search name, email, service…"
+                autocomplete="off"
+              >
+            </div>
+            <select id="contactStatusFilter" class="filter-select">
+              <option value="">All Status</option>
+              <option value="new">New</option>
+              <option value="read">Read</option>
+              <option value="replied">Replied</option>
+            </select>
+            <button class="action-btn" id="exportContactsBtn">
+              <i class="fas fa-download"></i> Export CSV
+            </button>
+            <button class="action-btn" id="refreshContacts">
+              <i class="fas fa-sync-alt"></i> Refresh
+            </button>
+          </div>
+        </div>
+
+        <div class="table-scroll" id="contactsTableWrap">
+          <!-- Skeleton on initial load -->
+        </div>
+
+      </div>
+    </div><!-- /contactsTab -->
+
+    <!-- ── Leads Tab ── -->
+    <div id="leadsTab" style="display:none;">
+      <div class="table-wrap">
+
+        <!-- Bulk Toolbar -->
+        <div class="bulk-toolbar" id="leadsBulkToolbar">
+          <i class="fas fa-check-square"></i>
+          <span id="leadsBulkCount">0 selected</span>
+          <button class="action-btn" id="bulkExportLeads">
+            <i class="fas fa-download"></i> Export Selected
+          </button>
+          <button class="action-btn danger" id="bulkDeleteLeads">
+            <i class="fas fa-trash-alt"></i> Delete Selected
+          </button>
+        </div>
+
+        <div class="table-header">
+          <div class="table-title">Chatbot Lead Captures</div>
+          <div class="table-controls">
+            <div class="search-wrap">
+              <i class="fas fa-search search-icon"></i>
+              <input
+                type="text"
+                id="leadSearch"
+                class="search-input"
+                placeholder="Search email…"
+                autocomplete="off"
+              >
+            </div>
+            <select id="leadStatusFilter" class="filter-select">
+              <option value="">All Status</option>
+              <option value="new">New</option>
+              <option value="contacted">Contacted</option>
+              <option value="converted">Converted</option>
+            </select>
+            <button class="action-btn" id="exportLeadsBtn">
+              <i class="fas fa-download"></i> Export CSV
+            </button>
+            <button class="action-btn" id="refreshLeads">
+              <i class="fas fa-sync-alt"></i> Refresh
+            </button>
+          </div>
+        </div>
+
+        <div class="table-scroll" id="leadsTableWrap">
+          <!-- Skeleton on initial load -->
+        </div>
+
+      </div>
+    </div><!-- /leadsTab -->
+
+  </div><!-- /main -->
+</div><!-- /dashboard -->
+
+<!-- ==================== MESSAGE DETAIL MODAL ==================== -->
+<div class="modal-overlay" id="msgModal" role="dialog" aria-modal="true" aria-labelledby="modalName">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div>
+        <div class="modal-name" id="modalName"></div>
+        <div class="modal-meta" id="modalMeta"></div>
+      </div>
+      <button class="modal-close-btn" id="modalCloseBtn" aria-label="Close modal">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="modal-subject" id="modalSubject"></div>
+    <div class="modal-message" id="modalMessage"></div>
+    <div class="modal-note-wrap">
+      <div class="modal-note-label">
+        <i class="fas fa-sticky-note"></i> Private Note
+      </div>
+      <textarea
+        class="modal-note-input"
+        id="modalNoteInput"
+        placeholder="Add a private note for yourself…"
+      ></textarea>
+    </div>
+    <div class="modal-actions">
+      <a class="modal-reply-btn" id="modalReplyBtn" href="#" target="_blank" rel="noopener">
+        <i class="fas fa-reply"></i> Reply via Email
+      </a>
+      <button class="modal-save-note-btn" id="modalSaveNoteBtn">
+        <i class="fas fa-save"></i> Save Note
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== CONFIRM MODAL ==================== -->
+<div class="confirm-overlay" id="confirmModal" role="dialog" aria-modal="true">
+  <div class="confirm-box">
+    <i class="confirm-icon fas fa-trash-alt danger"></i>
+    <h3>Delete this entry?</h3>
+    <p>This action cannot be undone. The entry will be permanently removed.</p>
+    <div class="confirm-actions">
+      <button class="btn-cancel" id="confirmCancelBtn">Cancel</button>
+      <button class="btn-delete" id="confirmDeleteBtn">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== TOAST ==================== -->
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="admin-panel.js"></script>
+</body>
+</html>
