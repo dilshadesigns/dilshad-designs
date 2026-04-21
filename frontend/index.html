@@ -1224,5 +1224,216 @@
 <!-- ✅ Extracted JS — replaces all inline <script> blocks -->
 <script src="js/main.js" defer></script>
 
+<!-- ==================== IMAGE PROTECTION ==================== -->
+<style>
+  /* Disable text & image selection site-wide */
+  * {
+    -webkit-user-select: none !important;
+    -moz-user-select: none !important;
+    -ms-user-select: none !important;
+    user-select: none !important;
+  }
+  /* Re-enable selection only on form inputs & textareas so usability is preserved */
+  input, textarea, [contenteditable="true"] {
+    -webkit-user-select: text !important;
+    -moz-user-select: text !important;
+    -ms-user-select: text !important;
+    user-select: text !important;
+  }
+  /* Prevent images from being dragged */
+  img {
+    -webkit-user-drag: none !important;
+    -khtml-user-drag: none !important;
+    -moz-user-drag: none !important;
+    -o-user-drag: none !important;
+    user-drag: none !important;
+    pointer-events: none !important;
+  }
+  /* Re-enable pointer-events on interactive images (gallery zoom icons, etc.) */
+  .gallery-slide,
+  .gallery-zoom-icon,
+  .gallery-slider,
+  .gallery-card,
+  #lightbox img {
+    pointer-events: auto !important;
+  }
+  /* Disable pointer on the <img> itself inside gallery while keeping parent clickable */
+  .gallery-slide img,
+  #lightbox img {
+    pointer-events: none !important;
+  }
+  /* Overlay to block right-click save on images */
+  .img-protect-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    background: transparent;
+    cursor: default;
+  }
+</style>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ── 1. Disable right-click context menu ── */
+  document.addEventListener('contextmenu', function (e) {
+    e.preventDefault();
+    return false;
+  });
+
+  /* ── 2. Block keyboard shortcuts ── */
+  document.addEventListener('keydown', function (e) {
+    var k = e.key ? e.key.toLowerCase() : '';
+    var code = e.keyCode || e.which;
+
+    // F12
+    if (code === 123) { e.preventDefault(); return false; }
+
+    // Ctrl / Cmd combos
+    if (e.ctrlKey || e.metaKey) {
+      switch (k) {
+        case 's':   // Save
+        case 'u':   // View source
+        case 'a':   // Select all
+        case 'c':   // Copy
+        case 'x':   // Cut
+        case 'p':   // Print
+          e.preventDefault();
+          return false;
+        case 'i':   // DevTools (Ctrl+I is Elements panel shortcut in some browsers)
+          if (e.shiftKey) { e.preventDefault(); return false; }
+          break;
+        case 'j':   // DevTools console (Chrome)
+          if (e.shiftKey) { e.preventDefault(); return false; }
+          break;
+        case 'k':   // DevTools (Firefox)
+          if (e.shiftKey) { e.preventDefault(); return false; }
+          break;
+      }
+    }
+
+    // Ctrl+Shift+I / Ctrl+Shift+J / Ctrl+Shift+K / Ctrl+Shift+C
+    if ((e.ctrlKey || e.metaKey) && e.shiftKey) {
+      if (['i', 'j', 'k', 'c'].indexOf(k) !== -1) {
+        e.preventDefault();
+        return false;
+      }
+    }
+  });
+
+  /* ── 3. Prevent all image dragging ── */
+  document.addEventListener('dragstart', function (e) {
+    if (e.target.tagName === 'IMG' || e.target.tagName === 'A') {
+      e.preventDefault();
+      return false;
+    }
+  });
+
+  /* ── 4. Block copy/cut events ── */
+  document.addEventListener('copy', function (e) {
+    e.preventDefault();
+    return false;
+  });
+  document.addEventListener('cut', function (e) {
+    e.preventDefault();
+    return false;
+  });
+
+  /* ── 5. Prevent print (Ctrl+P already blocked; also catch beforeprint) ── */
+  window.addEventListener('beforeprint', function (e) {
+    e.preventDefault();
+    return false;
+  });
+
+  /* ── 6. DevTools detection (size-based heuristic) ── */
+  var _devToolsOpen = false;
+  var _devToolsThreshold = 160;
+
+  function _checkDevTools() {
+    var widthDiff  = window.outerWidth  - window.innerWidth;
+    var heightDiff = window.outerHeight - window.innerHeight;
+    if (widthDiff > _devToolsThreshold || heightDiff > _devToolsThreshold) {
+      if (!_devToolsOpen) {
+        _devToolsOpen = true;
+        _onDevToolsOpen();
+      }
+    } else {
+      _devToolsOpen = false;
+    }
+  }
+
+  function _onDevToolsOpen() {
+    // Clear all image src attributes to prevent downloading via DevTools
+    var imgs = document.querySelectorAll('img');
+    imgs.forEach(function (img) {
+      if (!img.dataset.protectedSrc) {
+        img.dataset.protectedSrc = img.src;
+      }
+      img.src = '';
+    });
+    // Restore images if DevTools is closed
+    var restoreInterval = setInterval(function () {
+      var wDiff = window.outerWidth  - window.innerWidth;
+      var hDiff = window.outerHeight - window.innerHeight;
+      if (wDiff <= _devToolsThreshold && hDiff <= _devToolsThreshold) {
+        _devToolsOpen = false;
+        var allImgs = document.querySelectorAll('img[data-protected-src]');
+        allImgs.forEach(function (img) {
+          img.src = img.dataset.protectedSrc;
+        });
+        clearInterval(restoreInterval);
+      }
+    }, 800);
+  }
+
+  setInterval(_checkDevTools, 800);
+
+  /* ── 7. Disable long-press context menu on mobile (touch devices) ── */
+  document.addEventListener('touchstart', function (e) {
+    if (e.target.tagName === 'IMG') {
+      e.preventDefault();
+    }
+  }, { passive: false });
+
+  /* ── 8. Inject transparent overlay divs over every img after DOM is ready ── */
+  function _addImageOverlays() {
+    var imgs = document.querySelectorAll('img:not([data-overlay-added])');
+    imgs.forEach(function (img) {
+      // Only wrap images that are inside a positioned container
+      var parent = img.parentElement;
+      if (!parent) return;
+      var pStyle = window.getComputedStyle(parent).position;
+      if (pStyle === 'static') {
+        parent.style.position = 'relative';
+      }
+      var overlay = document.createElement('div');
+      overlay.className = 'img-protect-overlay';
+      overlay.setAttribute('aria-hidden', 'true');
+      overlay.addEventListener('contextmenu', function (e) { e.preventDefault(); return false; });
+      overlay.addEventListener('dragstart',   function (e) { e.preventDefault(); return false; });
+      parent.appendChild(overlay);
+      img.setAttribute('data-overlay-added', '1');
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', _addImageOverlays);
+  } else {
+    _addImageOverlays();
+  }
+
+  // Re-run for dynamically injected images (lightbox slides, etc.)
+  var _observer = new MutationObserver(function (mutations) {
+    mutations.forEach(function (m) {
+      if (m.addedNodes.length) { _addImageOverlays(); }
+    });
+  });
+  _observer.observe(document.body, { childList: true, subtree: true });
+
+})();
+</script>
+<!-- ==================== END IMAGE PROTECTION ==================== -->
+
 </body>
 </html>
