@@ -448,103 +448,104 @@
   btt.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
 
   // ===================================================================
-  // 12. CONTACT FORM
-  //    Sends to backend /api/contact first.
-  //    Falls back to EmailJS if backend is unavailable.
-  // ===================================================================
+// ===================================================================
+// 12. CONTACT FORM — only runs if form exists on this page
+// ===================================================================
   const contactForm = document.getElementById('contactForm');
-  const submitBtn   = document.getElementById('submitBtn');
-  const submitText  = document.getElementById('submitText');
-  const formSuccess = document.getElementById('formSuccess');
 
-  function validateField(input) {
-    const group = input.closest('.form-group');
-    if (!group) return true;
-    let valid = true;
+  if (contactForm) {
+    const submitBtn   = document.getElementById('submitBtn');
+    const submitText  = document.getElementById('submitText');
+    const formSuccess = document.getElementById('formSuccess');
 
-    if (input.type === 'email') {
-      valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.value.trim());
-    } else if (input.tagName === 'TEXTAREA') {
-      valid = input.value.trim().length >= 20;
-    } else if (input.tagName === 'SELECT') {
-      valid = input.value !== '';
-    } else {
-      valid = input.value.trim().length > 1;
+    function validateField(input) {
+      const group = input.closest('.form-group');
+      if (!group) return true;
+      let valid = true;
+
+      if (input.type === 'email') {
+        valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.value.trim());
+      } else if (input.tagName === 'TEXTAREA') {
+        valid = input.value.trim().length >= 20;
+      } else if (input.tagName === 'SELECT') {
+        valid = input.value !== '';
+      } else {
+        valid = input.value.trim().length > 1;
+      }
+
+      group.classList.toggle('has-error', !valid);
+      return valid;
     }
 
-    group.classList.toggle('has-error', !valid);
-    return valid;
-  }
-
-  contactForm.querySelectorAll('input, textarea, select').forEach(field => {
-    field.addEventListener('blur', () => validateField(field));
-    field.addEventListener('input', () => {
-      if (field.closest('.form-group').classList.contains('has-error')) {
-        validateField(field);
-      }
-    });
-  });
-
-  contactForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-
-    // Honeypot anti-spam check
-    if (contactForm.querySelector('[name="_honey"]').value) return;
-
-    const fields = contactForm.querySelectorAll('input:not([name="_honey"]), textarea, select');
-    let allValid = true;
-    fields.forEach(f => { if (!validateField(f)) allValid = false; });
-    if (!allValid) return;
-
-    submitBtn.disabled = true;
-    submitText.textContent = 'Sending...';
-    submitBtn.querySelector('i').className = 'fas fa-spinner fa-spin';
-
-    try {
-      // --- Try backend API first ---
-      const formData = {
-        name:    document.getElementById('cf-name').value.trim(),
-        email:   document.getElementById('cf-email').value.trim(),
-        subject: document.getElementById('cf-subject').value,
-        message: document.getElementById('cf-message').value.trim()
-      };
-
-      const response = await fetch(`${API_BASE}/api/contact`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
+    contactForm.querySelectorAll('input, textarea, select').forEach(field => {
+      field.addEventListener('blur', () => validateField(field));
+      field.addEventListener('input', () => {
+        if (field.closest('.form-group').classList.contains('has-error')) {
+          validateField(field);
+        }
       });
+    });
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || 'Server error: ' + response.status);
+    contactForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      if (contactForm.querySelector('[name="_honey"]').value) return;
+
+      const fields = contactForm.querySelectorAll('input:not([name="_honey"]), textarea, select');
+      let allValid = true;
+      fields.forEach(f => { if (!validateField(f)) allValid = false; });
+      if (!allValid) return;
+
+      submitBtn.disabled = true;
+      submitText.textContent = 'Sending...';
+      submitBtn.querySelector('i').className = 'fas fa-spinner fa-spin';
+
+      try {
+        const formData = {
+          name:    document.getElementById('cf-name').value.trim(),
+          email:   document.getElementById('cf-email').value.trim(),
+          subject: document.getElementById('cf-subject').value,
+          message: document.getElementById('cf-message').value.trim()
+        };
+
+        const response = await fetch(`${API_BASE}/api/contact`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData)
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.message || 'Server error: ' + response.status);
+        }
+
+        contactForm.style.display = 'none';
+        formSuccess.style.display = 'block';
+
+        setTimeout(() => {
+          formSuccess.style.display = 'none';
+          contactForm.reset();
+          contactForm.style.display = 'block';
+        }, 3000);
+
+      } catch (err) {
+        console.error('Form submission error:', err);
+        submitText.textContent = 'Failed — try again';
+        submitBtn.querySelector('i').className = 'fas fa-exclamation-triangle';
+        setTimeout(() => {
+          submitText.textContent = 'Send Message';
+          submitBtn.querySelector('i').className = 'fas fa-paper-plane';
+          submitBtn.disabled = false;
+        }, 3000);
+        return;
       }
 
-      contactForm.style.display = 'none';
-      formSuccess.style.display = 'block';
+      submitBtn.disabled = false;
+      submitText.textContent = 'Send Message';
+      submitBtn.querySelector('i').className = 'fas fa-paper-plane';
+    });
 
-      setTimeout(() => {
-        formSuccess.style.display = 'none';
-        contactForm.reset();
-        contactForm.style.display = 'block';
-      }, 3000);
-
-    } catch (err) {
-      console.error('Form submission error:', err);
-      submitText.textContent = 'Failed — try again';
-      submitBtn.querySelector('i').className = 'fas fa-exclamation-triangle';
-      setTimeout(() => {
-        submitText.textContent = 'Send Message';
-        submitBtn.querySelector('i').className = 'fas fa-paper-plane';
-        submitBtn.disabled = false;
-      }, 3000);
-      return;
-    }
-
-    submitBtn.disabled = false;
-    submitText.textContent = 'Send Message';
-    submitBtn.querySelector('i').className = 'fas fa-paper-plane';
-  });
+  } // end if (contactForm)
 
   // ===================================================================
   // 13. ENHANCED CHATBOT
