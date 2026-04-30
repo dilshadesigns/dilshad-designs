@@ -15,7 +15,7 @@
  * 10. Gallery Slider + Fullscreen Lightbox
  * 11. Back to Top
  * 12. Contact Form (backend API + EmailJS fallback)
- * 13. Enhanced Chatbot
+ * 13. AI-Powered Chatbot (OpenRouter via secure backend)
  * 14. Legal Modals
  */
 
@@ -25,14 +25,12 @@
   // ===================================================================
   // API BASE URL — automatically switches between local and production
   // ===================================================================
-  const API_BASE = window.location.hostname === 'localhost'
+  const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
     ? 'http://localhost:3000'
     : 'https://dilshad-designs.onrender.com';
 
   // ===================================================================
   // 1. EMAILJS INIT
-  //    Key is kept here only as a fallback. For production, use the
-  //    backend /api/contact route to avoid exposing credentials.
   // ===================================================================
 
 
@@ -176,8 +174,8 @@
     'use strict';
 
     /* -------- State -------- */
-    let lbImages = [];  // [{src, alt}] for current open card
-    let lbIndex  = 0;   // current slide index in lightbox
+    let lbImages = [];
+    let lbIndex  = 0;
     let lbOpen   = false;
 
     /* -------- DOM refs -------- */
@@ -191,9 +189,7 @@
     const lbPrev      = document.getElementById('lb-prev');
     const lbNext      = document.getElementById('lb-next');
 
-    /* ------------------------------------------------------------------ */
-    /* Card Sliders (inline mini-carousel on each gallery card)            */
-    /* ------------------------------------------------------------------ */
+    /* Card Sliders */
     document.querySelectorAll('.gallery-slider').forEach(function (slider) {
       const slides  = slider.querySelectorAll('.gallery-slide');
       const dots    = slider.querySelectorAll('.slider-dot');
@@ -203,9 +199,8 @@
       let current   = 0;
       let animating = false;
 
-      if (total <= 1) return; // single-image card — nothing to do
+      if (total <= 1) return;
 
-      // Ensure only index 0 is active on load
       slides.forEach(function (s, i) { s.classList.toggle('active', i === 0); });
       dots.forEach(function (d, i)   { d.classList.toggle('active', i === 0); });
 
@@ -222,7 +217,6 @@
         slides[current].classList.add('active');
         dots[current].classList.add('active');
 
-        // Preload next image
         const nextIdx = (current + 1) % total;
         const nextImg = slides[nextIdx].querySelector('img');
         if (nextImg && nextImg.dataset.src) {
@@ -253,7 +247,6 @@
         });
       });
 
-      // Touch / swipe support on card
       let touchStartX = 0, touchStartY = 0;
       slider.addEventListener('touchstart', function (e) {
         touchStartX = e.changedTouches[0].screenX;
@@ -270,10 +263,7 @@
       slider._getIndex = function () { return current; };
     });
 
-    /* ------------------------------------------------------------------ */
-    /* Lightbox — build slides, open/close, navigate                       */
-    /* ------------------------------------------------------------------ */
-
+    /* Lightbox */
     function buildLbSlides(images) {
       lbTrack.innerHTML  = '';
       lbDotsWrap.innerHTML = '';
@@ -345,7 +335,7 @@
       const inSlide  = slides[index];
 
       inSlide.classList.add(dir === 'right' ? 'lb-enter-right' : 'lb-enter-left');
-      void inSlide.offsetWidth; // force reflow
+      void inSlide.offsetWidth;
       outSlide.classList.remove('lb-active');
       inSlide.classList.remove('lb-enter-right', 'lb-enter-left');
       inSlide.classList.add('lb-active');
@@ -448,9 +438,8 @@
   btt.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
 
   // ===================================================================
-// ===================================================================
-// 12. CONTACT FORM — only runs if form exists on this page
-// ===================================================================
+  // 12. CONTACT FORM — only runs if form exists on this page
+  // ===================================================================
   const contactForm = document.getElementById('contactForm');
 
   if (contactForm) {
@@ -548,131 +537,81 @@
   } // end if (contactForm)
 
   // ===================================================================
-  // 13. ENHANCED CHATBOT
+  // 13. AI-POWERED CHATBOT
+  //
+  // WHAT CHANGED vs old chatbot:
+  //   REMOVED: botKnowledge object, getBotResponse() rule-based function
+  //   REMOVED: All pattern-matching trigger arrays
+  //   KEPT:    All UI functions (addMessage, showTyping, removeTyping, etc.)
+  //   KEPT:    All DOM interactions, lead capture, quick replies
+  //   ADDED:   callAI() — async function calling /api/chat on your backend
+  //   ADDED:   conversationHistory[] — maintains context across messages
+  //   ADDED:   Realistic typing delay tied to response length
+  //   ADDED:   Graceful error fallback (never shows a broken bot)
   // ===================================================================
   (function () {
-    const chatToggle      = document.getElementById('chatToggle');
-    const chatWindow      = document.getElementById('chatWindow');
-    const chatClose       = document.getElementById('chatClose');
-    const chatInput       = document.getElementById('chatInput');
-    const chatSend        = document.getElementById('chatSend');
-    const chatMessages    = document.getElementById('chatMessages');
-    const quickReplies    = document.getElementById('quickReplies');
+
+    // ── DOM refs (unchanged) ─────────────────────────────────────────
+    const chatToggle       = document.getElementById('chatToggle');
+    const chatWindow       = document.getElementById('chatWindow');
+    const chatClose        = document.getElementById('chatClose');
+    const chatInput        = document.getElementById('chatInput');
+    const chatSend         = document.getElementById('chatSend');
+    const chatMessages     = document.getElementById('chatMessages');
+    const quickReplies     = document.getElementById('quickReplies');
     const chatNotification = document.querySelector('.chat-notification');
-    const leadCapture     = document.getElementById('leadCapture');
-    const leadEmail       = document.getElementById('leadEmail');
-    const leadSubmitBtn   = document.getElementById('leadSubmitBtn');
+    const leadCapture      = document.getElementById('leadCapture');
+    const leadEmail        = document.getElementById('leadEmail');
+    const leadSubmitBtn    = document.getElementById('leadSubmitBtn');
 
-    let chatOpened        = false;
-    let messageCount      = 0;
-    let leadCaptureShown  = false;
-    let conversationContext = null;
+    // ── State ────────────────────────────────────────────────────────
+    let chatOpened       = false;
+    let messageCount     = 0;
+    let leadCaptureShown = false;
+    let isAITyping       = false; // prevent double-sends while AI responds
 
-    const botKnowledge = {
-      greetings: {
-        triggers: ['hello', 'hi', 'hey', 'good morning', 'good afternoon', 'good evening', 'howdy', 'sup', 'hlo'],
-        responses: [
-          "Hey there! 👋 So glad you stopped by! I'm Dilshad's assistant. Whether you need a stunning logo, a scroll-stopping social post, or a full brand makeover — you're in the right place. What can I help you with today?",
-          "Hi! 😊 Welcome to Dilshad Designs! I'm here to help you find the perfect design solution. What kind of project are you thinking about?",
-          "Hello! Great to see you here! ✨ Dilshad is a top-rated freelance graphic designer in New Delhi, India. Tell me — what does your project need?"
-        ]
-      },
-      services: {
-        triggers: ['service', 'offer', 'what do you do', 'work', 'design', 'can you make', 'what can'],
-        responses: [
-          "Here's what Dilshad creates for clients 🎨\n\n• **Brand Identity & Logo Design**\n• **Advertising & Poster Design**\n• **Packaging Design**\n• **Social Media Creatives**\n• **Motion Graphics**\n• **Merchandise Design**\n• **Custom Website Development**\n• **High-Converting Landing Pages**\n• **UI/UX Design Solutions**\n\nWhich of these sounds like what you need? 😊"
-        ]
-      },
-      pricing: {
-        triggers: ['price', 'cost', 'how much', 'rate', 'charge', 'fee', 'budget', 'affordable', 'cheap', 'expensive', 'quote'],
-        responses: [
-          "Great question! 💡 Pricing is customized based on your project scope. Here's a rough idea:\n\n• Logo Design: Starting at affordable rates\n• Social Media Posts: Per post or package deals\n• Brand Identity: Full package pricing\n• Website/Landing Pages: Based on complexity\n\nThe best way to get an exact quote is to message directly on 👉 **fiverr.com/dilshadesigns** or use the contact form above.\n\nWant me to help you figure out which service fits your needs? 🎯"
-        ]
-      },
-      delivery: {
-        triggers: ['delivery', 'how fast', 'time', 'deadline', 'quick', 'urgent', 'turnaround', 'when', 'how long'],
-        responses: [
-          "Speed is a priority here! ⚡\n\n• **Logo Design**: 1–3 days\n• **Social Media Posts**: 24 hours\n• **Brand Identity**: 3–5 days\n• **Posters & Banners**: 24–48 hours\n• **Landing Pages**: 3–7 days\n\nFor urgent projects, just mention your deadline and Dilshad will do everything possible to meet it! Need something fast? 🚀"
-        ]
-      },
-      revisions: {
-        triggers: ['revision', 'change', 'edit', 'modify', 'redo', 'update', 'unlimited'],
-        responses: [
-          "Absolutely yes! Revisions are included 🔄\n\nDilshad believes in 100% client satisfaction. Most packages include multiple revision rounds — and the work continues until you're genuinely happy with the result.\n\nNo extra charges for reasonable revision requests. Your satisfaction is the goal! 😊"
-        ]
-      },
-      fiverr: {
-        triggers: ['fiverr', 'order', 'hire', 'book', 'purchase', 'buy', 'freelance'],
-        responses: [
-          "You can hire Dilshad directly on Fiverr! 🌟\n\n👉 **fiverr.com/dilshadesigns**\n\nWhy Fiverr?\n✅ Secure payment protection\n✅ 5-star rated seller\n✅ Verified reviews\n✅ Easy communication\n✅ Satisfaction guarantee\n\nJust click the 'Hire on Fiverr' button at the top — or I can guide you to the right gig!"
-        ]
-      },
-      contact: {
-        triggers: ['contact', 'reach', 'email', 'phone', 'call', 'message', 'talk', 'meet'],
-        responses: [
-          "Here's how to reach Dilshad directly 📞\n\n📧 Email: dilshadesign.co@gmail.com\n📱 Phone: +91 11499 53616\n📍 Based in New Delhi, India\n🌐 Fiverr: fiverr.com/dilshadesigns\n📸 Instagram: @dilshadesigns\n\nOr just use the **Contact Form** on this page — Dilshad typically responds within 2–4 hours! ⚡"
-        ]
-      },
-      portfolio: {
-        triggers: ['portfolio', 'gallery', 'sample', 'example', 'work', 'previous', 'see your'],
-        responses: [
-          "Check out the Portfolio Gallery section right here on the page! 🖼️\n\nYou'll find examples of:\n• **Advertising Posters** — Consumer electronics, food & beverage, sports\n• **Branding & Logo Design** — Visual identity work\n• **Web Development Projects** — Invoice generator, landing pages\n\nScroll up and click on any image to see it fullscreen! Want me to tell you more about a specific type of work?"
-        ]
-      },
-      availability: {
-        triggers: ['available', 'availability', 'free', 'slot', 'open', 'busy', 'schedule', 'capacity'],
-        responses: [
-          "Great news! ✅ Dilshad is currently **accepting new clients**!\n\nWhile slots do fill up quickly (especially for rush projects), reaching out now is the best way to secure your spot.\n\n📬 Use the contact form or Fiverr to get started. Dilshad responds within **2–4 hours** on average. Don't miss your slot! 🎯"
-        ]
-      },
-      location: {
-        triggers: ['india', 'delhi', 'location', 'based', 'where', 'country', 'city', 'remote', 'online'],
-        responses: [
-          "Dilshad is based in **New Delhi, India** 🇮🇳 but works with clients **worldwide**!\n\nAll communication and file delivery happens online, so location is never a barrier. Whether you're in Mumbai, London, New York, or Dubai — Dilshad's got you covered! 🌍\n\nTime zone: IST (UTC+5:30). Fast response guaranteed!"
-        ]
-      },
-      default: [
-        "That's a great question! 😊 I'm not sure I fully understood, but I can help you with Dilshad's **design services**, **pricing**, **portfolio**, or **how to get started**.\n\nWhat would you like to know more about?",
-        "Interesting! I'd love to help. Could you tell me more about what you're looking for? I can share info about **services**, **turnaround times**, **pricing**, or **how to hire** Dilshad.",
-        "I want to make sure I give you the right answer! Are you asking about **design services**, **pricing**, **Fiverr**, or something else? Let me know and I'll help right away! 🎯"
-      ]
-    };
+    /**
+     * conversationHistory — kept in memory for the session.
+     * Sent to backend with each request so AI has full context.
+     * Format: [{ role: 'user'|'assistant', content: '...' }]
+     */
+    let conversationHistory = [];
 
-    function getBotResponse(msg) {
-      const lower = msg.toLowerCase().trim();
+    // ── callAI() — the core replacement for getBotResponse() ─────────
+    /**
+     * Sends message + history to your backend /api/chat endpoint.
+     * Backend calls OpenRouter with your secure API key.
+     * Returns the AI's reply string.
+     */
+    async function callAI(userMessage) {
+      const response = await fetch(`${API_BASE}/api/chat`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: userMessage,
+          history: conversationHistory, // send conversation context
+        }),
+      });
 
-      for (const [category, data] of Object.entries(botKnowledge)) {
-        if (category === 'default') continue;
-        if (!data.triggers) continue;
-        for (const trigger of data.triggers) {
-          if (lower.includes(trigger)) {
-            conversationContext = category;
-            const responses = data.responses;
-            return responses[Math.floor(Math.random() * responses.length)];
-          }
-        }
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        // If backend returned a fallback reply even on error, use it
+        if (data.reply) return data.reply;
+        throw new Error(data.error || `HTTP ${response.status}`);
       }
 
-      // Context-aware service recommendation
-      if (lower.includes('need') || lower.includes('want') || lower.includes('looking for')) {
-        if (lower.includes('grow') || lower.includes('audience') || lower.includes('followers')) {
-          return "Based on what you're describing, **Social Media Design** would be a perfect fit! Consistent, high-quality social content builds audiences fast.\n\nWant me to tell you more about Dilshad's social media packages? 📱";
-        }
-        if (lower.includes('product') || lower.includes('sell') || lower.includes('shop')) {
-          return "It sounds like you might need **Packaging Design** or a **High-Converting Landing Page** to help sell your product better! 🛍️\n\nWhich sounds closer to what you need?";
-        }
-        if (lower.includes('startup') || lower.includes('business') || lower.includes('company') || lower.includes('brand')) {
-          return "For a new business or brand, **Brand Identity Design** is the most important starting point — logo, colors, typography, and brand guidelines.\n\nDilshad has helped several startups build their visual identity from scratch! Want to see the portfolio? ✨";
-        }
-      }
-
-      const defaults = botKnowledge.default;
-      return defaults[Math.floor(Math.random() * defaults.length)];
+      const data = await response.json();
+      if (!data.reply) throw new Error('Empty AI response');
+      return data.reply;
     }
 
+    // ── UI Helpers (unchanged from original) ─────────────────────────
+
     function formatBubbleText(text) {
+      // Convert newlines to <br>, leave plain text otherwise
+      // AI responses don't use markdown bold (**) — server strips it
       return text
-        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*\*(.*?)\*\*/g, '$1') // strip bold markers gracefully
         .replace(/\n/g, '<br>');
     }
 
@@ -693,6 +632,7 @@
       chatMessages.scrollTop = chatMessages.scrollHeight;
       messageCount++;
 
+      // Show lead capture after 4th message exchange
       if (messageCount >= 4 && !leadCaptureShown && sender === 'bot') {
         setTimeout(() => {
           leadCapture.style.display = 'block';
@@ -722,32 +662,72 @@
       if (t) t.remove();
     }
 
-    function getTypingDelay(response) {
-      const words     = response.split(' ').length;
-      const baseDelay = 600;
-      const perWord   = 35;
-      const jitter    = Math.random() * 400;
-      return Math.min(baseDelay + (words * perWord) + jitter, 2800);
+    /**
+     * Calculates a realistic display delay based on response length.
+     * Short responses appear faster; long responses get a bit more time.
+     * Min: 400ms  Max: 1800ms (AI already took real time to respond)
+     */
+    function getDisplayDelay(responseText) {
+      const words = responseText.split(' ').length;
+      return Math.min(400 + words * 20, 1800);
     }
 
-    function sendMessage(text) {
-      const msg = text || chatInput.value.trim();
-      if (!msg) return;
+    // ── sendMessage() — upgraded to use AI ───────────────────────────
+
+    async function sendMessage(text) {
+      const msg = (text || chatInput.value).trim();
+      if (!msg || isAITyping) return;
+
       chatInput.value = '';
+      isAITyping = true;
+
+      // Disable input while waiting for AI
+      chatInput.disabled = true;
+      chatSend.disabled  = true;
+
       addMessage(msg, 'user');
       quickReplies.style.display = 'none';
 
-      showTyping();
-      const response = getBotResponse(msg);
-      const delay    = getTypingDelay(response);
+      // Add to history immediately
+      conversationHistory.push({ role: 'user', content: msg });
 
-      setTimeout(() => {
+      showTyping();
+
+      try {
+        // Call AI backend
+        const reply = await callAI(msg);
+
+        // Small display delay for realism (AI already did real work)
+        await new Promise(resolve => setTimeout(resolve, getDisplayDelay(reply)));
+
         removeTyping();
-        addMessage(response, 'bot');
-      }, delay);
+        addMessage(reply, 'bot');
+
+        // Add AI reply to conversation history
+        conversationHistory.push({ role: 'assistant', content: reply });
+
+        // Keep history from growing too large (last 20 messages)
+        if (conversationHistory.length > 20) {
+          conversationHistory = conversationHistory.slice(-20);
+        }
+
+      } catch (err) {
+        console.error('AI chat error:', err);
+        removeTyping();
+
+        // Graceful fallback — chatbot never appears broken
+        const fallback = "I'm having a quick moment of trouble, but I'll be right back! 😊\n\nIn the meantime, you can reach Dilshad directly:\n• Email: dilshadesign.co@gmail.com\n• Fiverr: fiverr.com/dilshadesigns\n• Or use the Contact form on this page!";
+        addMessage(fallback, 'bot');
+      } finally {
+        isAITyping       = false;
+        chatInput.disabled = false;
+        chatSend.disabled  = false;
+        chatInput.focus();
+      }
     }
 
-    // Pulse toggle after 2 seconds to attract attention
+    // ── Chat open/close (unchanged logic) ────────────────────────────
+
     setTimeout(() => {
       if (!chatOpened) {
         chatToggle.classList.add('chat-pulse');
@@ -762,19 +742,25 @@
         chatOpened = true;
         if (chatNotification) chatNotification.style.display = 'none';
 
-        // Greeting sequence
+        // Opening greeting sequence — hardcoded for instant feel (no AI delay on first open)
         setTimeout(() => {
           showTyping();
           setTimeout(() => {
             removeTyping();
-            addMessage("Hey there! 👋 Welcome to Dilshad Designs! I'm here to help you with any questions about services, pricing, or how to get started.", 'bot');
+            addMessage("Hey there! 👋 Welcome to Dilshad Designs! I'm your AI assistant — ask me anything about services, pricing, turnaround times, or how to get started.", 'bot');
 
             setTimeout(() => {
               showTyping();
               setTimeout(() => {
                 removeTyping();
-                addMessage("Dilshad is a top-rated freelance graphic designer based in New Delhi, India 🇮🇳 — working with brands globally. What can I help you with today?", 'bot');
+                addMessage("Dilshad is a top-rated freelance graphic designer and web developer based in New Delhi, India 🇮🇳 — working with brands globally. What can I help you with today?", 'bot');
                 quickReplies.style.display = 'flex';
+
+                // Pre-fill history so AI has context from the start
+                conversationHistory = [
+                  { role: 'assistant', content: "Hey there! I'm your AI assistant for Dilshad Designs — ask me anything about services, pricing, turnaround, or how to get started." },
+                  { role: 'assistant', content: "Dilshad is a top-rated freelance graphic designer and web developer based in New Delhi, India — working with brands globally." },
+                ];
               }, 1200);
             }, 800);
 
@@ -795,63 +781,56 @@
     });
 
     chatSend.addEventListener('click', () => sendMessage());
-    chatInput.addEventListener('keydown', e => { if (e.key === 'Enter') sendMessage(); });
+    chatInput.addEventListener('keydown', e => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+      }
+    });
 
     quickReplies.querySelectorAll('.quick-reply').forEach(btn => {
       btn.addEventListener('click', () => sendMessage(btn.dataset.msg));
     });
 
+    // ── Lead Capture (unchanged) ──────────────────────────────────────
+
     leadSubmitBtn.addEventListener('click', async () => {
       const email = leadEmail.value.trim();
 
-      // Validate email format
       if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
         leadEmail.style.borderColor = '#dc2626';
         return;
       }
 
-      // Clear error state
       leadEmail.style.borderColor = '';
-
-      // Show sending state on button
       leadSubmitBtn.textContent = '...';
       leadSubmitBtn.disabled    = true;
 
       try {
-        // Send email to backend lead route
-        const response = await fetch(`${API_BASE}/api/contact/lead`, {
+        await fetch(`${API_BASE}/api/contact/lead`, {
           method  : 'POST',
           headers : { 'Content-Type': 'application/json' },
-          body    : JSON.stringify({ email })
+          body    : JSON.stringify({ email }),
         });
-
-        // Show success message regardless of response
-        // (we never want to show an error to the user for this)
-        leadCapture.innerHTML = `
-          <p style="color:var(--brand);font-size:0.85rem;font-weight:600;">
-            ✔ Thanks! We'll be in touch soon.
-          </p>
-        `;
-
       } catch (err) {
-        // Network error — still show success to user
         console.error('Lead capture error:', err);
-        leadCapture.innerHTML = `
-          <p style="color:var(--brand);font-size:0.85rem;font-weight:600;">
-            ✔ Thanks! We'll be in touch soon.
-          </p>
-        `;
       }
+
+      // Always show success (never frustrate the user)
+      leadCapture.innerHTML = `
+        <p style="color:var(--brand);font-size:0.85rem;font-weight:600;">
+          ✔ Thanks! We'll be in touch soon.
+        </p>
+      `;
     });
 
-  })(); // End Chatbot IIFE
+  })(); // End AI Chatbot IIFE
 
 })(); // End main IIFE
 
 // ===================================================================
 // 14. LEGAL MODALS
-//    These functions are global because they are called via onclick=""
-//    in the HTML (Privacy Policy & Terms of Service buttons).
+//    Global scope — called via onclick="" in HTML
 // ===================================================================
 
 function openLegalModal(type) {
@@ -873,7 +852,6 @@ function closeLegalModal(type) {
   document.body.style.overflow = '';
 }
 
-// Close legal modals on backdrop click
 document.addEventListener('DOMContentLoaded', function () {
   ['privacyModal', 'tosModal'].forEach(function (id) {
     const overlay = document.getElementById(id);
