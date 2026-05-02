@@ -252,7 +252,7 @@
 <div id="page-progress"></div>
 
 <!-- ==================== NAVBAR ==================== -->
-<nav id="navbar">
+<nav id="navbar" aria-label="Main navigation">
   <div class="nav-inner">
     <a href="index.html" class="logo-mark"><span class="gold">Dilshad</span><span class="green">esigns</span></a>
 
@@ -280,7 +280,7 @@
 </nav>
 
 <!-- Mobile Menu -->
-<div id="mobile-menu">
+<nav id="mobile-menu" aria-label="Mobile navigation">
   <a href="index.html">Home</a>
   <a href="html/about.html">About</a>
   <a href="html/projects.html">Gallery</a>
@@ -290,7 +290,7 @@
   <a href="https://www.fiverr.com/dilshadesigns" target="_blank" rel="noopener" style="color:var(--brand);font-weight:700;">
     <i class="fas fa-external-link-alt"></i> Hire on Fiverr
   </a>
-</div>
+</nav>
 
 <!-- ==================== HERO ==================== -->
 <section id="home">
@@ -309,10 +309,9 @@
       Available for Freelance Work
     </div>
 
-    <h1 class="sr-only">Freelance Graphic Designer & Web Developer in Delhi, India — Dilshad Designs</h1>
-    <h1 class="hero-name">
-      <span class="gold">Dilshad</span><br>
-      <span class="light">Designs</span>
+    <h1 class="hero-name" aria-label="Dilshad Designs — Freelance Graphic Designer and Web Developer in Delhi, India">
+    <span class="gold" aria-hidden="true">Dilshad</span><br>
+    <span class="light" aria-hidden="true">Designs</span>
     </h1>
 
     <p class="hero-tagline">Turning Ideas into Bold Visuals</p>
@@ -351,7 +350,7 @@
 </section>
 
 <!-- ==================== ABOUT PREVIEW ==================== -->
-<section id="about" style="background:var(--bg-alt);">
+<section id="about" role="main" style="background:var(--bg-alt);">
   <div class="container">
     <div class="about-grid">
 
@@ -648,7 +647,7 @@
 </section>
 
 <!-- ==================== FOOTER ==================== -->
-<footer>
+<footer role="contentinfo" aria-label="Site footer">
   <div class="footer-inner">
     <div class="footer-grid">
       <div class="footer-brand">

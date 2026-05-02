@@ -108,7 +108,7 @@
 <div id="page-progress"></div>
 
 <!-- ==================== NAVBAR ==================== -->
-<nav id="navbar">
+<nav id="navbar" aria-label="Main navigation">
   <div class="nav-inner">
     <a href="../index.html" class="logo-mark"><span class="gold">Dilshad</span><span class="green">esigns</span></a>
     <ul class="nav-links">
@@ -130,7 +130,7 @@
 </nav>
 
 <!-- Mobile Menu -->
-<div id="mobile-menu">
+<nav id="mobile-menu" aria-label="Mobile navigation">
   <a href="../index.html">Home</a>
   <a href="about.html">About</a>
   <a href="projects.html">Gallery</a>
@@ -140,7 +140,7 @@
   <a href="https://www.fiverr.com/dilshadesigns" target="_blank" rel="noopener" style="color:var(--brand);font-weight:700;">
     <i class="fas fa-external-link-alt"></i> Hire on Fiverr
   </a>
-</div>
+</nav>
 
 <!-- ==================== PAGE HERO ==================== -->
 <section id="home" style="min-height:40vh;padding-top:68px;">
@@ -150,15 +150,15 @@
   <div class="hero-orb hero-orb-2"></div>
   <div class="hero-content" style="padding-top:3rem;">
     <div class="hero-badge"><span class="dot"></span> About Me</div>
-    <h1 class="hero-name" style="font-size:clamp(2.5rem,5vw,4rem);">
-      <span class="gold">Meet</span><br><span class="light">Dilshad</span>
+    <h1 class="hero-name" style="font-size:clamp(2.5rem,5vw,4rem);" aria-label="Meet Dilshad — Freelance Graphic Designer and Zoho Specialist in New Delhi, India">
+      <span class="gold" aria-hidden="true">Meet</span><br><span class="light" aria-hidden="true">Dilshad</span>
     </h1>
     <p class="hero-tagline">The Creative Mind Behind the Designs</p>
   </div>
 </section>
 
 <!-- ==================== ABOUT FULL ==================== -->
-<section id="about" style="background:var(--bg-alt);">
+<section id="about" role="main" style="background:var(--bg-alt);">
   <div class="container">
     <div class="about-grid">
 
@@ -245,7 +245,7 @@
 </section>
 
 <!-- ==================== FOOTER ==================== -->
-<footer>
+<footer role="contentinfo" aria-label="Site footer">
   <div class="footer-inner">
     <div class="footer-grid">
       <div class="footer-brand">
