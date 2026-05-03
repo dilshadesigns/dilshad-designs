@@ -1,17 +1,7 @@
 User-agent: *
 Allow: /
 
-# Block admin/backend paths (add yours if any)
 Disallow: /backend/
 Disallow: /admin/
 
-# Allow all CSS/JS for rendering
-Allow: /css/
-Allow: /js/
-Allow: /assets/
-
-# Sitemap location
 Sitemap: https://dilshadesigns.vercel.app/sitemap.xml
-
-# Crawl-delay (optional, be generous for small sites)
-Crawl-delay: 1
