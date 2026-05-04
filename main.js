@@ -914,3 +914,161 @@ function triggerEasterEgg() {
   setTimeout(() => msg.remove(), 3500);
 }
 
+// ===================================================================
+// 15. SERVICES CAROUSEL
+// ===================================================================
+(function ServicesCarousel() {
+  var stage    = document.getElementById('svcStage');
+  if (!stage) return;
+
+  var cards     = Array.from(stage.querySelectorAll('.svc-card'));
+  var dotsWrap  = document.getElementById('svcDots');
+  var prevBtn   = document.getElementById('svcPrev');
+  var nextBtn   = document.getElementById('svcNext');
+  var total     = cards.length;
+  var current   = 0;
+  var autoTimer = null;
+  var isAnimating = false;
+  var isPaused  = false;
+  var AUTOPLAY_INTERVAL = 3500;
+  var ANIM_DURATION     = 600;
+
+  // ── Build dots ──────────────────────────────────────────────────
+  cards.forEach(function (_, i) {
+    var dot = document.createElement('button');
+    dot.className = 'svc-dot' + (i === 0 ? ' active' : '');
+    dot.setAttribute('aria-label', 'Go to service ' + (i + 1));
+    dot.addEventListener('click', function () {
+      if (i !== current) goTo(i);
+    });
+    dotsWrap.appendChild(dot);
+  });
+
+  // ── Render ──────────────────────────────────────────────────────
+  function render(idx) {
+    var prevIdx = (idx - 1 + total) % total;
+    var nextIdx = (idx + 1) % total;
+
+    cards.forEach(function (card, i) {
+      card.classList.remove('svc-center', 'svc-left', 'svc-right');
+      if      (i === idx)     card.classList.add('svc-center');
+      else if (i === prevIdx) card.classList.add('svc-left');
+      else if (i === nextIdx) card.classList.add('svc-right');
+    });
+
+    var dots = dotsWrap.querySelectorAll('.svc-dot');
+    dots.forEach(function (d, i) {
+      d.classList.toggle('active', i === idx);
+    });
+  }
+
+  // ── Navigate ────────────────────────────────────────────────────
+  function goTo(idx) {
+    if (isAnimating) return;
+    isAnimating = true;
+    current = ((idx % total) + total) % total;
+    render(current);
+    setTimeout(function () { isAnimating = false; }, ANIM_DURATION);
+  }
+
+  function next() { goTo(current + 1); }
+  function prev() { goTo(current - 1); }
+
+  // ── Autoplay ────────────────────────────────────────────────────
+  function startAutoplay() {
+    // Always clear before starting to prevent duplicate timers
+    clearInterval(autoTimer);
+    if (isPaused) return;
+    autoTimer = setInterval(function () {
+      if (!isPaused && !isAnimating) next();
+    }, AUTOPLAY_INTERVAL);
+  }
+
+  function stopAutoplay() {
+    clearInterval(autoTimer);
+    autoTimer = null;
+  }
+
+  // ── Pause on hover / focus ───────────────────────────────────────
+  stage.addEventListener('mouseenter', function () {
+    isPaused = true;
+    stopAutoplay();
+  });
+  stage.addEventListener('mouseleave', function () {
+    isPaused = false;
+    startAutoplay();
+  });
+  stage.addEventListener('focusin', function () {
+    isPaused = true;
+    stopAutoplay();
+  });
+  stage.addEventListener('focusout', function () {
+    isPaused = false;
+    startAutoplay();
+  });
+
+  // ── Pause when tab is hidden ─────────────────────────────────────
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden) {
+      stopAutoplay();
+    } else if (!isPaused) {
+      startAutoplay();
+    }
+  });
+
+  // ── Arrow buttons ────────────────────────────────────────────────
+  prevBtn.addEventListener('click', function () {
+    prev();
+    // Brief pause after manual interaction, then resume
+    stopAutoplay();
+    setTimeout(function () {
+      if (!isPaused) startAutoplay();
+    }, AUTOPLAY_INTERVAL);
+  });
+
+  nextBtn.addEventListener('click', function () {
+    next();
+    stopAutoplay();
+    setTimeout(function () {
+      if (!isPaused) startAutoplay();
+    }, AUTOPLAY_INTERVAL);
+  });
+
+  // ── Click side cards to advance ──────────────────────────────────
+  cards.forEach(function (card) {
+    card.addEventListener('click', function () {
+      if (card.classList.contains('svc-left'))  { prev(); stopAutoplay(); setTimeout(function () { if (!isPaused) startAutoplay(); }, AUTOPLAY_INTERVAL); }
+      if (card.classList.contains('svc-right')) { next(); stopAutoplay(); setTimeout(function () { if (!isPaused) startAutoplay(); }, AUTOPLAY_INTERVAL); }
+    });
+  });
+
+  // ── Touch / swipe ────────────────────────────────────────────────
+  var touchStartX = 0;
+  var touchStartY = 0;
+  stage.addEventListener('touchstart', function (e) {
+    touchStartX = e.changedTouches[0].screenX;
+    touchStartY = e.changedTouches[0].screenY;
+  }, { passive: true });
+  stage.addEventListener('touchend', function (e) {
+    var dx = touchStartX - e.changedTouches[0].screenX;
+    var dy = Math.abs(touchStartY - e.changedTouches[0].screenY);
+    if (Math.abs(dx) > 40 && dy < 60) {
+      if (dx > 0) next(); else prev();
+      stopAutoplay();
+      setTimeout(function () { if (!isPaused) startAutoplay(); }, AUTOPLAY_INTERVAL);
+    }
+  }, { passive: true });
+
+  // ── Dot clicks pause briefly then resume ────────────────────────
+  dotsWrap.querySelectorAll('.svc-dot').forEach(function (dot, i) {
+    dot.addEventListener('click', function () {
+      stopAutoplay();
+      setTimeout(function () { if (!isPaused) startAutoplay(); }, AUTOPLAY_INTERVAL);
+    });
+  });
+
+  // ── Init ─────────────────────────────────────────────────────────
+  render(0);
+  startAutoplay();
+
+})(); // End ServicesCarousel
