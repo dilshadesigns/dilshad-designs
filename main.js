@@ -918,9 +918,12 @@ function triggerEasterEgg() {
 // 15. SERVICES CAROUSEL
 // ===================================================================
 (function ServicesCarousel() {
+  'use strict';
+
   var stage    = document.getElementById('svcStage');
   if (!stage) return;
 
+  var wrap      = stage.closest('.svc-carousel-wrap');
   var cards     = Array.from(stage.querySelectorAll('.svc-card'));
   var dotsWrap  = document.getElementById('svcDots');
   var prevBtn   = document.getElementById('svcPrev');
@@ -928,60 +931,91 @@ function triggerEasterEgg() {
   var total     = cards.length;
   var current   = 0;
   var autoTimer = null;
-  var isAnimating = false;
   var isPaused  = false;
-  var AUTOPLAY_INTERVAL = 3500;
-  var ANIM_DURATION     = 600;
+  var isAnimating = false;
+  var isMobile  = false;
 
-  // ── Build dots ──────────────────────────────────────────────────
+  var AUTOPLAY_MS   = 3500;
+  var ANIM_LOCK_MS  = 580;
+  var MOBILE_BP     = 767;
+
+  // ── Build dots ────────────────────────────────────────────────
   cards.forEach(function (_, i) {
     var dot = document.createElement('button');
     dot.className = 'svc-dot' + (i === 0 ? ' active' : '');
     dot.setAttribute('aria-label', 'Go to service ' + (i + 1));
-    dot.addEventListener('click', function () {
-      if (i !== current) goTo(i);
-    });
+    dot.setAttribute('type', 'button');
+    dot.addEventListener('click', function () { goTo(i); });
     dotsWrap.appendChild(dot);
   });
 
-  // ── Render ──────────────────────────────────────────────────────
-  function render(idx) {
-    var prevIdx = (idx - 1 + total) % total;
-    var nextIdx = (idx + 1) % total;
+  var dots = Array.from(dotsWrap.querySelectorAll('.svc-dot'));
 
-    cards.forEach(function (card, i) {
-      card.classList.remove('svc-center', 'svc-left', 'svc-right');
-      if      (i === idx)     card.classList.add('svc-center');
-      else if (i === prevIdx) card.classList.add('svc-left');
-      else if (i === nextIdx) card.classList.add('svc-right');
-    });
-
-    var dots = dotsWrap.querySelectorAll('.svc-dot');
-    dots.forEach(function (d, i) {
-      d.classList.toggle('active', i === idx);
-    });
+  // ── Update dots ───────────────────────────────────────────────
+  function setDot(idx) {
+    dots.forEach(function (d, i) { d.classList.toggle('active', i === idx); });
   }
 
-  // ── Navigate ────────────────────────────────────────────────────
+  // ── Desktop render (absolute-position strategy) ───────────────
+  function renderDesktop(idx) {
+    var left  = (idx - 1 + total) % total;
+    var right = (idx + 1) % total;
+    cards.forEach(function (card, i) {
+      card.classList.remove('svc-center', 'svc-left', 'svc-right');
+      if      (i === idx)   card.classList.add('svc-center');
+      else if (i === left)  card.classList.add('svc-left');
+      else if (i === right) card.classList.add('svc-right');
+    });
+    setDot(idx);
+  }
+
+  // ── Mobile render (scroll-snap strategy) ─────────────────────
+  function renderMobile(idx) {
+    // Update .svc-center class for the accent bar
+    cards.forEach(function (card, i) {
+      card.classList.toggle('svc-center', i === idx);
+      card.classList.remove('svc-left', 'svc-right');
+    });
+    setDot(idx);
+    // Scroll the card into view without animation (instant, no lag)
+    var target = cards[idx];
+    if (target) {
+      // offsetLeft within the scrollable stage
+      var cardLeft   = target.offsetLeft;
+      var stageW     = stage.clientWidth;
+      var cardW      = target.offsetWidth;
+      var scrollTo   = cardLeft - (stageW / 2) + (cardW / 2);
+      stage.scrollTo({ left: scrollTo, behavior: 'smooth' });
+    }
+  }
+
+  // ── Unified render ────────────────────────────────────────────
+  function render(idx) {
+    if (isMobile) renderMobile(idx);
+    else          renderDesktop(idx);
+  }
+
+  // ── goTo ──────────────────────────────────────────────────────
   function goTo(idx) {
     if (isAnimating) return;
+    idx = ((idx % total) + total) % total;
+    if (idx === current && !isMobile) return;
     isAnimating = true;
-    current = ((idx % total) + total) % total;
+    current = idx;
     render(current);
-    setTimeout(function () { isAnimating = false; }, ANIM_DURATION);
+    setTimeout(function () { isAnimating = false; }, ANIM_LOCK_MS);
   }
 
   function next() { goTo(current + 1); }
   function prev() { goTo(current - 1); }
 
-  // ── Autoplay ────────────────────────────────────────────────────
+  // ── Autoplay ──────────────────────────────────────────────────
   function startAutoplay() {
-    // Always clear before starting to prevent duplicate timers
     clearInterval(autoTimer);
     if (isPaused) return;
     autoTimer = setInterval(function () {
       if (!isPaused && !isAnimating) next();
-    }, AUTOPLAY_INTERVAL);
+    }, AUTOPLAY_MS);
   }
 
   function stopAutoplay() {
@@ -989,85 +1023,95 @@ function triggerEasterEgg() {
     autoTimer = null;
   }
 
-  // ── Pause on hover / focus ───────────────────────────────────────
-  stage.addEventListener('mouseenter', function () {
-    isPaused = true;
+  function pauseAndResume() {
     stopAutoplay();
+    setTimeout(function () {
+      if (!isPaused) startAutoplay();
+    }, AUTOPLAY_MS);
+  }
+
+  // ── Hover pause (desktop only — irrelevant on touch) ──────────
+  stage.addEventListener('mouseenter', function () {
+    if (isMobile) return;
+    isPaused = true; stopAutoplay();
   });
   stage.addEventListener('mouseleave', function () {
-    isPaused = false;
-    startAutoplay();
-  });
-  stage.addEventListener('focusin', function () {
-    isPaused = true;
-    stopAutoplay();
-  });
-  stage.addEventListener('focusout', function () {
-    isPaused = false;
-    startAutoplay();
+    if (isMobile) return;
+    isPaused = false; startAutoplay();
   });
 
-  // ── Pause when tab is hidden ─────────────────────────────────────
+  // ── Tab visibility ────────────────────────────────────────────
   document.addEventListener('visibilitychange', function () {
-    if (document.hidden) {
-      stopAutoplay();
-    } else if (!isPaused) {
-      startAutoplay();
-    }
+    if (document.hidden) { stopAutoplay(); }
+    else if (!isPaused)  { startAutoplay(); }
   });
 
-  // ── Arrow buttons ────────────────────────────────────────────────
-  prevBtn.addEventListener('click', function () {
-    prev();
-    // Brief pause after manual interaction, then resume
-    stopAutoplay();
-    setTimeout(function () {
-      if (!isPaused) startAutoplay();
-    }, AUTOPLAY_INTERVAL);
-  });
+  // ── Arrow buttons ─────────────────────────────────────────────
+  prevBtn.addEventListener('click', function () { prev(); pauseAndResume(); });
+  nextBtn.addEventListener('click', function () { next(); pauseAndResume(); });
 
-  nextBtn.addEventListener('click', function () {
-    next();
-    stopAutoplay();
-    setTimeout(function () {
-      if (!isPaused) startAutoplay();
-    }, AUTOPLAY_INTERVAL);
-  });
-
-  // ── Click side cards to advance ──────────────────────────────────
+  // ── Side-card click (desktop only) ───────────────────────────
   cards.forEach(function (card) {
     card.addEventListener('click', function () {
-      if (card.classList.contains('svc-left'))  { prev(); stopAutoplay(); setTimeout(function () { if (!isPaused) startAutoplay(); }, AUTOPLAY_INTERVAL); }
-      if (card.classList.contains('svc-right')) { next(); stopAutoplay(); setTimeout(function () { if (!isPaused) startAutoplay(); }, AUTOPLAY_INTERVAL); }
+      if (isMobile) return;
+      if (card.classList.contains('svc-left'))  { prev(); pauseAndResume(); }
+      if (card.classList.contains('svc-right')) { next(); pauseAndResume(); }
     });
   });
 
-  // ── Touch / swipe ────────────────────────────────────────────────
-  var touchStartX = 0;
-  var touchStartY = 0;
-  stage.addEventListener('touchstart', function (e) {
-    touchStartX = e.changedTouches[0].screenX;
-    touchStartY = e.changedTouches[0].screenY;
+  // ── Mobile: detect which card is centred after scroll ─────────
+  var scrollEndTimer = null;
+  stage.addEventListener('scroll', function () {
+    if (!isMobile) return;
+    clearTimeout(scrollEndTimer);
+    scrollEndTimer = setTimeout(function () {
+      // Find card closest to centre of stage
+      var stageMid = stage.scrollLeft + stage.clientWidth / 2;
+      var closest  = 0;
+      var minDist  = Infinity;
+      cards.forEach(function (card, i) {
+        var cardMid = card.offsetLeft + card.offsetWidth / 2;
+        var dist    = Math.abs(stageMid - cardMid);
+        if (dist < minDist) { minDist = dist; closest = i; }
+      });
+      if (closest !== current) {
+        current = closest;
+        setDot(current);
+        cards.forEach(function (card, i) {
+          card.classList.toggle('svc-center', i === current);
+        });
+      }
+    }, 80);
   }, { passive: true });
-  stage.addEventListener('touchend', function (e) {
-    var dx = touchStartX - e.changedTouches[0].screenX;
-    var dy = Math.abs(touchStartY - e.changedTouches[0].screenY);
-    if (Math.abs(dx) > 40 && dy < 60) {
-      if (dx > 0) next(); else prev();
-      stopAutoplay();
-      setTimeout(function () { if (!isPaused) startAutoplay(); }, AUTOPLAY_INTERVAL);
+
+  // ── Responsive: switch mode on resize ────────────────────────
+  function checkMobile() {
+    var wasMobile = isMobile;
+    isMobile = window.innerWidth <= MOBILE_BP;
+
+    if (isMobile === wasMobile) return; // no change
+
+    if (isMobile) {
+      // Switching to mobile: reset desktop classes
+      cards.forEach(function (card) {
+        card.classList.remove('svc-center', 'svc-left', 'svc-right');
+      });
+      renderMobile(current);
+    } else {
+      // Switching to desktop: clear scroll position, apply classes
+      stage.scrollLeft = 0;
+      renderDesktop(current);
     }
+  }
+
+  var resizeTimer = null;
+  window.addEventListener('resize', function () {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(checkMobile, 150);
   }, { passive: true });
 
-  // ── Dot clicks pause briefly then resume ────────────────────────
-  dotsWrap.querySelectorAll('.svc-dot').forEach(function (dot, i) {
-    dot.addEventListener('click', function () {
-      stopAutoplay();
-      setTimeout(function () { if (!isPaused) startAutoplay(); }, AUTOPLAY_INTERVAL);
-    });
-  });
-
-  // ── Init ─────────────────────────────────────────────────────────
+  // ── Init ──────────────────────────────────────────────────────
+  isMobile = window.innerWidth <= MOBILE_BP;
   render(0);
   startAutoplay();
 

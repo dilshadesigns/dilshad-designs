@@ -661,18 +661,17 @@
 
   </div><!-- /svc-stage -->
 
-  <!-- Arrows -->
-  <button class="svc-arrow svc-prev" id="svcPrev" aria-label="Previous service">
-    <i class="fas fa-chevron-left"></i>
-  </button>
-  <button class="svc-arrow svc-next" id="svcNext" aria-label="Next service">
-    <i class="fas fa-chevron-right"></i>
-  </button>
+  <!-- Arrows + Dots wrapped for mobile layout -->
+  <div class="svc-controls-row">
+    <button class="svc-arrow svc-prev" id="svcPrev" aria-label="Previous service">
+      <i class="fas fa-chevron-left"></i>
+    </button>
+    <div class="svc-dots" id="svcDots"></div>
+    <button class="svc-arrow svc-next" id="svcNext" aria-label="Next service">
+      <i class="fas fa-chevron-right"></i>
+    </button>
+  </div>
 
-  <!-- Dots -->
-  <div class="svc-dots" id="svcDots"></div>
-
-  <!-- View all -->
   <div style="text-align:center;margin-top:2.5rem;">
     <a href="services.html" class="btn-primary" style="display:inline-flex;">
       <i class="fas fa-layer-group"></i> View All Services
