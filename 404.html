@@ -8,42 +8,557 @@
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link rel="stylesheet" href="style.css">
+
   <style>
-    .page-404 {
-      min-height: 100vh; display: flex;
-      align-items: center; justify-content: center;
-      text-align: center; padding: 2rem;
-      background: var(--bg);
+    /* ─── Reset & Base ─────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --gold: #e6b740;
+      --gold-glow: rgba(230,183,64,.35);
+      --red: #ff4d4f;
+      --bg: #f8f7f4;
+      --surface: #ffffff;
+      --text: #1a1a1a;
+      --text-muted: #888;
+      --border: #e0ddd6;
     }
+    [data-theme="dark"] {
+      --bg: #0f0f0f;
+      --surface: #1a1a1a;
+      --text: #f0ede8;
+      --text-muted: #666;
+      --border: #2a2a2a;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    /* ─── Page Shell ────────────────────────────────────── */
+    .page-404 {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 2rem 1.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* ─── Ambient Background Grid ───────────────────────── */
+    .bg-grid {
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 48px 48px;
+      opacity: 0.4;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Radial gradient overlay on grid */
+    .bg-grid::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 70% 60% at 50% 50%, transparent 30%, var(--bg) 100%);
+    }
+
+    /* ─── Floating particles ────────────────────────────── */
+    .particles { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+    .particle {
+      position: absolute;
+      border-radius: 50%;
+      background: var(--gold);
+      opacity: 0;
+      animation: floatUp var(--dur, 8s) var(--delay, 0s) ease-in infinite;
+    }
+    @keyframes floatUp {
+      0%   { transform: translateY(110vh) scale(0); opacity: 0; }
+      10%  { opacity: .6; }
+      90%  { opacity: .2; }
+      100% { transform: translateY(-10vh) scale(1); opacity: 0; }
+    }
+
+    /* ─── Ghost / Cartoon Face ──────────────────────────── */
+    .ghost-wrap {
+      position: relative;
+      z-index: 2;
+      margin-bottom: 2.5rem;
+      animation: ghostBob 3s ease-in-out infinite;
+    }
+    @keyframes ghostBob {
+      0%, 100% { transform: translateY(0px) rotate(-1deg); }
+      50%       { transform: translateY(-18px) rotate(1deg); }
+    }
+
+    .ghost-svg {
+      width: clamp(120px, 22vw, 180px);
+      filter:
+        drop-shadow(0 8px 32px var(--gold-glow))
+        drop-shadow(0 2px 8px rgba(0,0,0,.12));
+    }
+
+    /* Blinking eyelids */
+    .eye-lid {
+      animation: blink 4s ease-in-out infinite;
+      transform-origin: center bottom;
+    }
+    .eye-lid.right { animation-delay: 0.08s; }
+    @keyframes blink {
+      0%, 92%, 100% { transform: scaleY(0); }
+      96%            { transform: scaleY(1); }
+    }
+
+    /* Pupils track mouse slightly — done via JS */
+    .pupil { transition: transform .1s ease; }
+
+    /* ─── Big ghost shadow ──────────────────────────────── */
+    .ghost-shadow {
+      width: clamp(80px, 15vw, 130px);
+      height: 14px;
+      background: radial-gradient(ellipse, rgba(0,0,0,.18) 0%, transparent 70%);
+      border-radius: 50%;
+      margin: -8px auto 0;
+      animation: shadowPulse 3s ease-in-out infinite;
+    }
+    @keyframes shadowPulse {
+      0%, 100% { transform: scaleX(1);   opacity: .7; }
+      50%       { transform: scaleX(.65); opacity: .3; }
+    }
+
+    /* ─── 404 Number ────────────────────────────────────── */
     .err-number {
       font-family: 'Syne', sans-serif;
-      font-size: clamp(6rem, 20vw, 12rem);
-      font-weight: 800; line-height: 1;
-      color: #ff4d4f; opacity: 0.12;
+      font-size: clamp(5.5rem, 22vw, 13rem);
+      font-weight: 800;
+      line-height: 1;
+      color: var(--red);
+      opacity: 0.09;
       position: absolute;
-      left: 50%; transform: translateX(-50%);
-      user-select: none; white-space: nowrap;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      user-select: none;
+      pointer-events: none;
+      z-index: 1;
+      letter-spacing: -0.04em;
     }
-    .err-content { position: relative; z-index: 1; }
-    .err-content img { width: 80px; border-radius: 50%; border: 2px solid var(--gold); margin: 0 auto 1.5rem; }
-    .err-content h1 { font-size: clamp(1.5rem, 4vw, 2.2rem); font-weight: 800; margin-bottom: 0.75rem; }
-    .err-content p  { color: var(--text-muted); font-size: 1rem; max-width: 400px; margin: 0 auto 2rem; }
-    .err-links { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+
+    /* ─── Content Card ──────────────────────────────────── */
+    .err-content {
+      position: relative;
+      z-index: 2;
+      animation: fadeUp .7s .15s cubic-bezier(.22,1,.36,1) both;
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(28px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ─── Badge ─────────────────────────────────────────── */
+    .err-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: .45rem;
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: 100px;
+      padding: .35rem .9rem;
+      font-size: .72rem;
+      font-weight: 600;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 1.25rem;
+      box-shadow: 0 1px 6px rgba(0,0,0,.06);
+    }
+    .err-badge .dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--red);
+      animation: pulse 1.8s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(255,77,79,.5); }
+      50%       { box-shadow: 0 0 0 5px rgba(255,77,79,0); }
+    }
+
+    /* ─── Heading ───────────────────────────────────────── */
+    .err-content h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(1.6rem, 4.5vw, 2.6rem);
+      font-weight: 800;
+      line-height: 1.15;
+      margin-bottom: .85rem;
+      letter-spacing: -.02em;
+    }
+    .err-content h1 .accent {
+      background: linear-gradient(135deg, var(--gold) 0%, #f0c060 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* ─── Sub-copy ──────────────────────────────────────── */
+    .err-content p {
+      color: var(--text-muted);
+      font-size: 1rem;
+      line-height: 1.7;
+      max-width: 400px;
+      margin: 0 auto 2.25rem;
+    }
+
+    /* ─── Smart Suggestions ─────────────────────────────── */
+    .suggestions {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: 16px;
+      padding: 1.25rem 1.5rem;
+      max-width: 420px;
+      margin: 0 auto 2.25rem;
+      text-align: left;
+      box-shadow: 0 2px 16px rgba(0,0,0,.05);
+      animation: fadeUp .7s .35s cubic-bezier(.22,1,.36,1) both;
+    }
+    .suggestions-title {
+      font-size: .72rem;
+      font-weight: 600;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: .9rem;
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+    }
+    .suggestions-title::before {
+      content: '';
+      display: block;
+      width: 14px; height: 2px;
+      background: var(--gold);
+      border-radius: 2px;
+    }
+    .suggestion-links {
+      display: flex;
+      flex-direction: column;
+      gap: .5rem;
+    }
+    .suggestion-link {
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+      padding: .6rem .75rem;
+      border-radius: 10px;
+      text-decoration: none;
+      color: var(--text);
+      font-size: .9rem;
+      font-weight: 500;
+      transition: background .18s, transform .18s;
+      border: 1.5px solid transparent;
+    }
+    .suggestion-link:hover {
+      background: var(--bg);
+      border-color: var(--border);
+      transform: translateX(4px);
+    }
+    .suggestion-link .icon {
+      width: 32px; height: 32px;
+      border-radius: 8px;
+      background: var(--bg);
+      display: flex; align-items: center; justify-content: center;
+      font-size: .85rem;
+      flex-shrink: 0;
+      border: 1.5px solid var(--border);
+      transition: background .18s, border-color .18s;
+    }
+    .suggestion-link:hover .icon {
+      background: var(--gold);
+      border-color: var(--gold);
+      color: #000;
+    }
+    .suggestion-link .arrow {
+      margin-left: auto;
+      color: var(--text-muted);
+      font-size: .75rem;
+      transition: transform .18s, color .18s;
+    }
+    .suggestion-link:hover .arrow {
+      transform: translateX(3px);
+      color: var(--gold);
+    }
+
+    /* ─── CTA Buttons ───────────────────────────────────── */
+    .err-links {
+      display: flex;
+      gap: .85rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      animation: fadeUp .7s .5s cubic-bezier(.22,1,.36,1) both;
+    }
+
+    /* Inherit your existing btn classes, but add micro-interaction */
+    .err-links a {
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: .9rem;
+      padding: .75rem 1.4rem;
+      border-radius: 100px;
+      transition: transform .18s cubic-bezier(.22,1,.36,1),
+                  box-shadow .18s, filter .18s;
+      position: relative;
+      overflow: hidden;
+    }
+    .err-links a::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: white;
+      opacity: 0;
+      transition: opacity .18s;
+    }
+    .err-links a:hover { transform: translateY(-3px) scale(1.03); }
+    .err-links a:hover::after { opacity: .08; }
+    .err-links a:active { transform: translateY(0) scale(.97); }
+
+    /* Primary */
+    .btn-primary {
+      background: var(--text);
+      color: var(--bg) !important;
+      box-shadow: 0 4px 20px rgba(0,0,0,.18);
+    }
+    .btn-primary:hover { box-shadow: 0 8px 28px rgba(0,0,0,.22); }
+
+    /* Gold */
+    .btn-gold {
+      background: linear-gradient(135deg, var(--gold) 0%, #f0c060 100%);
+      color: #000 !important;
+      box-shadow: 0 4px 20px var(--gold-glow);
+    }
+    .btn-gold:hover { box-shadow: 0 8px 28px var(--gold-glow); }
+
+    /* Outline */
+    .btn-outline {
+      background: var(--surface);
+      color: var(--text) !important;
+      border: 1.5px solid var(--border) !important;
+      box-shadow: 0 2px 8px rgba(0,0,0,.05);
+    }
+    .btn-outline:hover { box-shadow: 0 6px 18px rgba(0,0,0,.1); }
+
+    /* ─── Cursor trail ──────────────────────────────────── */
+    .cursor-dot {
+      position: fixed;
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--gold);
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%,-50%);
+      transition: transform .08s, opacity .2s;
+      mix-blend-mode: multiply;
+    }
+    [data-theme="dark"] .cursor-dot { mix-blend-mode: screen; }
+
+    /* ─── Easter egg wiggle on logo click ───────────────── */
+    @keyframes wiggle {
+      0%,100% { transform: rotate(0deg); }
+      20%     { transform: rotate(-12deg); }
+      40%     { transform: rotate(12deg); }
+      60%     { transform: rotate(-8deg); }
+      80%     { transform: rotate(8deg); }
+    }
+    .ghost-wrap.wiggle { animation: wiggle .5s ease !important; }
+
+    /* ─── Responsive ────────────────────────────────────── */
+    @media (max-width: 480px) {
+      .err-links { flex-direction: column; align-items: center; }
+      .err-links a { width: 100%; max-width: 280px; justify-content: center; }
+      .suggestions { padding: 1rem 1.1rem; }
+    }
   </style>
 </head>
 <body>
+
+  <!-- Ambient background grid -->
+  <div class="bg-grid"></div>
+
+  <!-- Floating gold particles -->
+  <div class="particles" id="particles"></div>
+
+  <!-- Custom cursor dot -->
+  <div class="cursor-dot" id="cursorDot"></div>
+
   <div class="page-404">
-    <div class="err-number">404</div>
+
+    <!-- Background 404 text -->
+    <div class="err-number" aria-hidden="true">404</div>
+
+    <!-- Ghost / Cartoon Face -->
+    <div class="ghost-wrap" id="ghostWrap" title="Click me!">
+      <svg class="ghost-svg" id="ghostSvg" viewBox="0 0 160 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Ghost body -->
+        <path d="M20 80 C20 40 45 8 80 8 C115 8 140 40 140 80 L140 155 L120 140 L100 155 L80 142 L60 155 L40 140 L20 155 Z"
+              fill="url(#ghostGrad)" />
+
+        <!-- Inner body highlight -->
+        <ellipse cx="80" cy="75" rx="45" ry="52" fill="white" opacity="0.15"/>
+
+        <!-- Left eye white -->
+        <ellipse cx="58" cy="75" rx="18" ry="20" fill="white"/>
+        <!-- Right eye white -->
+        <ellipse cx="102" cy="75" rx="18" ry="20" fill="white"/>
+
+        <!-- Left pupil -->
+        <circle class="pupil" id="pupilL" cx="61" cy="77" r="9" fill="#1a1a1a"/>
+        <!-- Right pupil -->
+        <circle class="pupil" id="pupilR" cx="105" cy="77" r="9" fill="#1a1a1a"/>
+
+        <!-- Left eye shine -->
+        <circle cx="65" cy="73" r="4" fill="white" opacity=".7"/>
+        <!-- Right eye shine -->
+        <circle cx="109" cy="73" r="4" fill="white" opacity=".7"/>
+
+        <!-- Left eyelid (blink overlay) -->
+        <ellipse class="eye-lid" cx="58" cy="75" rx="18" ry="20" fill="url(#ghostGrad)"/>
+        <!-- Right eyelid -->
+        <ellipse class="eye-lid right" cx="102" cy="75" rx="18" ry="20" fill="url(#ghostGrad)"/>
+
+        <!-- Wobbly mouth -->
+        <path d="M62 103 Q70 112 80 107 Q90 102 98 108" stroke="#1a1a1a" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+
+        <!-- Left cheek blush -->
+        <ellipse cx="44" cy="97" rx="10" ry="6" fill="#ff8fa3" opacity=".35"/>
+        <!-- Right cheek blush -->
+        <ellipse cx="116" cy="97" rx="10" ry="6" fill="#ff8fa3" opacity=".35"/>
+
+        <!-- Gold halo / crown ring -->
+        <ellipse cx="80" cy="14" rx="30" ry="7" stroke="url(#haloGrad)" stroke-width="3.5" fill="none" opacity=".7"/>
+
+        <!-- Stars around ghost -->
+        <g opacity=".6">
+          <path d="M18 48 L20 43 L22 48 L27 50 L22 52 L20 57 L18 52 L13 50 Z" fill="var(--gold)" />
+          <path d="M135 30 L137 26 L139 30 L143 32 L139 34 L137 38 L135 34 L131 32 Z" fill="var(--gold)" opacity=".7"/>
+          <circle cx="148" cy="65" r="3" fill="var(--gold)" opacity=".5"/>
+          <circle cx="12" cy="70" r="2" fill="var(--gold)" opacity=".4"/>
+        </g>
+
+        <defs>
+          <radialGradient id="ghostGrad" cx="50%" cy="35%" r="70%">
+            <stop offset="0%"   stop-color="#fff8e8"/>
+            <stop offset="60%"  stop-color="#ffe4a0"/>
+            <stop offset="100%" stop-color="#e6b740"/>
+          </radialGradient>
+          <linearGradient id="haloGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%"   stop-color="#e6b740"/>
+            <stop offset="50%"  stop-color="#fff5d0"/>
+            <stop offset="100%" stop-color="#e6b740"/>
+          </linearGradient>
+        </defs>
+      </svg>
+    </div>
+
+    <!-- Ghost ground shadow -->
+    <div class="ghost-shadow"></div>
+
+    <!-- Text content -->
     <div class="err-content">
-      <img src="assets/photo/logo-png.png" alt="Dilshad Designs">
-      <h1>Page Not Found</h1>
-      <p>Looks like this page took a design break. Let's get you back on track.</p>
-      <div class="err-links">
-        <a href="index.html" class="btn-primary"><i class="fas fa-home"></i> Go Home</a>
-        <a href="projects.html" class="btn-outline" style="color:var(--text);border-color:var(--border)"><i class="fas fa-images"></i> View Work</a>
-        <a href="contact.html" class="btn-gold"><i class="fas fa-paper-plane"></i> Contact Me</a>
+      <div class="err-badge"><span class="dot"></span> Error 404 — Lost in Space</div>
+
+      <h1>Oops! This page<br><span class="accent">went on vacation</span> ✈️</h1>
+      <p>Looks like this page took a creative break — or never existed. Let's get you somewhere more inspiring.</p>
+
+      <!-- Smart Suggestions -->
+      <div class="suggestions">
+        <div class="suggestions-title">Maybe you were looking for</div>
+        <div class="suggestion-links">
+          <a href="index.html" class="suggestion-link">
+            <span class="icon"><i class="fas fa-home"></i></span>
+            <span>Home — Start fresh</span>
+            <span class="arrow"><i class="fas fa-arrow-right"></i></span>
+          </a>
+          <a href="projects.html" class="suggestion-link">
+            <span class="icon"><i class="fas fa-images"></i></span>
+            <span>Projects — Browse my work</span>
+            <span class="arrow"><i class="fas fa-arrow-right"></i></span>
+          </a>
+          <a href="contact.html" class="suggestion-link">
+            <span class="icon"><i class="fas fa-paper-plane"></i></span>
+            <span>Contact — Let's connect</span>
+            <span class="arrow"><i class="fas fa-arrow-right"></i></span>
+          </a>
+        </div>
       </div>
     </div>
+
   </div>
+
+  <script>
+    /* ── Floating particles ── */
+    const container = document.getElementById('particles');
+    for (let i = 0; i < 18; i++) {
+      const p = document.createElement('div');
+      p.className = 'particle';
+      const size = 3 + Math.random() * 5;
+      p.style.cssText = `
+        left:${Math.random()*100}%;
+        width:${size}px; height:${size}px;
+        --dur:${7+Math.random()*8}s;
+        --delay:${Math.random()*9}s;
+        opacity:0;
+      `;
+      container.appendChild(p);
+    }
+
+    /* ── Custom cursor dot ── */
+    const dot = document.getElementById('cursorDot');
+    document.addEventListener('mousemove', e => {
+      dot.style.left = e.clientX + 'px';
+      dot.style.top  = e.clientY + 'px';
+    });
+
+    /* ── Eye tracking ── */
+    const pupilL = document.getElementById('pupilL');
+    const pupilR = document.getElementById('pupilR');
+    const svg    = document.getElementById('ghostSvg');
+
+    document.addEventListener('mousemove', e => {
+      const rect = svg.getBoundingClientRect();
+      const cx = rect.left + rect.width  / 2;
+      const cy = rect.top  + rect.height / 2;
+      const angle = Math.atan2(e.clientY - cy, e.clientX - cx);
+      const dist  = Math.min(5, Math.hypot(e.clientX - cx, e.clientY - cy) / 40);
+      const dx = Math.cos(angle) * dist;
+      const dy = Math.sin(angle) * dist;
+      pupilL.style.transform = `translate(${dx}px,${dy}px)`;
+      pupilR.style.transform = `translate(${dx}px,${dy}px)`;
+    });
+
+    /* ── Ghost wiggle on click ── */
+    const ghost = document.getElementById('ghostWrap');
+    ghost.addEventListener('click', () => {
+      ghost.classList.remove('wiggle');
+      void ghost.offsetWidth; // reflow
+      ghost.classList.add('wiggle');
+      ghost.addEventListener('animationend', () => ghost.classList.remove('wiggle'), { once: true });
+    });
+
+    /* ── Suggestion link hover sound (visual feedback handled by CSS) ── */
+    /* ── Touch: hide custom cursor on touch devices ── */
+    window.addEventListener('touchstart', () => { dot.style.display = 'none'; }, { once: true });
+  </script>
+
 </body>
 </html>
