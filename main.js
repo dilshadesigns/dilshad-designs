@@ -886,3 +886,31 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   });
 });
+
+// ===================== EASTER EGG =====================
+let eggBuffer = '';
+const eggCode = 'dilshad';
+
+document.addEventListener('keydown', e => {
+  eggBuffer += e.key.toLowerCase();
+  if (eggBuffer.length > eggCode.length) eggBuffer = eggBuffer.slice(-eggCode.length);
+  if (eggBuffer === eggCode) {
+    triggerEasterEgg();
+    eggBuffer = '';
+  }
+});
+
+function triggerEasterEgg() {
+  const msg = document.createElement('div');
+  msg.innerHTML = 'You found the secret! Welcome to Dilshad Designs ✦';
+  msg.style.cssText = `
+    position:fixed; bottom:2rem; left:50%; transform:translateX(-50%);
+    background:var(--gold); color:#1a2e26; padding:1rem 2rem;
+    border-radius:99px; font-weight:700; font-size:0.95rem;
+    z-index:999999; animation:eggFade 3.5s ease forwards;
+    white-space:nowrap; box-shadow:0 8px 32px rgba(245,198,44,0.4);
+  `;
+  document.body.appendChild(msg);
+  setTimeout(() => msg.remove(), 3500);
+}
+

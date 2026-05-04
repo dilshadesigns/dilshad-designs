@@ -182,6 +182,7 @@ h1, h2, h3, h4 { font-family: 'Syne', sans-serif; line-height: 1.2; }
 /* ===================== HERO ===================== */
 #home {
   min-height: 100vh;
+  padding-bottom: 1px;
   display: flex; align-items: center; justify-content: center;
   position: relative; overflow: hidden;
   padding-top: 68px;
@@ -302,7 +303,7 @@ h1, h2, h3, h4 { font-family: 'Syne', sans-serif; line-height: 1.2; }
 
 .hero-stats {
   display: flex; justify-content: center; gap: 3rem;
-  margin-top: 3rem;
+  margin-top: 1rem;
   animation: fadeUp 0.7s 0.8s ease both;
 }
 .hero-stat { text-align: center; }
@@ -1409,3 +1410,59 @@ footer {
   .legal-modal-footer { flex-direction: column; align-items: stretch; }
   .legal-accept-btn { justify-content: center; }
 }
+
+/* ===================== MARQUEE STRIP ===================== */
+.marquee-strip {
+  background: var(--brand);
+  padding: 0.85rem 0;
+  overflow: hidden;
+  position: relative;
+}
+ 
+.marquee-strip::before,
+.marquee-strip::after {
+  content: '';
+  position: absolute;
+  top: 0; bottom: 0;
+  width: 80px;
+  z-index: 2;
+  pointer-events: none;
+}
+.marquee-strip::before { left: 0; background: linear-gradient(to right, var(--brand), transparent); }
+.marquee-strip::after  { right: 0; background: linear-gradient(to left, var(--brand), transparent); }
+ 
+.marquee-track {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  white-space: nowrap;
+  animation: marqueeScroll 35s linear infinite;
+  width: max-content;
+}
+ 
+.marquee-track span {
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.85);
+}
+ 
+.marquee-dot {
+  color: var(--gold) !important;
+  font-size: 0.55rem !important;
+  opacity: 0.8;
+}
+ 
+@keyframes marqueeScroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+@keyframes eggFade {
+  0%   { opacity:0; transform:translateX(-50%) translateY(16px); }
+  15%  { opacity:1; transform:translateX(-50%) translateY(0); }
+  80%  { opacity:1; }
+  100% { opacity:0; transform:translateX(-50%) translateY(-8px); }
+}
+
