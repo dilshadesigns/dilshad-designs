@@ -5,74 +5,118 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>404 — Page Not Found | Dilshad Designs</title>
   <link rel="icon" href="assets/photo/favicon-round.png" type="image/png">
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <link rel="stylesheet" href="style.css">
 
   <style>
-    /* ─── Reset & Base ─────────────────────────────────── */
+    /* ═══════════════════════════════════════════════════════
+       DESIGN TOKENS & RESET
+    ═══════════════════════════════════════════════════════ */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --gold: #e6b740;
-      --gold-glow: rgba(230,183,64,.35);
-      --red: #ff4d4f;
-      --bg: #f8f7f4;
-      --surface: #ffffff;
-      --text: #1a1a1a;
-      --text-muted: #888;
-      --border: #e0ddd6;
+      --gold:         #e6b740;
+      --gold-light:   #f5d07a;
+      --gold-glow:    rgba(230,183,64,.30);
+      --gold-glow-lg: rgba(230,183,64,.15);
+      --red:          #ff4d4f;
+      --red-glow:     rgba(255,77,79,.20);
+      --bg:           #f8f7f4;
+      --surface:      #ffffff;
+      --surface-2:    #f2f1ee;
+      --text:         #1a1a1a;
+      --text-muted:   #8a8680;
+      --border:       #e2dfd8;
+      --border-light: #eeece8;
+
+      /* Ghost emotion state colors */
+      --mouth-default: #1a1a1a;
     }
+
     [data-theme="dark"] {
-      --bg: #0f0f0f;
-      --surface: #1a1a1a;
-      --text: #f0ede8;
-      --text-muted: #666;
-      --border: #2a2a2a;
+      --bg:           #0e0d0b;
+      --surface:      #181714;
+      --surface-2:    #1e1d1a;
+      --text:         #f0ede7;
+      --text-muted:   #6a6760;
+      --border:       #2c2b27;
+      --border-light: #242320;
+    }
+
+    /* ═══════════════════════════════════════════════════════
+       BASE
+    ═══════════════════════════════════════════════════════ */
+    html, body {
+      height: 100%;
+      overflow: hidden; /* zero scroll — everything in 100vh */
     }
 
     body {
       font-family: 'DM Sans', sans-serif;
       background: var(--bg);
       color: var(--text);
-      overflow-x: hidden;
-    }
-
-    /* ─── Page Shell ────────────────────────────────────── */
-    .page-404 {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      padding: 2rem 1.5rem;
-      position: relative;
       overflow: hidden;
+      cursor: none; /* use custom cursor */
     }
 
-    /* ─── Ambient Background Grid ───────────────────────── */
+    /* ═══════════════════════════════════════════════════════
+       CUSTOM CURSOR (dual-layer: dot + ring)
+    ═══════════════════════════════════════════════════════ */
+    .cursor-dot,
+    .cursor-ring {
+      position: fixed;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      will-change: transform;
+    }
+    .cursor-dot {
+      width: 6px; height: 6px;
+      background: var(--gold);
+      mix-blend-mode: multiply;
+      transition: opacity .2s, width .2s, height .2s;
+    }
+    .cursor-ring {
+      width: 34px; height: 34px;
+      border: 1.5px solid var(--gold);
+      opacity: 0.5;
+      transition: width .25s cubic-bezier(.22,1,.36,1),
+                  height .25s cubic-bezier(.22,1,.36,1),
+                  opacity .25s, border-color .25s;
+    }
+    /* Hover state — ring expands */
+    body.cursor-hover .cursor-ring {
+      width: 50px; height: 50px;
+      opacity: 0.7;
+      border-color: var(--gold-light);
+    }
+    [data-theme="dark"] .cursor-dot { mix-blend-mode: screen; }
+
+    /* ═══════════════════════════════════════════════════════
+       AMBIENT GRID BACKGROUND
+    ═══════════════════════════════════════════════════════ */
     .bg-grid {
       position: fixed;
       inset: 0;
       background-image:
-        linear-gradient(var(--border) 1px, transparent 1px),
-        linear-gradient(90deg, var(--border) 1px, transparent 1px);
-      background-size: 48px 48px;
-      opacity: 0.4;
+        linear-gradient(var(--border-light) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border-light) 1px, transparent 1px);
+      background-size: 52px 52px;
+      opacity: 0.55;
       pointer-events: none;
       z-index: 0;
     }
-
-    /* Radial gradient overlay on grid */
     .bg-grid::after {
       content: '';
       position: absolute;
       inset: 0;
-      background: radial-gradient(ellipse 70% 60% at 50% 50%, transparent 30%, var(--bg) 100%);
+      background: radial-gradient(ellipse 75% 65% at 50% 50%, transparent 20%, var(--bg) 100%);
     }
 
-    /* ─── Floating particles ────────────────────────────── */
+    /* ═══════════════════════════════════════════════════════
+       FLOATING PARTICLES
+    ═══════════════════════════════════════════════════════ */
     .particles { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
     .particle {
       position: absolute;
@@ -83,66 +127,37 @@
     }
     @keyframes floatUp {
       0%   { transform: translateY(110vh) scale(0); opacity: 0; }
-      10%  { opacity: .6; }
-      90%  { opacity: .2; }
-      100% { transform: translateY(-10vh) scale(1); opacity: 0; }
+      8%   { opacity: .5; }
+      90%  { opacity: .15; }
+      100% { transform: translateY(-10vh) scale(1.2); opacity: 0; }
     }
 
-    /* ─── Ghost / Cartoon Face ──────────────────────────── */
-    .ghost-wrap {
+    /* ═══════════════════════════════════════════════════════
+       PAGE SHELL — 100VH, NO SCROLL
+    ═══════════════════════════════════════════════════════ */
+    .page-404 {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: clamp(1rem, 2vw, 1.5rem) 1.5rem;
       position: relative;
-      z-index: 2;
-      margin-bottom: 2.5rem;
-      animation: ghostBob 3s ease-in-out infinite;
-    }
-    @keyframes ghostBob {
-      0%, 100% { transform: translateY(0px) rotate(-1deg); }
-      50%       { transform: translateY(-18px) rotate(1deg); }
+      overflow: hidden;
+      gap: 0;
     }
 
-    .ghost-svg {
-      width: clamp(120px, 22vw, 180px);
-      filter:
-        drop-shadow(0 8px 32px var(--gold-glow))
-        drop-shadow(0 2px 8px rgba(0,0,0,.12));
-    }
-
-    /* Blinking eyelids */
-    .eye-lid {
-      animation: blink 4s ease-in-out infinite;
-      transform-origin: center bottom;
-    }
-    .eye-lid.right { animation-delay: 0.08s; }
-    @keyframes blink {
-      0%, 92%, 100% { transform: scaleY(0); }
-      96%            { transform: scaleY(1); }
-    }
-
-    /* Pupils track mouse slightly — done via JS */
-    .pupil { transition: transform .1s ease; }
-
-    /* ─── Big ghost shadow ──────────────────────────────── */
-    .ghost-shadow {
-      width: clamp(80px, 15vw, 130px);
-      height: 14px;
-      background: radial-gradient(ellipse, rgba(0,0,0,.18) 0%, transparent 70%);
-      border-radius: 50%;
-      margin: -8px auto 0;
-      animation: shadowPulse 3s ease-in-out infinite;
-    }
-    @keyframes shadowPulse {
-      0%, 100% { transform: scaleX(1);   opacity: .7; }
-      50%       { transform: scaleX(.65); opacity: .3; }
-    }
-
-    /* ─── 404 Number ────────────────────────────────────── */
+    /* ═══════════════════════════════════════════════════════
+       GHOST BIG 404 WATERMARK
+    ═══════════════════════════════════════════════════════ */
     .err-number {
       font-family: 'Syne', sans-serif;
-      font-size: clamp(5.5rem, 22vw, 13rem);
+      font-size: clamp(6rem, 24vw, 15rem);
       font-weight: 800;
       line-height: 1;
       color: var(--red);
-      opacity: 0.09;
+      opacity: 0.065;
       position: absolute;
       inset: 0;
       display: flex;
@@ -151,17 +166,110 @@
       user-select: none;
       pointer-events: none;
       z-index: 1;
-      letter-spacing: -0.04em;
+      letter-spacing: -0.05em;
+      /* subtle parallax set by JS */
+      will-change: transform;
     }
 
-    /* ─── Content Card ──────────────────────────────────── */
+    /* ═══════════════════════════════════════════════════════
+       GHOST CHARACTER
+    ═══════════════════════════════════════════════════════ */
+    .ghost-wrap {
+      position: relative;
+      z-index: 3;
+      margin-bottom: clamp(.6rem, 1.5vh, 1.4rem);
+      cursor: none;
+
+      /* Breathing: very subtle scale */
+      animation: ghostBreathe 4s ease-in-out infinite;
+      will-change: transform;
+
+      /* Tilt transform is applied via JS — uses CSS custom props */
+      --tilt-x: 0deg;
+      --tilt-y: 0deg;
+    }
+
+    @keyframes ghostBreathe {
+      0%, 100% { transform: rotateX(var(--tilt-x)) rotateY(var(--tilt-y)) translateY(0px) scale(1); }
+      50%       { transform: rotateX(var(--tilt-x)) rotateY(var(--tilt-y)) translateY(-14px) scale(1.012); }
+    }
+
+    .ghost-svg {
+      width: clamp(100px, 18vw, 160px);
+      /* glow intensity driven by JS via CSS var */
+      filter:
+        drop-shadow(0 8px 28px var(--ghost-glow, var(--gold-glow)))
+        drop-shadow(0 2px 8px rgba(0,0,0,.1));
+      transition: filter .3s ease;
+      display: block;
+    }
+
+    /* Eyelid blink — randomised in JS, class toggled */
+    .eye-lid {
+      transform-origin: center bottom;
+      transition: transform .06s ease;
+    }
+    .eye-lid.blink-active { transform: scaleY(1) !important; }
+
+    /* Pupils — position set by JS */
+    .pupil {
+      transition: none; /* LERP done in rAF */
+      will-change: transform;
+    }
+
+    /* Ghost glow aura (behind ghost) */
+    .ghost-aura {
+      position: absolute;
+      inset: -30%;
+      border-radius: 50%;
+      background: radial-gradient(ellipse, var(--gold-glow-lg) 0%, transparent 70%);
+      pointer-events: none;
+      opacity: 0.6;
+      transition: opacity .4s;
+      animation: auraPulse 4s ease-in-out infinite;
+    }
+    @keyframes auraPulse {
+      0%, 100% { transform: scale(1); opacity: .5; }
+      50%       { transform: scale(1.1); opacity: .8; }
+    }
+
+    /* Ground shadow */
+    .ghost-shadow {
+      width: clamp(60px, 12vw, 110px);
+      height: 11px;
+      background: radial-gradient(ellipse, rgba(0,0,0,.16) 0%, transparent 70%);
+      border-radius: 50%;
+      margin: -6px auto 0;
+      animation: shadowPulse 4s ease-in-out infinite;
+    }
+    @keyframes shadowPulse {
+      0%, 100% { transform: scaleX(1); opacity: .6; }
+      50%       { transform: scaleX(.6); opacity: .25; }
+    }
+
+    /* ═══════════════════════════════════════════════════════
+       CONTENT AREA
+    ═══════════════════════════════════════════════════════ */
     .err-content {
       position: relative;
       z-index: 2;
-      animation: fadeUp .7s .15s cubic-bezier(.22,1,.36,1) both;
+      width: 100%;
+      max-width: 480px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
+
+    /* Staggered entrance animations */
+    .err-badge    { animation: fadeUp .6s .05s cubic-bezier(.22,1,.36,1) both; }
+    .err-heading  { animation: fadeUp .6s .15s cubic-bezier(.22,1,.36,1) both; }
+    .err-subtext  { animation: fadeUp .6s .25s cubic-bezier(.22,1,.36,1) both; }
+    .err-ctas     { animation: fadeUp .6s .35s cubic-bezier(.22,1,.36,1) both; }
+    .suggestions  { animation: fadeUp .6s .45s cubic-bezier(.22,1,.36,1) both; }
+    .err-search   { animation: fadeUp .6s .55s cubic-bezier(.22,1,.36,1) both; }
+
     @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(28px); }
+      from { opacity: 0; transform: translateY(22px); }
       to   { opacity: 1; transform: translateY(0); }
     }
 
@@ -173,155 +281,80 @@
       background: var(--surface);
       border: 1.5px solid var(--border);
       border-radius: 100px;
-      padding: .35rem .9rem;
-      font-size: .72rem;
+      padding: .3rem .85rem;
+      font-size: .7rem;
       font-weight: 600;
-      letter-spacing: .08em;
+      letter-spacing: .09em;
       text-transform: uppercase;
       color: var(--text-muted);
-      margin-bottom: 1.25rem;
-      box-shadow: 0 1px 6px rgba(0,0,0,.06);
+      margin-bottom: clamp(.6rem, 1.2vh, 1rem);
+      box-shadow: 0 1px 8px rgba(0,0,0,.05);
     }
     .err-badge .dot {
       width: 6px; height: 6px;
       border-radius: 50%;
       background: var(--red);
-      animation: pulse 1.8s ease-in-out infinite;
+      animation: pulseDot 1.8s ease-in-out infinite;
     }
-    @keyframes pulse {
+    @keyframes pulseDot {
       0%, 100% { box-shadow: 0 0 0 0 rgba(255,77,79,.5); }
       50%       { box-shadow: 0 0 0 5px rgba(255,77,79,0); }
     }
 
     /* ─── Heading ───────────────────────────────────────── */
-    .err-content h1 {
+    .err-heading {
       font-family: 'Syne', sans-serif;
-      font-size: clamp(1.6rem, 4.5vw, 2.6rem);
+      font-size: clamp(1.5rem, 4vw, 2.4rem);
       font-weight: 800;
       line-height: 1.15;
-      margin-bottom: .85rem;
-      letter-spacing: -.02em;
+      letter-spacing: -.025em;
+      margin-bottom: clamp(.4rem, .8vh, .7rem);
     }
-    .err-content h1 .accent {
-      background: linear-gradient(135deg, var(--gold) 0%, #f0c060 100%);
+    .err-heading .accent {
+      background: linear-gradient(135deg, var(--gold) 0%, #f7cf6a 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
     }
 
     /* ─── Sub-copy ──────────────────────────────────────── */
-    .err-content p {
+    .err-subtext {
       color: var(--text-muted);
-      font-size: 1rem;
-      line-height: 1.7;
-      max-width: 400px;
-      margin: 0 auto 2.25rem;
-    }
-
-    /* ─── Smart Suggestions ─────────────────────────────── */
-    .suggestions {
-      background: var(--surface);
-      border: 1.5px solid var(--border);
-      border-radius: 16px;
-      padding: 1.25rem 1.5rem;
-      max-width: 420px;
-      margin: 0 auto 2.25rem;
-      text-align: left;
-      box-shadow: 0 2px 16px rgba(0,0,0,.05);
-      animation: fadeUp .7s .35s cubic-bezier(.22,1,.36,1) both;
-    }
-    .suggestions-title {
-      font-size: .72rem;
-      font-weight: 600;
-      letter-spacing: .1em;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      margin-bottom: .9rem;
-      display: flex;
-      align-items: center;
-      gap: .5rem;
-    }
-    .suggestions-title::before {
-      content: '';
-      display: block;
-      width: 14px; height: 2px;
-      background: var(--gold);
-      border-radius: 2px;
-    }
-    .suggestion-links {
-      display: flex;
-      flex-direction: column;
-      gap: .5rem;
-    }
-    .suggestion-link {
-      display: flex;
-      align-items: center;
-      gap: .75rem;
-      padding: .6rem .75rem;
-      border-radius: 10px;
-      text-decoration: none;
-      color: var(--text);
-      font-size: .9rem;
-      font-weight: 500;
-      transition: background .18s, transform .18s;
-      border: 1.5px solid transparent;
-    }
-    .suggestion-link:hover {
-      background: var(--bg);
-      border-color: var(--border);
-      transform: translateX(4px);
-    }
-    .suggestion-link .icon {
-      width: 32px; height: 32px;
-      border-radius: 8px;
-      background: var(--bg);
-      display: flex; align-items: center; justify-content: center;
-      font-size: .85rem;
-      flex-shrink: 0;
-      border: 1.5px solid var(--border);
-      transition: background .18s, border-color .18s;
-    }
-    .suggestion-link:hover .icon {
-      background: var(--gold);
-      border-color: var(--gold);
-      color: #000;
-    }
-    .suggestion-link .arrow {
-      margin-left: auto;
-      color: var(--text-muted);
-      font-size: .75rem;
-      transition: transform .18s, color .18s;
-    }
-    .suggestion-link:hover .arrow {
-      transform: translateX(3px);
-      color: var(--gold);
+      font-size: clamp(.85rem, 1.5vw, .95rem);
+      line-height: 1.65;
+      max-width: 360px;
+      margin: 0 auto clamp(.8rem, 1.6vh, 1.5rem);
     }
 
     /* ─── CTA Buttons ───────────────────────────────────── */
-    .err-links {
+    .err-ctas {
       display: flex;
-      gap: .85rem;
+      gap: .6rem;
       justify-content: center;
       flex-wrap: wrap;
-      animation: fadeUp .7s .5s cubic-bezier(.22,1,.36,1) both;
+      margin-bottom: clamp(.8rem, 1.4vh, 1.4rem);
     }
 
-    /* Inherit your existing btn classes, but add micro-interaction */
-    .err-links a {
+    .btn {
       display: inline-flex;
       align-items: center;
-      gap: .5rem;
+      gap: .45rem;
       text-decoration: none;
+      font-family: 'DM Sans', sans-serif;
       font-weight: 600;
-      font-size: .9rem;
-      padding: .75rem 1.4rem;
+      font-size: .85rem;
+      padding: .62rem 1.3rem;
       border-radius: 100px;
-      transition: transform .18s cubic-bezier(.22,1,.36,1),
-                  box-shadow .18s, filter .18s;
+      border: none;
+      cursor: none;
       position: relative;
       overflow: hidden;
+      transition:
+        transform .22s cubic-bezier(.22,1,.36,1),
+        box-shadow .22s,
+        filter .22s;
     }
-    .err-links a::after {
+    .btn::after {
       content: '';
       position: absolute;
       inset: 0;
@@ -329,92 +362,145 @@
       opacity: 0;
       transition: opacity .18s;
     }
-    .err-links a:hover { transform: translateY(-3px) scale(1.03); }
-    .err-links a:hover::after { opacity: .08; }
-    .err-links a:active { transform: translateY(0) scale(.97); }
+    .btn:hover  { transform: translateY(-3px) scale(1.04); }
+    .btn:hover::after { opacity: .09; }
+    .btn:active { transform: translateY(0) scale(.97); }
+    .btn:focus-visible {
+      outline: 2px solid var(--gold);
+      outline-offset: 3px;
+    }
 
-    /* Primary */
     .btn-primary {
       background: var(--text);
       color: var(--bg) !important;
-      box-shadow: 0 4px 20px rgba(0,0,0,.18);
+      box-shadow: 0 4px 18px rgba(0,0,0,.15);
     }
     .btn-primary:hover { box-shadow: 0 8px 28px rgba(0,0,0,.22); }
 
-    /* Gold */
     .btn-gold {
-      background: linear-gradient(135deg, var(--gold) 0%, #f0c060 100%);
+      background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
       color: #000 !important;
       box-shadow: 0 4px 20px var(--gold-glow);
     }
-    .btn-gold:hover { box-shadow: 0 8px 28px var(--gold-glow); }
+    .btn-gold:hover { box-shadow: 0 8px 30px var(--gold-glow); }
 
-    /* Outline */
     .btn-outline {
       background: var(--surface);
       color: var(--text) !important;
       border: 1.5px solid var(--border) !important;
-      box-shadow: 0 2px 8px rgba(0,0,0,.05);
+      box-shadow: 0 2px 8px rgba(0,0,0,.04);
     }
-    .btn-outline:hover { box-shadow: 0 6px 18px rgba(0,0,0,.1); }
+    .btn-outline:hover { box-shadow: 0 6px 18px rgba(0,0,0,.09); }
 
-    /* ─── Cursor trail ──────────────────────────────────── */
-    .cursor-dot {
+
+    /* ─── Theme toggle ──────────────────────────────────── */
+    .theme-toggle {
       position: fixed;
-      width: 7px; height: 7px;
+      top: 1.2rem;
+      right: 1.2rem;
+      z-index: 100;
+      width: 38px; height: 38px;
       border-radius: 50%;
-      background: var(--gold);
-      pointer-events: none;
-      z-index: 9999;
-      transform: translate(-50%,-50%);
-      transition: transform .08s, opacity .2s;
-      mix-blend-mode: multiply;
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      cursor: none;
+      transition: background .2s, box-shadow .2s, transform .2s;
+      color: var(--text);
+      font-size: .85rem;
+      box-shadow: 0 2px 10px rgba(0,0,0,.06);
     }
-    [data-theme="dark"] .cursor-dot { mix-blend-mode: screen; }
-
-    /* ─── Easter egg wiggle on logo click ───────────────── */
-    @keyframes wiggle {
-      0%,100% { transform: rotate(0deg); }
-      20%     { transform: rotate(-12deg); }
-      40%     { transform: rotate(12deg); }
-      60%     { transform: rotate(-8deg); }
-      80%     { transform: rotate(8deg); }
+    .theme-toggle:hover {
+      transform: scale(1.1);
+      box-shadow: 0 4px 16px rgba(0,0,0,.1);
     }
-    .ghost-wrap.wiggle { animation: wiggle .5s ease !important; }
+    .theme-toggle:focus-visible {
+      outline: 2px solid var(--gold);
+      outline-offset: 2px;
+    }
 
-    /* ─── Responsive ────────────────────────────────────── */
+    /* ═══════════════════════════════════════════════════════
+       REDUCED MOTION
+    ═══════════════════════════════════════════════════════ */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+      }
+      .cursor-dot, .cursor-ring { display: none; }
+      body { cursor: auto; }
+    }
+
+    /* ═══════════════════════════════════════════════════════
+       RESPONSIVE
+    ═══════════════════════════════════════════════════════ */
     @media (max-width: 480px) {
-      .err-links { flex-direction: column; align-items: center; }
-      .err-links a { width: 100%; max-width: 280px; justify-content: center; }
-      .suggestions { padding: 1rem 1.1rem; }
+      .err-ctas { gap: .5rem; }
+      .err-ctas .btn { padding: .58rem 1.1rem; font-size: .82rem; }
+      .ghost-wrap { margin-bottom: .5rem; }
     }
+
+    @media (max-width: 360px) {
+      .err-ctas .btn { width: 100%; justify-content: center; max-width: 260px; }
+    }
+
+    /* Tablet tight height */
+    @media (max-height: 680px) {
+      .err-subtext { margin-bottom: .7rem; }
+    }
+
+    /* ─── Ghost emotion mouth paths transition ──────────── */
+    #ghostMouth {
+      transition: d .4s cubic-bezier(.22,1,.36,1);
+    }
+
+    /* Wiggle easter egg */
+    @keyframes wiggle {
+      0%,100% { transform: rotate(0deg) translateY(0); }
+      20%     { transform: rotate(-14deg); }
+      40%     { transform: rotate(14deg); }
+      60%     { transform: rotate(-9deg); }
+      80%     { transform: rotate(9deg); }
+    }
+    .ghost-wrap.wiggle { animation: wiggle .55s cubic-bezier(.22,1,.36,1) !important; }
   </style>
 </head>
 <body>
 
   <!-- Ambient background grid -->
-  <div class="bg-grid"></div>
+  <div class="bg-grid" aria-hidden="true"></div>
 
   <!-- Floating gold particles -->
-  <div class="particles" id="particles"></div>
+  <div class="particles" id="particles" aria-hidden="true"></div>
 
-  <!-- Custom cursor dot -->
-  <div class="cursor-dot" id="cursorDot"></div>
+  <!-- Custom cursor (hidden on touch) -->
+  <div class="cursor-dot"  id="cursorDot"  aria-hidden="true"></div>
+  <div class="cursor-ring" id="cursorRing" aria-hidden="true"></div>
 
-  <div class="page-404">
+  <!-- Theme toggle -->
+  <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark/light mode" title="Toggle theme">
+    <i class="fas fa-moon" id="themeIcon"></i>
+  </button>
 
-    <!-- Background 404 text -->
-    <div class="err-number" aria-hidden="true">404</div>
+  <main class="page-404" role="main">
 
-    <!-- Ghost / Cartoon Face -->
+    <!-- Background 404 watermark -->
+    <div class="err-number" aria-hidden="true" id="errNumber">404</div>
+
+    <!-- Ghost character -->
     <div class="ghost-wrap" id="ghostWrap" title="Click me!">
-      <svg class="ghost-svg" id="ghostSvg" viewBox="0 0 160 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <div class="ghost-aura" aria-hidden="true"></div>
+      <svg class="ghost-svg" id="ghostSvg" viewBox="0 0 160 180" fill="none"
+           xmlns="http://www.w3.org/2000/svg"
+           role="img" aria-label="Lost ghost character">
+
         <!-- Ghost body -->
         <path d="M20 80 C20 40 45 8 80 8 C115 8 140 40 140 80 L140 155 L120 140 L100 155 L80 142 L60 155 L40 140 L20 155 Z"
-              fill="url(#ghostGrad)" />
+              fill="url(#ghostGrad)"/>
 
-        <!-- Inner body highlight -->
-        <ellipse cx="80" cy="75" rx="45" ry="52" fill="white" opacity="0.15"/>
+        <!-- Inner highlight -->
+        <ellipse cx="80" cy="72" rx="44" ry="50" fill="white" opacity="0.13"/>
 
         <!-- Left eye white -->
         <ellipse cx="58" cy="75" rx="18" ry="20" fill="white"/>
@@ -426,44 +512,50 @@
         <!-- Right pupil -->
         <circle class="pupil" id="pupilR" cx="105" cy="77" r="9" fill="#1a1a1a"/>
 
-        <!-- Left eye shine -->
-        <circle cx="65" cy="73" r="4" fill="white" opacity=".7"/>
-        <!-- Right eye shine -->
-        <circle cx="109" cy="73" r="4" fill="white" opacity=".7"/>
+        <!-- Left iris glint -->
+        <circle cx="65" cy="73" r="3.5" fill="white" opacity=".75"/>
+        <!-- Right iris glint -->
+        <circle cx="109" cy="73" r="3.5" fill="white" opacity=".75"/>
+
+        <!-- Left pupil highlight (tiny) -->
+        <circle cx="63" cy="75" r="1.5" fill="white" opacity=".5"/>
+        <!-- Right pupil highlight (tiny) -->
+        <circle cx="107" cy="75" r="1.5" fill="white" opacity=".5"/>
 
         <!-- Left eyelid (blink overlay) -->
-        <ellipse class="eye-lid" cx="58" cy="75" rx="18" ry="20" fill="url(#ghostGrad)"/>
+        <ellipse class="eye-lid" id="elidL" cx="58" cy="75" rx="18" ry="20" fill="url(#ghostGrad)" transform="scale(1 0)"/>
         <!-- Right eyelid -->
-        <ellipse class="eye-lid right" cx="102" cy="75" rx="18" ry="20" fill="url(#ghostGrad)"/>
+        <ellipse class="eye-lid" id="elidR" cx="102" cy="75" rx="18" ry="20" fill="url(#ghostGrad)" transform="scale(1 0)"/>
 
-        <!-- Wobbly mouth -->
-        <path d="M62 103 Q70 112 80 107 Q90 102 98 108" stroke="#1a1a1a" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+        <!-- Wobbly mouth — path morphs per emotion state -->
+        <path id="ghostMouth" d="M62 103 Q70 112 80 107 Q90 102 98 108"
+              stroke="#1a1a1a" stroke-width="3.5" stroke-linecap="round" fill="none"/>
 
-        <!-- Left cheek blush -->
-        <ellipse cx="44" cy="97" rx="10" ry="6" fill="#ff8fa3" opacity=".35"/>
-        <!-- Right cheek blush -->
-        <ellipse cx="116" cy="97" rx="10" ry="6" fill="#ff8fa3" opacity=".35"/>
+        <!-- Cheek blush -->
+        <ellipse cx="44" cy="97" rx="10" ry="6" fill="#ff8fa3" opacity=".32" id="blushL"/>
+        <ellipse cx="116" cy="97" rx="10" ry="6" fill="#ff8fa3" opacity=".32" id="blushR"/>
 
-        <!-- Gold halo / crown ring -->
-        <ellipse cx="80" cy="14" rx="30" ry="7" stroke="url(#haloGrad)" stroke-width="3.5" fill="none" opacity=".7"/>
+        <!-- Gold halo -->
+        <ellipse cx="80" cy="14" rx="30" ry="7"
+                 stroke="url(#haloGrad)" stroke-width="3.5" fill="none" opacity=".75"/>
 
-        <!-- Stars around ghost -->
-        <g opacity=".6">
-          <path d="M18 48 L20 43 L22 48 L27 50 L22 52 L20 57 L18 52 L13 50 Z" fill="var(--gold)" />
+        <!-- Stars / sparkles around ghost -->
+        <g opacity=".65" id="ghostStars">
+          <path d="M18 48 L20 43 L22 48 L27 50 L22 52 L20 57 L18 52 L13 50 Z" fill="var(--gold)"/>
           <path d="M135 30 L137 26 L139 30 L143 32 L139 34 L137 38 L135 34 L131 32 Z" fill="var(--gold)" opacity=".7"/>
-          <circle cx="148" cy="65" r="3" fill="var(--gold)" opacity=".5"/>
-          <circle cx="12" cy="70" r="2" fill="var(--gold)" opacity=".4"/>
+          <circle cx="148" cy="65" r="2.5" fill="var(--gold)" opacity=".5"/>
+          <circle cx="12"  cy="70" r="2"   fill="var(--gold)" opacity=".4"/>
         </g>
 
         <defs>
-          <radialGradient id="ghostGrad" cx="50%" cy="35%" r="70%">
-            <stop offset="0%"   stop-color="#fff8e8"/>
-            <stop offset="60%"  stop-color="#ffe4a0"/>
+          <radialGradient id="ghostGrad" cx="50%" cy="30%" r="72%">
+            <stop offset="0%"   stop-color="#fff9ed"/>
+            <stop offset="55%"  stop-color="#ffe8a8"/>
             <stop offset="100%" stop-color="#e6b740"/>
           </radialGradient>
           <linearGradient id="haloGrad" x1="0%" y1="0%" x2="100%" y2="0%">
             <stop offset="0%"   stop-color="#e6b740"/>
-            <stop offset="50%"  stop-color="#fff5d0"/>
+            <stop offset="50%"  stop-color="#fff9d0"/>
             <stop offset="100%" stop-color="#e6b740"/>
           </linearGradient>
         </defs>
@@ -471,94 +563,325 @@
     </div>
 
     <!-- Ghost ground shadow -->
-    <div class="ghost-shadow"></div>
+    <div class="ghost-shadow" aria-hidden="true"></div>
 
     <!-- Text content -->
     <div class="err-content">
-      <div class="err-badge"><span class="dot"></span> Error 404 — Lost in Space</div>
 
-      <h1>Oops! This page<br><span class="accent">went on vacation</span> ✈️</h1>
-      <p>Looks like this page took a creative break — or never existed. Let's get you somewhere more inspiring.</p>
-
-      <!-- Smart Suggestions -->
-      <div class="suggestions">
-        <div class="suggestions-title">Maybe you were looking for</div>
-        <div class="suggestion-links">
-          <a href="index.html" class="suggestion-link">
-            <span class="icon"><i class="fas fa-home"></i></span>
-            <span>Home — Start fresh</span>
-            <span class="arrow"><i class="fas fa-arrow-right"></i></span>
-          </a>
-          <a href="projects.html" class="suggestion-link">
-            <span class="icon"><i class="fas fa-images"></i></span>
-            <span>Projects — Browse my work</span>
-            <span class="arrow"><i class="fas fa-arrow-right"></i></span>
-          </a>
-          <a href="contact.html" class="suggestion-link">
-            <span class="icon"><i class="fas fa-paper-plane"></i></span>
-            <span>Contact — Let's connect</span>
-            <span class="arrow"><i class="fas fa-arrow-right"></i></span>
-          </a>
-        </div>
+      <!-- Status badge -->
+      <div class="err-badge" aria-live="polite">
+        <span class="dot" aria-hidden="true"></span>
+        Error 404 — Lost in Space
       </div>
-    </div>
 
-  </div>
+      <!-- Main heading -->
+      <h1 class="err-heading">
+        Oops! This page<br><span class="accent">went on vacation</span> ✈️
+      </h1>
+
+      <!-- Sub-copy -->
+      <p class="err-subtext">
+        Looks like this page took a creative break — or never existed.
+        Let's get you somewhere more inspiring.
+      </p>
+
+      <!-- Primary CTAs -->
+      <nav class="err-ctas" aria-label="Recovery options">
+        <a href="index.html"    class="btn btn-gold"    aria-label="Go to homepage">
+          <i class="fas fa-home" aria-hidden="true"></i> Go Home
+        </a>
+        <a href="javascript:history.back()" class="btn btn-primary" aria-label="Go back to previous page">
+          <i class="fas fa-arrow-left" aria-hidden="true"></i> Go Back
+        </a>
+        <a href="projects.html" class="btn btn-outline" aria-label="View projects">
+          <i class="fas fa-images" aria-hidden="true"></i> Projects
+        </a>
+      </nav>
+
+
+    </div>
+  </main>
+
 
   <script>
-    /* ── Floating particles ── */
-    const container = document.getElementById('particles');
-    for (let i = 0; i < 18; i++) {
+    /* ════════════════════════════════════════════════════════
+       DILSHAD DESIGNS — 404 PAGE INTERACTIVE SYSTEM
+       Clean, modular, production-ready.
+    ════════════════════════════════════════════════════════ */
+
+    /* ── 1. THEME TOGGLE ───────────────────────────────── */
+    const html  = document.documentElement;
+    const tBtn  = document.getElementById('themeToggle');
+    const tIcon = document.getElementById('themeIcon');
+
+    function applyTheme(theme) {
+      html.setAttribute('data-theme', theme);
+      tIcon.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+      localStorage.setItem('dd-theme', theme);
+    }
+
+    // Init from stored preference or system
+    const stored = localStorage.getItem('dd-theme');
+    const sys    = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    applyTheme(stored || sys);
+
+    tBtn.addEventListener('click', () => {
+      applyTheme(html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+    });
+
+
+    /* ── 2. FLOATING PARTICLES ─────────────────────────── */
+    const particleContainer = document.getElementById('particles');
+    for (let i = 0; i < 20; i++) {
       const p = document.createElement('div');
       p.className = 'particle';
-      const size = 3 + Math.random() * 5;
+      const size = 2.5 + Math.random() * 4.5;
       p.style.cssText = `
         left:${Math.random()*100}%;
         width:${size}px; height:${size}px;
-        --dur:${7+Math.random()*8}s;
-        --delay:${Math.random()*9}s;
-        opacity:0;
+        --dur:${7 + Math.random() * 9}s;
+        --delay:${Math.random() * 10}s;
       `;
-      container.appendChild(p);
+      particleContainer.appendChild(p);
     }
 
-    /* ── Custom cursor dot ── */
-    const dot = document.getElementById('cursorDot');
-    document.addEventListener('mousemove', e => {
-      dot.style.left = e.clientX + 'px';
-      dot.style.top  = e.clientY + 'px';
-    });
 
-    /* ── Eye tracking ── */
-    const pupilL = document.getElementById('pupilL');
-    const pupilR = document.getElementById('pupilR');
-    const svg    = document.getElementById('ghostSvg');
+    /* ── 3. CUSTOM DUAL-LAYER CURSOR ───────────────────── */
+    const cursorDot  = document.getElementById('cursorDot');
+    const cursorRing = document.getElementById('cursorRing');
+
+    // Ring follows cursor with slight lag
+    let ringX = 0, ringY = 0;
+    let mouseX = 0, mouseY = 0;
 
     document.addEventListener('mousemove', e => {
-      const rect = svg.getBoundingClientRect();
-      const cx = rect.left + rect.width  / 2;
-      const cy = rect.top  + rect.height / 2;
-      const angle = Math.atan2(e.clientY - cy, e.clientX - cx);
-      const dist  = Math.min(5, Math.hypot(e.clientX - cx, e.clientY - cy) / 40);
-      const dx = Math.cos(angle) * dist;
-      const dy = Math.sin(angle) * dist;
-      pupilL.style.transform = `translate(${dx}px,${dy}px)`;
-      pupilR.style.transform = `translate(${dx}px,${dy}px)`;
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+      // Dot moves instantly
+      cursorDot.style.left = mouseX + 'px';
+      cursorDot.style.top  = mouseY + 'px';
     });
 
-    /* ── Ghost wiggle on click ── */
-    const ghost = document.getElementById('ghostWrap');
-    ghost.addEventListener('click', () => {
-      ghost.classList.remove('wiggle');
-      void ghost.offsetWidth; // reflow
-      ghost.classList.add('wiggle');
-      ghost.addEventListener('animationend', () => ghost.classList.remove('wiggle'), { once: true });
+    // Smooth ring follow
+    (function animateRing() {
+      ringX += (mouseX - ringX) * 0.14;
+      ringY += (mouseY - ringY) * 0.14;
+      cursorRing.style.left = ringX + 'px';
+      cursorRing.style.top  = ringY + 'px';
+      requestAnimationFrame(animateRing);
+    })();
+
+    // Hover feedback on interactive elements
+    document.querySelectorAll('a, button, input').forEach(el => {
+      el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
+      el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
     });
 
-    /* ── Suggestion link hover sound (visual feedback handled by CSS) ── */
-    /* ── Touch: hide custom cursor on touch devices ── */
-    window.addEventListener('touchstart', () => { dot.style.display = 'none'; }, { once: true });
+    // Hide cursor on touch
+    window.addEventListener('touchstart', () => {
+      cursorDot.style.display  = 'none';
+      cursorRing.style.display = 'none';
+      document.body.style.cursor = 'auto';
+    }, { once: true });
+
+
+    /* ── 4. GHOST SYSTEM ───────────────────────────────── */
+    const ghostWrap = document.getElementById('ghostWrap');
+    const ghostSvg  = document.getElementById('ghostSvg');
+    const pupilL    = document.getElementById('pupilL');
+    const pupilR    = document.getElementById('pupilR');
+    const elidL     = document.getElementById('elidL');
+    const elidR     = document.getElementById('elidR');
+    const mouth     = document.getElementById('ghostMouth');
+    const blushL    = document.getElementById('blushL');
+    const blushR    = document.getElementById('blushR');
+
+    /* Ghost centre positions in SVG space */
+    const EYE_L  = { cx: 61, cy: 77 };
+    const EYE_R  = { cx: 105, cy: 77 };
+    const MAX_R  = 6; // max pupil travel radius
+
+    /* LERP helpers */
+    function lerp(a, b, t) { return a + (b - a) * t; }
+
+    /* Current LERP'd pupil positions */
+    let lerpLX = EYE_L.cx, lerpLY = EYE_L.cy;
+    let lerpRX = EYE_R.cx, lerpRY = EYE_R.cy;
+    /* Targets */
+    let targetLX = EYE_L.cx, targetLY = EYE_L.cy;
+    let targetRX = EYE_R.cx, targetRY = EYE_R.cy;
+
+    /* Idle jitter */
+    let idleTimer = null;
+    let isIdle = false;
+
+    function resetIdleTimer() {
+      isIdle = false;
+      clearTimeout(idleTimer);
+      idleTimer = setTimeout(() => { isIdle = true; }, 2500);
+    }
+    resetIdleTimer();
+    document.addEventListener('mousemove', resetIdleTimer);
+
+    /* Idle random wander */
+    function idleWander() {
+      if (isIdle) {
+        const angle = Math.random() * Math.PI * 2;
+        const dist  = Math.random() * MAX_R;
+        const dx = Math.cos(angle) * dist;
+        const dy = Math.sin(angle) * dist;
+        targetLX = EYE_L.cx + dx + (Math.random() - .5); // slight asymmetry
+        targetLY = EYE_L.cy + dy;
+        targetRX = EYE_R.cx + dx - (Math.random() - .5);
+        targetRY = EYE_R.cy + dy;
+      }
+      setTimeout(idleWander, 1500 + Math.random() * 2000);
+    }
+    idleWander();
+
+    /* Mouse → SVG pupil target */
+    document.addEventListener('mousemove', e => {
+      const rect  = ghostSvg.getBoundingClientRect();
+      // Map screen coords into SVG viewBox (160 × 180)
+      const svgX  = ((e.clientX - rect.left) / rect.width)  * 160;
+      const svgY  = ((e.clientY - rect.top)  / rect.height) * 180;
+
+      function computeTarget(eye) {
+        const angle = Math.atan2(svgY - eye.cy, svgX - eye.cx);
+        const dist  = Math.min(MAX_R, Math.hypot(svgX - eye.cx, svgY - eye.cy) / 10);
+        return {
+          x: eye.cx + Math.cos(angle) * dist,
+          y: eye.cy + Math.sin(angle) * dist
+        };
+      }
+
+      const tL = computeTarget(EYE_L);
+      const tR = computeTarget(EYE_R);
+      // Slight asymmetry: right eye lags a touch more
+      targetLX = tL.x;  targetLY = tL.y;
+      targetRX = tR.x + .4;  targetRY = tR.y;
+    });
+
+    /* Continuous pupil LERP loop */
+    (function animatePupils() {
+      lerpLX = lerp(lerpLX, targetLX, .08);
+      lerpLY = lerp(lerpLY, targetLY, .08);
+      lerpRX = lerp(lerpRX, targetRX, .06); // slightly lazier
+      lerpRY = lerp(lerpRY, targetRY, .06);
+
+      pupilL.setAttribute('cx', lerpLX.toFixed(2));
+      pupilL.setAttribute('cy', lerpLY.toFixed(2));
+      pupilR.setAttribute('cx', lerpRX.toFixed(2));
+      pupilR.setAttribute('cy', lerpRY.toFixed(2));
+
+      requestAnimationFrame(animatePupils);
+    })();
+
+
+    /* ── 4b. BLINK SYSTEM (randomised) ────────────────── */
+    function triggerBlink() {
+      // Animate left lid close/open
+      elidL.style.transform = 'scaleY(1)';
+      setTimeout(() => {
+        elidR.style.transform = 'scaleY(1)'; // right eye blinks slightly after
+      }, 55);
+      setTimeout(() => {
+        elidL.style.transform = 'scaleY(0)';
+        setTimeout(() => { elidR.style.transform = 'scaleY(0)'; }, 45);
+      }, 160);
+
+      // Random next blink interval 2–6s
+      setTimeout(triggerBlink, 2200 + Math.random() * 3800);
+    }
+    // Occasional double-blink
+    setTimeout(triggerBlink, 1800 + Math.random() * 2000);
+
+
+    /* ── 4c. EMOTION SYSTEM ────────────────────────────── */
+    /*
+     * Mouth SVG paths for each state.
+     * Format: "M62 103 Q<ctrl-x> <ctrl-y> 80 <end-y> Q<ctrl-x2> <ctrl-y2> 98 <end-y2>"
+     */
+    const EMOTIONS = {
+      // Slightly sad / confused (default)
+      default:   'M62 108 Q70 100 80 105 Q90 110 98 104',
+      // Happy / curious
+      hover:     'M62 103 Q70 116 80 114 Q90 112 98 104',
+      // Surprised
+      surprised: 'M68 104 Q80 118 92 104',
+      // Joyful after click
+      happy:     'M60 104 Q70 118 80 116 Q90 114 100 104',
+    };
+
+    function setEmotion(state) {
+      mouth.setAttribute('d', EMOTIONS[state] || EMOTIONS.default);
+      // Blush intensity
+      const blushOpacity = state === 'hover' || state === 'happy' ? '.5' : '.32';
+      blushL.setAttribute('opacity', blushOpacity);
+      blushR.setAttribute('opacity', blushOpacity);
+    }
+
+    setEmotion('default'); // init
+
+    ghostWrap.addEventListener('mouseenter', () => setEmotion('hover'));
+    ghostWrap.addEventListener('mouseleave', () => setEmotion('default'));
+    ghostWrap.addEventListener('click', () => {
+      setEmotion('surprised');
+      setTimeout(() => setEmotion('happy'), 350);
+      setTimeout(() => setEmotion('default'), 1800);
+
+      // Wiggle Easter Egg
+      ghostWrap.classList.remove('wiggle');
+      void ghostWrap.offsetWidth; // force reflow
+      ghostWrap.classList.add('wiggle');
+      ghostWrap.addEventListener('animationend', () => ghostWrap.classList.remove('wiggle'), { once: true });
+    });
+
+
+    /* ── 4d. TILT INTERACTION ──────────────────────────── */
+    let tiltX = 0, tiltY = 0;
+
+    document.addEventListener('mousemove', e => {
+      const cx = window.innerWidth  / 2;
+      const cy = window.innerHeight / 2;
+      // Max ±6deg tilt
+      tiltY = ((e.clientX - cx) / cx) * 6;
+      tiltX = -((e.clientY - cy) / cy) * 4;
+    });
+
+    let curTiltX = 0, curTiltY = 0;
+    (function animateTilt() {
+      curTiltX = lerp(curTiltX, tiltX, .05);
+      curTiltY = lerp(curTiltY, tiltY, .05);
+      ghostWrap.style.setProperty('--tilt-x', curTiltX.toFixed(2) + 'deg');
+      ghostWrap.style.setProperty('--tilt-y', curTiltY.toFixed(2) + 'deg');
+      requestAnimationFrame(animateTilt);
+    })();
+
+
+    /* ── 4e. GLOW REACTION (proximity) ────────────────── */
+    document.addEventListener('mousemove', e => {
+      const rect = ghostSvg.getBoundingClientRect();
+      const gx   = rect.left + rect.width  / 2;
+      const gy   = rect.top  + rect.height / 2;
+      const dist = Math.hypot(e.clientX - gx, e.clientY - gy);
+      const maxD = 280;
+      const intensity = Math.max(0, 1 - dist / maxD);
+      // Interpolate glow from default to strong
+      const alpha = .15 + intensity * .45;
+      ghostSvg.style.setProperty('--ghost-glow', `rgba(230,183,64,${alpha.toFixed(2)})`);
+    });
+
+
+    /* ── 5. 404 NUMBER SUBTLE PARALLAX ────────────────── */
+    const errNum = document.getElementById('errNumber');
+    document.addEventListener('mousemove', e => {
+      const px = (e.clientX / window.innerWidth  - .5) * 18;
+      const py = (e.clientY / window.innerHeight - .5) * 12;
+      errNum.style.transform = `translate(${px.toFixed(1)}px, ${py.toFixed(1)}px)`;
+    });
+
+
   </script>
-
 </body>
 </html>
