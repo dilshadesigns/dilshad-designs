@@ -284,6 +284,6 @@ And run backend separately on a different port.
 
 **Dilshad Designs**  
 📧 dilshadesign.co@gmail.com  
-📱 +91 11499 53616  
+📱 +91 87507 57595
 🌐 https://dilshadesigns.vercel.app
 🛒 https://www.fiverr.com/dilshadesigns
